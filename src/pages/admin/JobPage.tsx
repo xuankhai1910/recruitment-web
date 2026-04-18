@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Pencil, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
 import { formatSalary, formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { matchesNoAccent } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
 const SALARY_RANGES = [
@@ -28,6 +29,8 @@ const SALARY_RANGES = [
   { key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined },
 ] as const;
 
+const PAGE_SIZE = 10;
+
 export default function JobPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -36,16 +39,35 @@ export default function JobPage() {
   const [salaryKey, setSalaryKey] = useState("all");
 
   const salaryRange = SALARY_RANGES.find((r) => r.key === salaryKey);
+  const isSearching = search.trim().length > 0;
 
   const { data, isLoading } = useJobsByAdmin({
-    current: page,
-    pageSize: 10,
-    name: search ? `/${search}/i` : undefined,
+    current: isSearching ? 1 : page,
+    pageSize: isSearching ? 500 : PAGE_SIZE,
     level: levels.length > 0 ? levels.join(",") : undefined,
     "salary[$gte]": salaryRange?.min,
     "salary[$lte]": salaryRange?.max,
   });
   const deleteJob = useDeleteJob();
+
+  const filtered = useMemo(() => {
+    const all = data?.result ?? [];
+    if (!isSearching) return all;
+    return all.filter((j) => matchesNoAccent(j.name, search));
+  }, [data, search, isSearching]);
+
+  const displayData = isSearching
+    ? filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : (data?.result ?? []);
+
+  const displayMeta = isSearching
+    ? {
+        current: page,
+        pageSize: PAGE_SIZE,
+        pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+        total: filtered.length,
+      }
+    : data?.meta;
 
   const resetFilters = () => {
     setLevels([]);
@@ -135,8 +157,8 @@ export default function JobPage() {
         <h1 className="text-2xl font-bold tracking-tight">Quản lý công việc</h1>
         <DataTable
           columns={columns}
-          data={data?.result ?? []}
-          meta={data?.meta}
+          data={displayData}
+          meta={displayMeta}
           loading={isLoading}
           searchPlaceholder="Tìm kiếm theo tên..."
           searchValue={search}

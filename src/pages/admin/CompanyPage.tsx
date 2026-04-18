@@ -8,9 +8,11 @@ import { CompanyModal } from "@/components/admin/company/CompanyModal";
 import { useCompanies, useDeleteCompany } from "@/hooks/useCompanies";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/constants";
+import { matchesNoAccent } from "@/lib/vietnamese";
 import type { Company } from "@/types/company";
 
 const { COMPANIES } = ALL_PERMISSIONS;
+const PAGE_SIZE = 10;
 
 export default function CompanyPage() {
   const [page, setPage] = useState(1);
@@ -18,12 +20,32 @@ export default function CompanyPage() {
   const [openModal, setOpenModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
 
+  const isSearching = search.trim().length > 0;
+
   const { data, isLoading } = useCompanies({
-    current: page,
-    pageSize: 10,
+    current: isSearching ? 1 : page,
+    pageSize: isSearching ? 500 : PAGE_SIZE,
     sort: "-updatedAt",
-    name: search ? `/${search}/i` : undefined,
   });
+
+  const filtered = useMemo(() => {
+    const all = data?.result ?? [];
+    if (!isSearching) return all;
+    return all.filter((c) => matchesNoAccent(c.name, search));
+  }, [data, search, isSearching]);
+
+  const displayData = isSearching
+    ? filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : (data?.result ?? []);
+
+  const displayMeta = isSearching
+    ? {
+        current: page,
+        pageSize: PAGE_SIZE,
+        pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+        total: filtered.length,
+      }
+    : data?.meta;
 
   const { mutateAsync: deleteCompany } = useDeleteCompany();
 
@@ -88,8 +110,8 @@ export default function CompanyPage() {
 
       <DataTable<Company>
         columns={columns}
-        data={data?.result ?? []}
-        meta={data?.meta}
+        data={displayData}
+        meta={displayMeta}
         loading={isLoading}
         searchPlaceholder="Tìm theo tên công ty..."
         searchValue={search}

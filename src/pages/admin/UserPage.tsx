@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Eye, Pencil, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +10,11 @@ import { UserDetail } from "@/components/admin/user/UserDetail";
 import { useUsers, useDeleteUser } from "@/hooks/useUsers";
 import { rolesApi } from "@/api/roles.api";
 import { formatDateTime } from "@/lib/constants";
+import { matchesNoAccent } from "@/lib/vietnamese";
 import type { User } from "@/types/user";
 import type { Role } from "@/types/role";
+
+const PAGE_SIZE = 10;
 
 export default function UserPage() {
   const [page, setPage] = useState(1);
@@ -28,15 +31,37 @@ export default function UserPage() {
     });
   }, []);
 
+  const isSearching = search.trim().length > 0;
+
   const { data, isLoading } = useUsers({
-    current: page,
-    pageSize: 10,
+    current: isSearching ? 1 : page,
+    pageSize: isSearching ? 500 : PAGE_SIZE,
     sort: "-createdAt",
     populate: "role",
     fields: "role._id,role.name",
-    ...(search ? { email: `/${search}/i` } : {}),
     ...(roleIds.length > 0 ? { role: roleIds.join(",") } : {}),
   } as any);
+
+  const filtered = useMemo(() => {
+    const all = data?.result ?? [];
+    if (!isSearching) return all;
+    return all.filter(
+      (u) => matchesNoAccent(u.name, search) || matchesNoAccent(u.email, search),
+    );
+  }, [data, search, isSearching]);
+
+  const displayData = isSearching
+    ? filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : (data?.result ?? []);
+
+  const displayMeta = isSearching
+    ? {
+        current: page,
+        pageSize: PAGE_SIZE,
+        pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+        total: filtered.length,
+      }
+    : data?.meta;
 
   const deleteMutation = useDeleteUser();
 
@@ -131,10 +156,10 @@ export default function UserPage() {
 
       <DataTable
         columns={columns}
-        data={data?.result ?? []}
-        meta={data?.meta}
+        data={displayData}
+        meta={displayMeta}
         loading={isLoading}
-        searchPlaceholder="Tìm theo email..."
+        searchPlaceholder="Tìm theo tên hoặc email..."
         searchValue={search}
         onSearchChange={(v) => {
           setSearch(v);

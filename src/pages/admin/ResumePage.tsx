@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { Eye, FileDown, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useResumes, useDeleteResume } from "@/hooks/useResumes";
 import { formatDateTime, STATUS_LIST } from "@/lib/constants";
+import { matchesNoAccent } from "@/lib/vietnamese";
 import { ResumeDetail } from "@/components/admin/resume/ResumeDetail";
 import { usersApi } from "@/api/users.api";
 import type { Resume } from "@/types/resume";
@@ -26,6 +27,28 @@ export default function ResumePage() {
   const [statuses, setStatuses] = useState<string[]>([]);
   const [search, setSearch] = useState("");
 
+  const isSearching = search.trim().length > 0;
+
+  // Fetch users once for name search → map to userIds
+  const { data: usersData } = useQuery({
+    queryKey: ["users", "all-for-resume-search"],
+    queryFn: () =>
+      usersApi.getList({ current: 1, pageSize: 500 }).then((r) => r.data.data),
+    staleTime: 5 * 60 * 1000,
+    enabled: isSearching,
+  });
+
+  const matchedUserIds = useMemo(() => {
+    if (!isSearching) return [] as string[];
+    return (usersData?.result ?? [])
+      .filter(
+        (u) => matchesNoAccent(u.name, search) || matchesNoAccent(u.email, search),
+      )
+      .map((u) => u._id);
+  }, [usersData, search, isSearching]);
+
+  const shouldSkipResumes = isSearching && matchedUserIds.length === 0;
+
   const { data, isLoading } = useResumes({
     current: page,
     pageSize: 10,
@@ -34,13 +57,19 @@ export default function ResumePage() {
     fields:
       "companyId._id,companyId.name,companyId.logo,jobId._id,jobId.name,userId._id,userId.name,userId.email",
     status: statuses.length > 0 ? statuses.join(",") : undefined,
-    // Resume doc has `email` — search candidate by email
-    ...(search ? { email: `/${search}/i` } : {}),
+    ...(isSearching && matchedUserIds.length > 0
+      ? { userId: matchedUserIds.join(",") }
+      : {}),
   } as Record<string, unknown>);
   const deleteResume = useDeleteResume();
 
   const [selected, setSelected] = useState<Resume | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const displayData = shouldSkipResumes ? [] : (data?.result ?? []);
+  const displayMeta = shouldSkipResumes
+    ? { current: 1, pageSize: 10, pages: 0, total: 0 }
+    : data?.meta;
 
   // Collect unique userIds to fetch user info (backend can't populate userId)
   const userIds = useMemo(() => {
@@ -188,10 +217,10 @@ export default function ResumePage() {
         <h1 className="text-2xl font-bold tracking-tight">Quản lý hồ sơ</h1>
         <DataTable
           columns={columns}
-          data={data?.result ?? []}
-          meta={data?.meta}
+          data={displayData}
+          meta={displayMeta}
           loading={isLoading}
-          searchPlaceholder="Tìm theo email ứng viên..."
+          searchPlaceholder="Tìm theo tên ứng viên..."
           searchValue={search}
           onSearchChange={(v) => {
             setSearch(v);

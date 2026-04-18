@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, Pencil, Eye, RotateCcw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -11,11 +11,13 @@ import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS, ALL_MODULES } from "@/lib/permissions";
 import { permissionsApi } from "@/api/permissions.api";
 import { formatDateTime, colorMethodBg } from "@/lib/constants";
+import { matchesNoAccent } from "@/lib/vietnamese";
 import { PermissionModal } from "@/components/admin/permission/PermissionModal";
 import { PermissionDetail } from "@/components/admin/permission/PermissionDetail";
 import type { Permission } from "@/types/permission";
 
 const METHOD_LIST = ["GET", "POST", "PATCH", "PUT", "DELETE"] as const;
+const PAGE_SIZE = 10;
 
 export default function PermissionPage() {
   const qc = useQueryClient();
@@ -24,20 +26,40 @@ export default function PermissionPage() {
   const [methods, setMethods] = useState<string[]>([]);
   const [modules, setModules] = useState<string[]>([]);
 
+  const isSearching = search.trim().length > 0;
+
   const { data, isLoading } = useQuery({
-    queryKey: ["permissions", page, search, methods, modules],
+    queryKey: ["permissions", page, isSearching, methods, modules],
     queryFn: () =>
       permissionsApi
         .getList({
-          current: page,
-          pageSize: 10,
-          ...(search ? { name: `/${search}/i` } as Record<string, unknown> : {}),
+          current: isSearching ? 1 : page,
+          pageSize: isSearching ? 500 : PAGE_SIZE,
           ...(methods.length > 0 ? { method: methods.join(",") } : {}),
           ...(modules.length > 0 ? { module: modules.join(",") } : {}),
         } as Record<string, unknown>)
         .then((r) => r.data.data),
     placeholderData: (prev) => prev,
   });
+
+  const filtered = useMemo(() => {
+    const all = data?.result ?? [];
+    if (!isSearching) return all;
+    return all.filter((p) => matchesNoAccent(p.name, search));
+  }, [data, search, isSearching]);
+
+  const displayData = isSearching
+    ? filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+    : (data?.result ?? []);
+
+  const displayMeta = isSearching
+    ? {
+        current: page,
+        pageSize: PAGE_SIZE,
+        pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+        total: filtered.length,
+      }
+    : data?.meta;
 
   const hasFilter = methods.length > 0 || modules.length > 0;
   const resetFilters = () => {
@@ -138,8 +160,8 @@ export default function PermissionPage() {
         <h1 className="text-2xl font-bold tracking-tight">Quản lý quyền hạn</h1>
         <DataTable
           columns={columns}
-          data={data?.result ?? []}
-          meta={data?.meta}
+          data={displayData}
+          meta={displayMeta}
           loading={isLoading}
           searchPlaceholder="Tìm kiếm theo tên..."
           searchValue={search}
