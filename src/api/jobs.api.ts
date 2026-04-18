@@ -14,6 +14,7 @@ export interface JobQueryParams extends PaginationParams {
   level?: string;
   skills?: string;
   isActive?: boolean;
+  "company._id"?: string;
 }
 
 export const jobsApi = {

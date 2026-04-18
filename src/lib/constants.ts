@@ -19,6 +19,15 @@ export const LEVEL_LIST = [
   "SENIOR",
 ] as const;
 
+export const SALARY_RANGES = [
+  { key: "all", label: "Tất cả", min: undefined, max: undefined },
+  { key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000 },
+  { key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000 },
+  { key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000 },
+  { key: "30-50", label: "30 - 50 triệu", min: 30_000_000, max: 50_000_000 },
+  { key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined },
+] as const;
+
 export const STATUS_LIST = [
   "PENDING",
   "REVIEWING",
