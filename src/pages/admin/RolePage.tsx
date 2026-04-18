@@ -38,11 +38,13 @@ export default function RolePage() {
     {
       key: "name",
       label: "Tên vai trò",
-      render: (row) => <span className="font-medium">{row.name}</span>,
+      className: "w-[40%]",
+      render: (row) => <span className="font-medium truncate block">{row.name}</span>,
     },
     {
       key: "status",
       label: "Trạng thái",
+      className: "w-[18%]",
       render: (row) => (
         <Badge
           variant="outline"
@@ -59,12 +61,13 @@ export default function RolePage() {
     {
       key: "createdAt",
       label: "Ngày tạo",
+      className: "w-[24%]",
       render: (row) => formatDateTime(row.createdAt),
     },
     {
       key: "actions",
       label: "Thao tác",
-      className: "w-[100px]",
+      className: "w-[18%] text-center",
       render: (row) => (
         <div className="flex items-center gap-1">
           <Access permission={ALL_PERMISSIONS.ROLES.UPDATE} hideChildren>

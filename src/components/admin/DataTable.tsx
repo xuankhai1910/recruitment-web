@@ -30,6 +30,7 @@ interface DataTableProps<T> {
   onSearchChange?: (value: string) => void;
   onPageChange?: (page: number) => void;
   toolbar?: ReactNode;
+  filters?: ReactNode;
   rowKey: (row: T) => string;
 }
 
@@ -43,6 +44,7 @@ export function DataTable<T>({
   onSearchChange,
   onPageChange,
   toolbar,
+  filters,
   rowKey,
 }: DataTableProps<T>) {
   return (
@@ -65,9 +67,16 @@ export function DataTable<T>({
         {toolbar && <div className="flex items-center gap-2">{toolbar}</div>}
       </div>
 
+      {/* Filters row */}
+      {filters && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border/60 bg-muted/30 p-3">
+          {filters}
+        </div>
+      )}
+
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-border/60">
-        <Table>
+        <Table className="table-fixed min-w-[900px]">
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
               {columns.map((col) => (

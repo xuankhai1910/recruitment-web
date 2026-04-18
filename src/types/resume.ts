@@ -8,7 +8,7 @@ export interface Resume {
   _id: string;
   url: string;
   email: string;
-  userId: string;
+  userId: string | { _id: string; name: string; email?: string };
   status: 'PENDING' | 'REVIEWING' | 'APPROVED' | 'REJECTED';
   companyId: string | { _id: string; name: string };
   jobId: string | { _id: string; name: string };

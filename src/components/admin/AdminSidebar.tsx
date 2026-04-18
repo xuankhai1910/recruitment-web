@@ -102,6 +102,12 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <Separator />
 
+      {/* DEBUG: show user state — remove after verification */}
+      <div className="mx-3 my-2 rounded-md bg-muted/50 p-2 text-xs">
+        <div><strong>Role:</strong> {user?.role.name ?? "—"}</div>
+        <div><strong>Company:</strong> {user?.company?.name ?? "❌ NULL"}</div>
+      </div>
+
       {/* User */}
       <div className="p-3">
         <DropdownMenu>

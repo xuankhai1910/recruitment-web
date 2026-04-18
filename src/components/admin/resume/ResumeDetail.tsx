@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileDown } from "lucide-react";
 import { useUpdateResumeStatus } from "@/hooks/useResumes";
 import { STATUS_LIST, formatDateTime } from "@/lib/constants";
 import type { Resume, UpdateResumeStatusDto } from "@/types/resume";
@@ -85,6 +85,21 @@ export function ResumeDetail({
             label="Ngày nộp"
             value={formatDateTime(resume.createdAt)}
           />
+          <InfoItem label="CV">
+            {resume.url ? (
+              <a
+                href={`${import.meta.env.VITE_STATIC_URL}/images/resume/${resume.url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-primary transition-colors duration-150 hover:text-primary/80"
+              >
+                <FileDown className="h-4 w-4" />
+                <span>Tải CV</span>
+              </a>
+            ) : (
+              "—"
+            )}
+          </InfoItem>
         </div>
 
         <Separator />

@@ -4,6 +4,7 @@ import type { Resume, CreateResumeDto, UpdateResumeStatusDto } from '@/types/res
 
 export interface ResumeQueryParams extends PaginationParams {
   status?: string;
+  email?: string;
   populate?: string;
   fields?: string;
 }

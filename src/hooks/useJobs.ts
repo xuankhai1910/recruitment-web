@@ -11,6 +11,15 @@ export function useJobs(params: JobQueryParams) {
   });
 }
 
+// Admin variant — auto filter by user's company (HR) or return all (SUPER_ADMIN)
+export function useJobsByAdmin(params: JobQueryParams) {
+  return useQuery({
+    queryKey: ['jobs-admin', params],
+    queryFn: () => jobsApi.getListByAdmin(params).then((r) => r.data.data),
+    placeholderData: (prev) => prev,
+  });
+}
+
 export function useJob(id: string) {
   return useQuery({
     queryKey: ['jobs', id],

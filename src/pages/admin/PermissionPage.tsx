@@ -1,32 +1,50 @@
 import { useState } from "react";
-import { Plus, Pencil, Eye } from "lucide-react";
+import { Plus, Pencil, Eye, RotateCcw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { Access } from "@/components/guards/Access";
-import { ALL_PERMISSIONS } from "@/lib/permissions";
+import { ALL_PERMISSIONS, ALL_MODULES } from "@/lib/permissions";
 import { permissionsApi } from "@/api/permissions.api";
 import { formatDateTime, colorMethodBg } from "@/lib/constants";
 import { PermissionModal } from "@/components/admin/permission/PermissionModal";
 import { PermissionDetail } from "@/components/admin/permission/PermissionDetail";
 import type { Permission } from "@/types/permission";
 
+const METHOD_LIST = ["GET", "POST", "PATCH", "PUT", "DELETE"] as const;
+
 export default function PermissionPage() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [methods, setMethods] = useState<string[]>([]);
+  const [modules, setModules] = useState<string[]>([]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["permissions", page, search],
+    queryKey: ["permissions", page, search, methods, modules],
     queryFn: () =>
       permissionsApi
-        .getList({ current: page, pageSize: 10, ...(search ? { name: `/${search}/i` } as Record<string, unknown> : {}) })
+        .getList({
+          current: page,
+          pageSize: 10,
+          ...(search ? { name: `/${search}/i` } as Record<string, unknown> : {}),
+          ...(methods.length > 0 ? { method: methods.join(",") } : {}),
+          ...(modules.length > 0 ? { module: modules.join(",") } : {}),
+        } as Record<string, unknown>)
         .then((r) => r.data.data),
     placeholderData: (prev) => prev,
   });
+
+  const hasFilter = methods.length > 0 || modules.length > 0;
+  const resetFilters = () => {
+    setMethods([]);
+    setModules([]);
+    setPage(1);
+  };
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => permissionsApi.delete(id),
@@ -45,16 +63,19 @@ export default function PermissionPage() {
     {
       key: "name",
       label: "Tên",
-      render: (row) => <span className="font-medium">{row.name}</span>,
+      className: "w-[22%]",
+      render: (row) => <span className="font-medium truncate block">{row.name}</span>,
     },
     {
       key: "apiPath",
       label: "API Path",
-      render: (row) => <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{row.apiPath}</code>,
+      className: "w-[28%]",
+      render: (row) => <code className="text-xs bg-muted px-1.5 py-0.5 rounded truncate block">{row.apiPath}</code>,
     },
     {
       key: "method",
       label: "Method",
+      className: "w-[10%]",
       render: (row) => (
         <Badge variant="outline" className={`font-mono text-xs ${colorMethodBg(row.method)}`}>
           {row.method}
@@ -64,17 +85,19 @@ export default function PermissionPage() {
     {
       key: "module",
       label: "Module",
-      render: (row) => row.module,
+      className: "w-[13%]",
+      render: (row) => <Badge variant="secondary" className="font-normal">{row.module}</Badge>,
     },
     {
       key: "createdAt",
       label: "Ngày tạo",
+      className: "w-[15%]",
       render: (row) => formatDateTime(row.createdAt),
     },
     {
       key: "actions",
       label: "Thao tác",
-      className: "w-[130px]",
+      className: "w-[12%] text-center",
       render: (row) => (
         <div className="flex items-center gap-1">
           <Button
@@ -123,6 +146,33 @@ export default function PermissionPage() {
           onSearchChange={(v) => { setSearch(v); setPage(1); }}
           onPageChange={setPage}
           rowKey={(row) => row._id}
+          filters={
+            <>
+              <MultiSelectFilter
+                label="Method"
+                options={METHOD_LIST}
+                value={methods}
+                onChange={(v) => { setMethods(v); setPage(1); }}
+              />
+              <MultiSelectFilter
+                label="Module"
+                options={ALL_MODULES}
+                value={modules}
+                onChange={(v) => { setModules(v); setPage(1); }}
+              />
+              {hasFilter && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 cursor-pointer text-muted-foreground hover:text-foreground"
+                  onClick={resetFilters}
+                >
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                  Đặt lại
+                </Button>
+              )}
+            </>
+          }
           toolbar={
             <Access permission={ALL_PERMISSIONS.PERMISSIONS.CREATE} hideChildren>
               <Button

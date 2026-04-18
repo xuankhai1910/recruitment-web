@@ -32,29 +32,31 @@ export default function CompanyPage() {
       {
         key: "stt",
         label: "STT",
-        className: "w-16 text-center",
+        className: "w-[6%] text-center",
         render: (_row, index) => (page - 1) * 10 + index + 1,
       },
       {
         key: "name",
         label: "Tên công ty",
-        render: (row) => <span className="font-medium">{row.name}</span>,
+        className: "w-[30%]",
+        render: (row) => <span className="font-medium truncate block">{row.name}</span>,
       },
       {
         key: "address",
         label: "Địa chỉ",
-        render: (row) => row.address,
+        className: "w-[34%]",
+        render: (row) => <span className="truncate block">{row.address}</span>,
       },
       {
         key: "createdAt",
         label: "Ngày tạo",
-        className: "w-44",
+        className: "w-[18%]",
         render: (row) => formatDateTime(row.createdAt),
       },
       {
         key: "actions",
         label: "Thao tác",
-        className: "w-28 text-center",
+        className: "w-[12%] text-center",
         render: (row) => (
           <div className="flex items-center justify-center gap-1">
             <Access permission={COMPANIES.UPDATE} hideChildren>
