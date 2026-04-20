@@ -1,14 +1,14 @@
 export const SKILLS_LIST = [
-  "React.JS",
-  "React Native",
-  "Vue.JS",
-  "Angular",
-  "Nest.JS",
-  "TypeScript",
-  "Java",
-  "Frontend",
-  "Backend",
-  "Fullstack",
+  "REACT.JS",
+  "REACT NATIVE",
+  "VUE.JS",
+  "ANGULAR",
+  "NEST.JS",
+  "TYPESCRIPT",
+  "JAVA",
+  "FRONTEND",
+  "BACKEND",
+  "FULLSTACK",
 ] as const;
 
 export const LEVEL_LIST = [
