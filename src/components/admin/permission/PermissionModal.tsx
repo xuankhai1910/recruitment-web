@@ -5,6 +5,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -89,6 +90,13 @@ export function PermissionModal({
 			toast.success("Tạo permission thành công");
 			onOpenChange(false);
 		},
+		onError: (error) => {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Tạo permission thất bại";
+			toast.error(msg);
+		},
 	});
 
 	const updateMutation = useMutation({
@@ -98,6 +106,13 @@ export function PermissionModal({
 			qc.invalidateQueries({ queryKey: ["permissions"] });
 			toast.success("Cập nhật thành công");
 			onOpenChange(false);
+		},
+		onError: (error) => {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Cập nhật permission thất bại";
+			toast.error(msg);
 		},
 	});
 

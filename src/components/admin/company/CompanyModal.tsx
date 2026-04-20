@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import {
 	Dialog,
 	DialogContent,
@@ -29,7 +31,7 @@ const companySchema = z.object({
 	name: z.string().min(1, "Tên công ty không được để trống"),
 	address: z.string().min(1, "Địa chỉ không được để trống"),
 	logo: z.string().min(1, "Vui lòng upload logo"),
-	description: z.string(),
+	description: z.string().min(1, "Mô tả không được để trống"),
 });
 
 type CompanyFormValues = z.infer<typeof companySchema>;
@@ -103,8 +105,12 @@ export function CompanyModal({
 				await createCompany.mutateAsync(values);
 			}
 			onOpenChange(false);
-		} catch {
-			// error toasts handled by mutation hooks
+		} catch (error) {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Đã xảy ra lỗi, vui lòng thử lại";
+			toast.error(msg);
 		}
 	};
 
@@ -119,7 +125,7 @@ export function CompanyModal({
 			<DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
 				<DialogHeader>
 					<DialogTitle>
-						{isEdit ? "Cập nhật Company" : "Tạo mới Company"}
+						{isEdit ? "Cập nhật công ty" : "Tạo mới công ty"}
 					</DialogTitle>
 				</DialogHeader>
 

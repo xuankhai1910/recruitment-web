@@ -2,6 +2,8 @@ import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,8 +41,8 @@ const jobSchema = z.object({
 	name: z.string().min(1, "Tên công việc không được để trống"),
 	skills: z.array(z.string()).min(1, "Chọn ít nhất 1 kỹ năng"),
 	location: z.string().min(1, "Vui lòng chọn địa điểm"),
-	salary: z.coerce.number().min(0, "Mức lương phải >= 0"),
-	quantity: z.coerce.number().min(1, "Số lượng phải >= 1"),
+	salary: z.number().min(0, "Mức lương phải >= 0"),
+	quantity: z.number().min(1, "Số lượng phải >= 1"),
 	level: z.string().min(1, "Vui lòng chọn level"),
 	companyId: z.string().min(1, "Vui lòng chọn công ty"),
 	startDate: z.string().min(1, "Vui lòng chọn ngày bắt đầu"),
@@ -143,8 +145,12 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 				await createJob.mutateAsync(payload);
 			}
 			onOpenChange(false);
-		} catch {
-			// error toasts handled by mutation hooks
+		} catch (error) {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Đã xảy ra lỗi, vui lòng thử lại";
+			toast.error(msg);
 		}
 	};
 
@@ -192,26 +198,30 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									</FormLabel>
 									<div className="flex flex-wrap gap-3">
 										{SKILLS_LIST.map((skill) => (
-											<button
-												type="button"
+											<div
 												key={skill}
-												className="flex items-center gap-1.5 text-sm cursor-pointer select-none"
-												onClick={() => {
-													if (field.value.includes(skill)) {
-														field.onChange(
-															field.value.filter((s: string) => s !== skill),
-														);
-													} else {
-														field.onChange([...field.value, skill]);
-													}
-												}}
+												className="flex items-center gap-1.5 text-sm"
 											>
 												<Checkbox
+													id={`skill-${skill}`}
 													checked={field.value.includes(skill)}
-													tabIndex={-1}
+													onCheckedChange={(checked) => {
+														if (checked) {
+															field.onChange([...field.value, skill]);
+														} else {
+															field.onChange(
+																field.value.filter((s: string) => s !== skill),
+															);
+														}
+													}}
 												/>
-												{skill}
-											</button>
+												<label
+													htmlFor={`skill-${skill}`}
+													className="cursor-pointer select-none"
+												>
+													{skill}
+												</label>
+											</div>
 										))}
 									</div>
 									<FormMessage />
@@ -294,7 +304,12 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									<FormItem>
 										<FormLabel>Mức lương (VNĐ)</FormLabel>
 										<FormControl>
-											<Input type="number" min={0} {...field} />
+											<Input
+												type="number"
+												min={0}
+												{...field}
+												onChange={(e) => field.onChange(e.target.valueAsNumber)}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -307,7 +322,12 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									<FormItem>
 										<FormLabel>Số lượng</FormLabel>
 										<FormControl>
-											<Input type="number" min={1} {...field} />
+											<Input
+												type="number"
+												min={1}
+												{...field}
+												onChange={(e) => field.onChange(e.target.valueAsNumber)}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
@@ -387,16 +407,19 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							name="isActive"
 							render={({ field }) => (
 								<FormItem>
-									<button
-										type="button"
-										className="flex items-center gap-2 cursor-pointer select-none"
-										onClick={() => {
-											field.onChange(!field.value);
-										}}
-									>
-										<Checkbox checked={field.value} tabIndex={-1} />
-										<span className="text-sm">Đang tuyển (Active)</span>
-									</button>
+									<div className="flex items-center gap-2">
+										<Checkbox
+											id="job-isActive"
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
+										<label
+											htmlFor="job-isActive"
+											className="text-sm cursor-pointer select-none"
+										>
+											Đang tuyển (Active)
+										</label>
+									</div>
 								</FormItem>
 							)}
 						/>

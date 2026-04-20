@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { isAxiosError } from "axios";
 import { Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ import type { CreateRoleDto } from "@/types/role";
 
 const roleSchema = z.object({
 	name: z.string().min(1, "Tên vai trò không được để trống"),
-	description: z.string(),
+	description: z.string().min(1, "Mô tả không được để trống"),
 	isActive: z.boolean(),
 	permissions: z.array(z.string()).min(1, "Vui lòng chọn ít nhất 1 quyền"),
 });
@@ -162,6 +163,13 @@ export function RoleModal({ open, onOpenChange, roleId }: RoleModalProps) {
 			toast.success("Tạo vai trò thành công");
 			onOpenChange(false);
 		},
+		onError: (error) => {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Tạo vai trò thất bại";
+			toast.error(msg);
+		},
 	});
 
 	const updateMutation = useMutation({
@@ -171,6 +179,13 @@ export function RoleModal({ open, onOpenChange, roleId }: RoleModalProps) {
 			qc.invalidateQueries({ queryKey: ["roles"] });
 			toast.success("Cập nhật thành công");
 			onOpenChange(false);
+		},
+		onError: (error) => {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Cập nhật vai trò thất bại";
+			toast.error(msg);
 		},
 	});
 
@@ -318,21 +333,23 @@ export function RoleModal({ open, onOpenChange, roleId }: RoleModalProps) {
 														{!isCollapsed && (
 															<div className="divide-y divide-border/40">
 																{perms.map((perm) => (
-																	<button
-																		type="button"
+																	<div
 																		key={perm._id}
-																		className="flex w-full items-center gap-3 px-4 py-2 cursor-pointer hover:bg-accent/30 transition-colors duration-150"
-																		onClick={() => {
-																			togglePermission(perm._id);
-																		}}
+																		className="flex w-full items-center gap-3 px-4 py-2 hover:bg-accent/30 transition-colors duration-150"
 																	>
 																		<Checkbox
+																			id={`perm-${perm._id}`}
 																			checked={checkedIds.has(perm._id)}
-																			tabIndex={-1}
+																			onCheckedChange={() => {
+																				togglePermission(perm._id);
+																			}}
 																		/>
-																		<span className="text-sm flex-1 text-left">
+																		<label
+																			htmlFor={`perm-${perm._id}`}
+																			className="text-sm flex-1 text-left cursor-pointer"
+																		>
 																			{perm.name}
-																		</span>
+																		</label>
 																		<Badge
 																			variant="outline"
 																			className={`font-mono text-[10px] ${colorMethodBg(perm.method)}`}
@@ -342,7 +359,7 @@ export function RoleModal({ open, onOpenChange, roleId }: RoleModalProps) {
 																		<code className="text-[11px] text-muted-foreground">
 																			{perm.apiPath}
 																		</code>
-																	</button>
+																	</div>
 																))}
 															</div>
 														)}

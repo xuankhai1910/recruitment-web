@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 import {
 	Dialog,
 	DialogContent,
@@ -41,7 +43,7 @@ const userCreateSchema = z.object({
 		.min(6, "Mật khẩu ít nhất 6 ký tự")
 		.max(15, "Mật khẩu tối đa 15 ký tự"),
 	name: z.string().min(1, "Tên không được để trống"),
-	age: z.coerce.number().min(1, "Tuổi phải >= 1").max(100, "Tuổi phải <= 100"),
+	age: z.number().min(1, "Tuổi phải >= 1").max(100, "Tuổi phải <= 100"),
 	gender: z.string().min(1, "Vui lòng chọn giới tính"),
 	roleId: z.string().min(1, "Vui lòng chọn vai trò"),
 	companyId: z.string(),
@@ -52,7 +54,7 @@ const userEditSchema = z.object({
 	email: z.string().email("Email không hợp lệ"),
 	password: z.string(),
 	name: z.string().min(1, "Tên không được để trống"),
-	age: z.coerce.number().min(1, "Tuổi phải >= 1").max(100, "Tuổi phải <= 100"),
+	age: z.number().min(1, "Tuổi phải >= 1").max(100, "Tuổi phải <= 100"),
 	gender: z.string().min(1, "Vui lòng chọn giới tính"),
 	roleId: z.string().min(1, "Vui lòng chọn vai trò"),
 	companyId: z.string(),
@@ -164,8 +166,12 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 				});
 			}
 			onOpenChange(false);
-		} catch {
-			// toasts handled by hooks
+		} catch (error) {
+			const msg =
+				isAxiosError(error) && error.response?.data?.message
+					? error.response.data.message
+					: "Đã xảy ra lỗi, vui lòng thử lại";
+			toast.error(msg);
 		}
 	};
 
@@ -258,7 +264,13 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 											Tuổi <span className="text-destructive">*</span>
 										</FormLabel>
 										<FormControl>
-											<Input type="number" min={1} max={100} {...field} />
+											<Input
+												type="number"
+												min={1}
+												max={100}
+												{...field}
+												onChange={(e) => field.onChange(e.target.valueAsNumber)}
+											/>
 										</FormControl>
 										<FormMessage />
 									</FormItem>
