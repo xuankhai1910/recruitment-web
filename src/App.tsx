@@ -19,60 +19,58 @@ import DashboardPage from "@/pages/admin/DashboardPage";
 import CompanyPage from "@/pages/admin/CompanyPage";
 import UserPage from "@/pages/admin/UserPage";
 import JobPage from "@/pages/admin/JobPage";
-import JobUpsert from "@/components/admin/job/JobUpsert";
 import ResumePage from "@/pages/admin/ResumePage";
 import PermissionPage from "@/pages/admin/PermissionPage";
 import RolePage from "@/pages/admin/RolePage";
 
 export default function App() {
-  const { setAuth, clearAuth } = useAuthStore();
+	const { setAuth, clearAuth } = useAuthStore();
 
-  useEffect(() => {
-    authApi
-      .refreshToken()
-      .then(({ data }) => {
-        const { access_token, user } = data.data;
-        setAuth(user, access_token);
-      })
-      .catch(() => {
-        clearAuth();
-      });
-  }, [setAuth, clearAuth]);
+	useEffect(() => {
+		authApi
+			.refreshToken()
+			.then(({ data }) => {
+				const { access_token, user } = data.data;
+				setAuth(user, access_token);
+			})
+			.catch(() => {
+				clearAuth();
+			});
+	}, [setAuth, clearAuth]);
 
-  return (
-    <Routes>
-      {/* Auth */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
+	return (
+		<Routes>
+			{/* Auth */}
+			<Route element={<AuthLayout />}>
+				<Route path="/login" element={<LoginPage />} />
+				<Route path="/register" element={<RegisterPage />} />
+			</Route>
 
-      {/* Public */}
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/jobs/:id" element={<JobDetailPage />} />
-        <Route path="/companies" element={<CompaniesPage />} />
-        <Route path="/companies/:id" element={<CompanyDetailPage />} />
-      </Route>
+			{/* Public */}
+			<Route element={<MainLayout />}>
+				<Route path="/" element={<HomePage />} />
+				<Route path="/jobs" element={<JobsPage />} />
+				<Route path="/jobs/:id" element={<JobDetailPage />} />
+				<Route path="/companies" element={<CompaniesPage />} />
+				<Route path="/companies/:id" element={<CompanyDetailPage />} />
+			</Route>
 
-      {/* Admin (protected) */}
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<DashboardPage />} />
-          <Route path="/admin/company" element={<CompanyPage />} />
-          <Route path="/admin/user" element={<UserPage />} />
-          <Route path="/admin/job" element={<JobPage />} />
-          <Route path="/admin/job/upsert" element={<JobUpsert />} />
-          <Route path="/admin/resume" element={<ResumePage />} />
-          <Route path="/admin/permission" element={<PermissionPage />} />
-          <Route path="/admin/role" element={<RolePage />} />
-        </Route>
-      </Route>
+			{/* Admin (protected) */}
+			<Route element={<ProtectedRoute />}>
+				<Route element={<AdminLayout />}>
+					<Route path="/admin" element={<DashboardPage />} />
+					<Route path="/admin/company" element={<CompanyPage />} />
+					<Route path="/admin/user" element={<UserPage />} />
+					<Route path="/admin/job" element={<JobPage />} />
+					<Route path="/admin/resume" element={<ResumePage />} />
+					<Route path="/admin/permission" element={<PermissionPage />} />
+					<Route path="/admin/role" element={<RolePage />} />
+				</Route>
+			</Route>
 
-      {/* Error pages */}
-      <Route path="/403" element={<ForbiddenPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  );
+			{/* Error pages */}
+			<Route path="/403" element={<ForbiddenPage />} />
+			<Route path="*" element={<NotFoundPage />} />
+		</Routes>
+	);
 }
