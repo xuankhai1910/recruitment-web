@@ -25,7 +25,7 @@ interface ApplyModalProps {
   job: Job;
 }
 
-const MAX_SIZE = 1024 * 1024; // 1MB
+const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPT = {
   "application/pdf": [".pdf"],
   "application/msword": [".doc"],
@@ -42,7 +42,7 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
 
   const onDrop = useCallback((accepted: File[], rejected: unknown[]) => {
     if (rejected.length > 0) {
-      toast.error("File không hợp lệ. Chỉ nhận PDF/DOC/DOCX, tối đa 1MB.");
+      toast.error("File không hợp lệ. Chỉ nhận PDF/DOC/DOCX, tối đa 5MB.");
       return;
     }
     if (accepted[0]) setFile(accepted[0]);
@@ -88,15 +88,15 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="font-heading">Ứng tuyển</DialogTitle>
-          <DialogDescription>
+        <DialogHeader className="min-w-0">
+          <DialogTitle className="font-heading">Ứng tuyển công việc</DialogTitle>
+          <DialogDescription className="wrap-break-word">
             <span className="font-medium text-foreground">{job.name}</span>
             <span className="text-muted-foreground"> · {job.company.name}</span>
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="apply-email">Email</Label>
             <Input
@@ -115,7 +115,7 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">
+                  <p className="truncate text-sm font-medium text-foreground" title={file.name}>
                     {file.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -151,7 +151,7 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
                     Kéo thả CV vào đây hoặc bấm để chọn
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    PDF, DOC, DOCX · tối đa 1MB
+                    PDF, DOC, DOCX · tối đa 5MB
                   </p>
                 </div>
               </div>
