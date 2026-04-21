@@ -18,10 +18,23 @@ export function nonAccentVietnamese(str: string): string {
   return str;
 }
 
-export function matchesNoAccent(text: string | undefined | null, search: string): boolean {
+export function matchesNoAccent(
+  text: string | undefined | null,
+  search: string,
+): boolean {
   if (!search) return true;
   if (!text) return false;
-  return nonAccentVietnamese(text).toLowerCase().includes(
-    nonAccentVietnamese(search).toLowerCase(),
-  );
+  return nonAccentVietnamese(text)
+    .toLowerCase()
+    .includes(nonAccentVietnamese(search).toLowerCase());
+}
+
+/** Converts a search string to a MongoDB-compatible regex string for aqp (e.g. "/nguyen/i").
+ *  Returns undefined when search is empty so the filter param is omitted from the API call.
+ */
+export function toSearchRegex(search: string): string | undefined {
+  const trimmed = search.trim();
+  if (!trimmed) return undefined;
+  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return `/${escaped}/i`;
 }

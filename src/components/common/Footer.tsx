@@ -17,16 +17,7 @@ export function Footer() {
               Job<span className="text-primary">Finder</span>
             </span>
           </Link>
-          <div className="flex gap-6">
-            {["Việc làm", "Công ty", "Liên hệ"].map((item) => (
-              <span
-                key={item}
-                className="cursor-pointer text-sm text-muted-foreground transition-colors duration-200 hover:text-primary"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
+          
           <p className="text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} JobFinder
           </p>

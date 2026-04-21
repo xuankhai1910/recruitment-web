@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Plus, Pencil, RotateCcw } from "lucide-react";
+import { useState } from "react";
+import { Plus, Pencil, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,7 +17,7 @@ import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
 import { formatSalary, formatDateTime, LEVEL_LIST } from "@/lib/constants";
-import { matchesNoAccent } from "@/lib/vietnamese";
+import { toSearchRegex } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
 const SALARY_RANGES = [
@@ -29,46 +29,53 @@ const SALARY_RANGES = [
 	{ key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined },
 ] as const;
 
-const PAGE_SIZE = 10;
-
 export default function JobPage() {
 	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
 	const [search, setSearch] = useState("");
 	const [levels, setLevels] = useState<string[]>([]);
 	const [salaryKey, setSalaryKey] = useState("all");
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editingJob, setEditingJob] = useState<Job | null>(null);
+	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
+	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+	const handleSort = (field: "name" | "salary") => {
+		if (sortField !== field) {
+			setSortField(field);
+			setSortDir("asc");
+		} else if (sortDir === "asc") {
+			setSortDir("desc");
+		} else {
+			setSortField(null);
+			setSortDir("asc");
+		}
+		setPage(1);
+	};
+
+	const getSortTitle = (field: "name" | "salary") => {
+		if (sortField !== field) return "Nhấn để sắp xếp tăng dần";
+		if (sortDir === "asc") return "Nhấn để sắp xếp giảm dần";
+		return "Nhấn để hủy sắp xếp";
+	};
+
+	const sortParam = sortField ? (sortDir === "asc" ? sortField : `-${sortField}`) : undefined;
 
 	const salaryRange = SALARY_RANGES.find((r) => r.key === salaryKey);
-	const isSearching = search.trim().length > 0;
 
 	const { data, isLoading } = useJobsByAdmin({
-		current: isSearching ? 1 : page,
-		pageSize: isSearching ? 500 : PAGE_SIZE,
+		current: page,
+		pageSize,
+		sort: sortParam,
+		name: toSearchRegex(search),
 		level: levels.length > 0 ? levels.join(",") : undefined,
 		"salary[$gte]": salaryRange?.min,
 		"salary[$lte]": salaryRange?.max,
 	});
 	const deleteJob = useDeleteJob();
 
-	const filtered = useMemo(() => {
-		const all = data?.result ?? [];
-		if (!isSearching) return all;
-		return all.filter((j) => matchesNoAccent(j.name, search));
-	}, [data, search, isSearching]);
-
-	const displayData = isSearching
-		? filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-		: (data?.result ?? []);
-
-	const displayMeta = isSearching
-		? {
-				current: page,
-				pageSize: PAGE_SIZE,
-				pages: Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
-				total: filtered.length,
-			}
-		: data?.meta;
+	const displayData = data?.result ?? [];
+	const displayMeta = data?.meta;
 
 	const resetFilters = () => {
 		setLevels([]);
@@ -78,11 +85,29 @@ export default function JobPage() {
 
 	const hasFilter = levels.length > 0 || salaryKey !== "all";
 
+	const SortIcon = ({ field }: { field: "name" | "salary" }) => {
+		if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
+		return sortDir === "asc"
+			? <ArrowUp className="h-3.5 w-3.5 text-primary" />
+			: <ArrowDown className="h-3.5 w-3.5 text-primary" />;
+	};
+
 	const columns: Column<Job>[] = [
 		{
 			key: "name",
 			label: "Tên công việc",
 			className: "w-[28%]",
+			labelNode: (
+				<button
+					type="button"
+					title={getSortTitle("name")}
+					className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+					onClick={() => handleSort("name")}
+				>
+					Tên công việc
+					<SortIcon field="name" />
+				</button>
+			),
 			render: (row) => (
 				<span className="font-medium truncate block">{row.name}</span>
 			),
@@ -91,6 +116,17 @@ export default function JobPage() {
 			key: "salary",
 			label: "Mức lương",
 			className: "w-[16%]",
+			labelNode: (
+				<button
+					type="button"
+					title={getSortTitle("salary")}
+					className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+					onClick={() => handleSort("salary")}
+				>
+					Mức lương
+					<SortIcon field="salary" />
+				</button>
+			),
 			render: (row) => formatSalary(row.salary),
 		},
 		{
@@ -169,6 +205,10 @@ export default function JobPage() {
 						setPage(1);
 					}}
 					onPageChange={setPage}
+					onPageSizeChange={(s) => {
+						setPageSize(s);
+						setPage(1);
+					}}
 					rowKey={(row) => row._id}
 					filters={
 						<>

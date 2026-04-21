@@ -168,6 +168,7 @@ export function JobDetailPage() {
                 }}
                 className="mt-5 w-full cursor-pointer bg-[#22C55E] text-white transition-colors duration-200 hover:bg-[#16A34A] sm:w-auto"
                 size="lg"
+                disabled= {!job.isActive}
               >
                 <Send className="mr-2 h-4 w-4" />
                 Ứng tuyển ngay
