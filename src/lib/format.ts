@@ -22,3 +22,15 @@ export function resumeFileUrl(file: string): string {
     ? file
     : `${import.meta.env.VITE_STATIC_URL}/images/resume/${file}`;
 }
+
+/**
+ * Backend stores uploaded files as `{unixTimestamp}_{originalFilename}`.
+ * This helper strips the numeric timestamp prefix to recover the original name.
+ */
+export function extractOriginalFileName(storedName: string): string {
+  if (!storedName) return "";
+  // Drop any path segments just in case
+  const base = storedName.split(/[\\/]/).pop() ?? storedName;
+  // Remove leading "<digits>_" prefix (e.g. "1729500000_cv.pdf" -> "cv.pdf")
+  return base.replace(/^\d+_/, "");
+}

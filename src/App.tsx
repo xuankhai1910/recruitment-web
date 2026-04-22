@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { HomePage } from "@/pages/HomePage";
 import { JobsPage } from "@/pages/JobsPage";
 import { JobDetailPage } from "@/pages/JobDetailPage";
+import { RecommendedJobsPage } from "@/pages/RecommendedJobsPage";
 import { CompaniesPage } from "@/pages/CompaniesPage";
 import { CompanyDetailPage } from "@/pages/CompanyDetailPage";
 import { LoginPage } from "@/pages/LoginPage";
@@ -50,6 +51,7 @@ export default function App() {
 			<Route element={<MainLayout />}>
 				<Route path="/" element={<HomePage />} />
 				<Route path="/jobs" element={<JobsPage />} />
+				<Route path="/jobs/recommended" element={<RecommendedJobsPage />} />
 				<Route path="/jobs/:id" element={<JobDetailPage />} />
 				<Route path="/companies" element={<CompaniesPage />} />
 				<Route path="/companies/:id" element={<CompanyDetailPage />} />
