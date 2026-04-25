@@ -25,9 +25,10 @@ import PermissionPage from "@/pages/admin/PermissionPage";
 import RolePage from "@/pages/admin/RolePage";
 
 export default function App() {
-	const { setAuth, clearAuth } = useAuthStore();
+	const { setAuth, clearAuth, setLoading, isLoading } = useAuthStore();
 
 	useEffect(() => {
+		setLoading(true);
 		authApi
 			.refreshToken()
 			.then(({ data }) => {
@@ -36,8 +37,18 @@ export default function App() {
 			})
 			.catch(() => {
 				clearAuth();
-			});
-	}, [setAuth, clearAuth]);
+			})
+			.finally(() => setLoading(false));
+	}, [setAuth, clearAuth, setLoading]);
+
+	// Chặn render đến khi bootstrap auth xong -> hết flicker login/logout
+	if (isLoading) {
+		return (
+			<div className="flex min-h-screen items-center justify-center">
+				<div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-gray-800" />
+			</div>
+		);
+	}
 
 	return (
 		<Routes>
