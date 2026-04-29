@@ -37,6 +37,8 @@ export interface RegisterRequest {
   address: string;
   age: number;
   gender: string;
+  role: string;
+  company?: { _id: string; name: string };
 }
 
 export interface LoginResponse {

@@ -16,6 +16,8 @@ import { LoginPage } from "@/pages/LoginPage";
 import { RegisterPage } from "@/pages/RegisterPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
+import { NotificationsPage } from "@/pages/NotificationsPage";
+import { useNotificationBootstrap } from "@/hooks/useNotifications";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CompanyPage from "@/pages/admin/CompanyPage";
 import UserPage from "@/pages/admin/UserPage";
@@ -26,6 +28,9 @@ import RolePage from "@/pages/admin/RolePage";
 
 export default function App() {
 	const { setAuth, clearAuth, setLoading, isLoading } = useAuthStore();
+
+	// Manage notification socket lifecycle alongside auth state.
+	useNotificationBootstrap();
 
 	useEffect(() => {
 		setLoading(true);
@@ -66,6 +71,9 @@ export default function App() {
 				<Route path="/jobs/:id" element={<JobDetailPage />} />
 				<Route path="/companies" element={<CompaniesPage />} />
 				<Route path="/companies/:id" element={<CompanyDetailPage />} />
+				<Route element={<ProtectedRoute />}>
+					<Route path="/notifications" element={<NotificationsPage />} />
+				</Route>
 			</Route>
 
 			{/* Admin (protected) */}
