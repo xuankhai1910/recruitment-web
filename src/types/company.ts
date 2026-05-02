@@ -4,6 +4,8 @@ export interface Company {
   address: string;
   description: string;
   logo: string;
+  email: string;
+  phone: string;
   createdAt: string;
   updatedAt: string;
   createdBy: { _id: string; email: string };
@@ -15,6 +17,8 @@ export interface CreateCompanyDto {
   address: string;
   description: string;
   logo: string;
+  email: string;
+  phone: string;
 }
 
 export interface UpdateCompanyDto {
@@ -22,4 +26,6 @@ export interface UpdateCompanyDto {
   address?: string;
   description?: string;
   logo?: string;
+  email?: string;
+  phone?: string;
 }

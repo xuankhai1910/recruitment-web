@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -22,19 +23,34 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Mail, Phone, Upload, X } from "lucide-react";
 import { useCreateCompany, useUpdateCompany } from "@/hooks/useCompanies";
 import { useUploadFile } from "@/hooks/useFiles";
 import type { Company } from "@/types/company";
 
-const companySchema = z.object({
+const companySchemaBase = z.object({
 	name: z.string().min(1, "Tên công ty không được để trống"),
 	address: z.string().min(1, "Địa chỉ không được để trống"),
 	logo: z.string().min(1, "Vui lòng upload logo"),
 	description: z.string().min(1, "Mô tả không được để trống"),
+	email: z.string().email("Email không hợp lệ"),
+	phone: z
+		.string()
+		.regex(/^(0|\+84)[3|5|7|8|9][0-9]{8}$/, "Số điện thoại không hợp lệ"),
 });
 
-type CompanyFormValues = z.infer<typeof companySchema>;
+const companyUpdateSchema = companySchemaBase.extend({
+	email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+	phone: z
+		.string()
+		.regex(/^(0|\+84)[3|5|7|8|9][0-9]{8}$/, "Số điện thoại không hợp lệ")
+		.optional()
+		.or(z.literal("")),
+});
+
+const companySchema = companySchemaBase;
+
+type CompanyFormValues = z.infer<typeof companySchemaBase>;
 
 interface CompanyModalProps {
 	open: boolean;
@@ -57,12 +73,16 @@ export function CompanyModal({
 	const isSubmitting = createCompany.isPending || updateCompany.isPending;
 
 	const form = useForm<CompanyFormValues>({
-		resolver: zodResolver(companySchema),
+		resolver: zodResolver(
+			isEdit ? companyUpdateSchema : companySchema,
+		) as Resolver<CompanyFormValues>,
 		defaultValues: {
 			name: "",
 			address: "",
 			logo: "",
 			description: "",
+			email: "",
+			phone: "",
 		},
 	});
 
@@ -75,6 +95,8 @@ export function CompanyModal({
 				address: company?.address ?? "",
 				logo: company?.logo ?? "",
 				description: company?.description ?? "",
+				email: company?.email ?? "",
+				phone: company?.phone ?? "",
 			});
 		}
 	}, [open, company, form]);
@@ -224,6 +246,56 @@ export function CompanyModal({
 										</FormLabel>
 										<FormControl>
 											<Input placeholder="Nhập địa chỉ" {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						{/* Email + Phone */}
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-start">
+							<FormField
+								control={form.control}
+								name="email"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Email liên hệ
+											{!isEdit && <span className="text-destructive"> *</span>}
+										</FormLabel>
+										<FormControl>
+											<div className="relative">
+												<Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+												<Input
+													placeholder="contact@company.com"
+													className="pl-9"
+													{...field}
+												/>
+											</div>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="phone"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Số điện thoại liên hệ
+											{!isEdit && <span className="text-destructive"> *</span>}
+										</FormLabel>
+										<FormControl>
+											<div className="relative">
+												<Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+												<Input
+													placeholder="0912345678"
+													className="pl-9"
+													{...field}
+												/>
+											</div>
 										</FormControl>
 										<FormMessage />
 									</FormItem>

@@ -6,6 +6,8 @@ export interface Job {
     _id: string;
     name: string;
     logo?: string;
+    email?: string;
+    phone?: string;
   };
   location: string;
   salary: number;
@@ -28,6 +30,8 @@ export interface CreateJobDto {
     _id: string;
     name: string;
     logo?: string;
+    email?: string;
+    phone?: string;
   };
   location: string;
   salary: number;
