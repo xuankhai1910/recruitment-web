@@ -1,0 +1,18 @@
+services:
+  recruitment-web:
+    build:
+      context: .
+      args:
+        # Vite inline lúc build -> phải truyền ở đây.
+        # Đổi giá trị tương ứng với BE production.
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_STATIC_URL: ${VITE_STATIC_URL}
+    container_name: recruitment-web
+    restart: always
+    ports:
+      - "127.0.0.1:8002:80"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
