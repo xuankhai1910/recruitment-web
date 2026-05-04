@@ -3,8 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { useJobs } from "@/hooks/useJobs";
 import { JobCard } from "@/components/common/JobCard";
 import { LocationMultiSelect } from "@/components/common/LocationMultiSelect";
+import {
+	SearchAutocomplete,
+	pushRecentSearch,
+} from "@/components/common/SearchAutocomplete";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -72,17 +75,12 @@ function FilterPanel({
 				<label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 					Từ khóa
 				</label>
-				<div className="relative">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
-						placeholder="Tên công việc, kỹ năng..."
-						value={keyword}
-						onChange={(e) => {
-							setKeyword(e.target.value);
-						}}
-						className="pl-9"
-					/>
-				</div>
+				<SearchAutocomplete
+					value={keyword}
+					onChange={setKeyword}
+					placeholder="Tên công việc, kỹ năng..."
+					showIcon
+				/>
 			</div>
 
 			<div>
@@ -250,7 +248,10 @@ export function JobsPage() {
 
 	const applyFilters = () => {
 		const p = new URLSearchParams();
-		if (keyword) p.set("keyword", keyword);
+		if (keyword) {
+			p.set("keyword", keyword);
+			pushRecentSearch(keyword);
+		}
 		if (locations.length > 0) p.set("location", locations.join(","));
 		if (level) p.set("level", level);
 		if (skills.length > 0) p.set("skills", skills.join(","));

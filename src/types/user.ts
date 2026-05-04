@@ -7,6 +7,7 @@ export interface User {
   gender: string;
   role: { _id: string; name: string };
   company?: { _id: string; name: string };
+  isJobSeeking?: boolean;
   createdAt: string;
   updatedAt: string;
   createdBy: { _id: string; email: string };

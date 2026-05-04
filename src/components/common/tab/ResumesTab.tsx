@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { format } from "date-fns";
-import { ExternalLink, FileText } from "lucide-react";
+import { ExternalLink, FileText, History } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMyResumes } from "@/hooks/useResumes";
 import { resumeFileUrl } from "@/lib/format";
+import { ResumeTimelineDialog } from "@/components/common/ResumeTimelineDialog";
+import type { Resume } from "@/types/resume";
 
 const RESUME_STATUS_STYLE: Record<string, string> = {
 	PENDING: "bg-amber-50 text-amber-700 border-amber-200",
@@ -14,9 +17,17 @@ const RESUME_STATUS_STYLE: Record<string, string> = {
 	REJECTED: "bg-red-50 text-red-700 border-red-200",
 };
 
+const RESUME_STATUS_LABEL: Record<string, string> = {
+	PENDING: "Chờ xử lý",
+	REVIEWING: "Đang xem xét",
+	APPROVED: "Được duyệt",
+	REJECTED: "Đã từ chối",
+};
+
 export function ResumesTab() {
 	const { data, isLoading } = useMyResumes();
 	const resumes = data ?? [];
+	const [selected, setSelected] = useState<Resume | null>(null);
 
 	if (isLoading) {
 		return (
@@ -38,52 +49,75 @@ export function ResumesTab() {
 	}
 
 	return (
-		<div className="max-h-[420px] space-y-3 overflow-y-auto rounded-lg border border-border/60 bg-muted/20 p-3">
-			{resumes.map((r) => {
-				const job =
-					typeof r.jobId === "object" ? r.jobId : { _id: r.jobId, name: "—" };
-				const company =
-					typeof r.companyId === "object"
-						? r.companyId
-						: { _id: r.companyId, name: "—" };
-				return (
-					<div
-						key={r._id}
-						className="flex items-center gap-3 rounded-lg border border-border/60 bg-card p-3"
-					>
-						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-							<FileText className="h-5 w-5 text-primary" />
-						</div>
-						<div className="min-w-0 flex-1">
-							<p className="line-clamp-1 text-sm font-semibold text-foreground">
-								{job.name}
-							</p>
-							<p className="line-clamp-1 text-xs text-muted-foreground">
-								{company.name} · {format(new Date(r.createdAt), "dd/MM/yyyy")}
-							</p>
-						</div>
-						<Badge
-							variant="outline"
-							className={`shrink-0 font-normal ${RESUME_STATUS_STYLE[r.status] ?? ""}`}
+		<>
+			<div className="max-h-[420px] space-y-3 overflow-y-auto rounded-lg border border-border/60 bg-muted/20 p-3">
+				{resumes.map((r) => {
+					const job =
+						typeof r.jobId === "object" ? r.jobId : { _id: r.jobId, name: "—" };
+					const company =
+						typeof r.companyId === "object"
+							? r.companyId
+							: { _id: r.companyId, name: "—" };
+					return (
+						<button
+							key={r._id}
+							type="button"
+							className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card p-3 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
+							onClick={() => {
+								setSelected(r);
+							}}
 						>
-							{r.status}
-						</Badge>
-						<a
-							href={resumeFileUrl(r.url)}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-8 w-8 cursor-pointer"
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
+								<FileText className="h-5 w-5 text-primary" />
+							</div>
+							<div className="min-w-0 flex-1">
+								<p className="line-clamp-1 text-sm font-semibold text-foreground">
+									{job.name}
+								</p>
+								<p className="line-clamp-1 text-xs text-muted-foreground">
+									{company.name} · {format(new Date(r.createdAt), "dd/MM/yyyy")}
+								</p>
+							</div>
+							<Badge
+								variant="outline"
+								className={`shrink-0 font-normal ${RESUME_STATUS_STYLE[r.status] ?? ""}`}
 							>
-								<ExternalLink className="h-4 w-4" />
-							</Button>
-						</a>
-					</div>
-				);
-			})}
-		</div>
+								{RESUME_STATUS_LABEL[r.status] ?? r.status}
+							</Badge>
+							<span
+								className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground"
+								title="Xem tiến trình"
+							>
+								<History className="h-4 w-4" />
+							</span>
+							<a
+								href={resumeFileUrl(r.url)}
+								target="_blank"
+								rel="noopener noreferrer"
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
+							>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 cursor-pointer"
+								>
+									<ExternalLink className="h-4 w-4" />
+								</Button>
+							</a>
+						</button>
+					);
+				})}
+			</div>
+
+			<ResumeTimelineDialog
+				resume={selected}
+				open={!!selected}
+				onOpenChange={(o) => {
+					if (!o) setSelected(null);
+				}}
+			/>
+		</>
 	);
 }

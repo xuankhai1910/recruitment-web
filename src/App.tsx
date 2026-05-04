@@ -17,6 +17,7 @@ import { RegisterPage } from "@/pages/RegisterPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
+import { SalaryCalculatorPage } from "@/pages/SalaryCalculatorPage";
 import { useNotificationBootstrap } from "@/hooks/useNotifications";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CompanyPage from "@/pages/admin/CompanyPage";
@@ -71,6 +72,10 @@ export default function App() {
 				<Route path="/jobs/:id" element={<JobDetailPage />} />
 				<Route path="/companies" element={<CompaniesPage />} />
 				<Route path="/companies/:id" element={<CompanyDetailPage />} />
+				<Route
+					path="/tools/salary-calculator"
+					element={<SalaryCalculatorPage />}
+				/>
 				<Route element={<ProtectedRoute />}>
 					<Route path="/notifications" element={<NotificationsPage />} />
 				</Route>

@@ -35,6 +35,14 @@ export function useJob(id: string) {
   });
 }
 
+export function useSimilarJobs(id: string) {
+  return useQuery({
+    queryKey: ["jobs", id, "similar"],
+    queryFn: () => jobsApi.getSimilar(id).then((r) => r.data.data),
+    enabled: !!id,
+  });
+}
+
 export function useCreateJob() {
   const qc = useQueryClient();
   return useMutation({

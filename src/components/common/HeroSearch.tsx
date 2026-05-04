@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { LocationMultiSelect } from "@/components/common/LocationMultiSelect";
+import {
+	SearchAutocomplete,
+	pushRecentSearch,
+} from "@/components/common/SearchAutocomplete";
 import { Search, TrendingUp } from "lucide-react";
 
 const POPULAR_KEYWORDS = ["React", "Java", "Python", "Marketing", "Design"];
@@ -12,14 +15,21 @@ export function HeroSearch() {
 	const [keyword, setKeyword] = useState("");
 	const [locations, setLocations] = useState<string[]>([]);
 
-	const handleSearch = (e: React.FormEvent) => {
-		e.preventDefault();
+	const submitWith = (kw: string) => {
 		const params = new URLSearchParams();
-		if (keyword) params.set("keyword", keyword);
+		if (kw) {
+			params.set("keyword", kw);
+			pushRecentSearch(kw);
+		}
 		if (locations.length > 0) params.set("location", locations.join(","));
 		params.set("current", "1");
 		params.set("pageSize", "5");
 		navigate(`/jobs?${params.toString()}`);
+	};
+
+	const handleSearch = (e: React.FormEvent) => {
+		e.preventDefault();
+		submitWith(keyword);
 	};
 
 	return (
@@ -38,14 +48,16 @@ export function HeroSearch() {
 					className="mx-auto mt-8 flex max-w-3xl flex-col gap-2 rounded-lg bg-card p-2 sm:flex-row sm:items-center"
 				>
 					<div className="relative flex-1">
-						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-						<Input
-							placeholder="Tên công việc, kỹ năng..."
+						<SearchAutocomplete
 							value={keyword}
-							onChange={(e) => {
-								setKeyword(e.target.value);
+							onChange={setKeyword}
+							onSelect={(v) => {
+								setKeyword(v);
+								submitWith(v);
 							}}
-							className="h-11 border-0 bg-transparent pl-10 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+							placeholder="Tên công việc, kỹ năng..."
+							showIcon
+							inputClassName="h-11 border-0 bg-transparent pl-10 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
 						/>
 					</div>
 

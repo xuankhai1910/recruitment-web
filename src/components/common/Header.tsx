@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/useAuth";
 import { ManageAccountModal } from "@/components/common/ManageAccountModal";
 import { NotificationBell } from "@/components/common/notification";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -74,6 +75,7 @@ export function Header() {
 				<div className="flex items-center gap-1.5">
 					{isAuthenticated && user ? (
 						<>
+							<ThemeToggle />
 							<NotificationBell />
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -138,6 +140,7 @@ export function Header() {
 						</>
 					) : (
 						<>
+							<ThemeToggle />
 							<Button
 								variant="ghost"
 								className="h-9 cursor-pointer px-3 text-sm font-medium text-foreground/80 hover:text-primary"

@@ -1,4 +1,4 @@
-import { Briefcase } from "lucide-react";
+import { Briefcase, Calculator } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -16,6 +16,16 @@ export function Footer() {
 						Job<span className="text-primary">Finder</span>
 					</span>
 				</Link>
+
+				<nav className="flex flex-wrap items-center gap-4 text-xs">
+					<Link
+						to="/tools/salary-calculator"
+						className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+					>
+						<Calculator className="h-3.5 w-3.5" />
+						Tính lương Gross/Net
+					</Link>
+				</nav>
 
 				<p className="text-xs text-muted-foreground">
 					&copy; {new Date().getFullYear()} JobFinder. All rights reserved.

@@ -1,15 +1,21 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useJob } from "@/hooks/useJobs";
+import { useJob, useSimilarJobs } from "@/hooks/useJobs";
 import { useCompany } from "@/hooks/useCompanies";
+import { useAuthStore } from "@/stores/auth.store";
+import { useCheckSaved, useToggleSaveJob } from "@/hooks/useSavedJobs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApplyModal } from "@/components/common/ApplyModal";
+import { JobCard } from "@/components/common/JobCard";
+import { toast } from "sonner";
 import {
 	ArrowLeft,
 	Banknote,
+	Bookmark,
+	BookmarkCheck,
 	Briefcase,
 	Building2,
 	Calendar,
@@ -18,19 +24,34 @@ import {
 	MapPin,
 	Phone,
 	Send,
+	Sparkles,
 	Users,
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { formatSalary } from "@/lib/constants";
 import { companyLogoUrl } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export function JobDetailPage() {
 	const { id = "" } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const { data: job, isLoading } = useJob(id);
 	const { data: company } = useCompany(job?.company._id ?? "");
+	const { data: similarJobs, isLoading: isLoadingSimilar } = useSimilarJobs(id);
+	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+	const { data: savedCheck } = useCheckSaved(isAuthenticated ? id : "");
+	const toggleSave = useToggleSaveJob();
+	const saved = savedCheck ?? false;
 	const [applyOpen, setApplyOpen] = useState(false);
+
+	const handleToggleSave = () => {
+		if (!isAuthenticated) {
+			toast.error("Đăng nhập để lưu việc làm");
+			return;
+		}
+		toggleSave.mutate(id);
+	};
 
 	if (isLoading) {
 		return (
@@ -126,6 +147,54 @@ export function JobDetailPage() {
 									</Badge>
 								))}
 							</div>
+
+							<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+								<div>
+									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+										<Banknote className="h-3.5 w-3.5" />
+										Mức lương
+									</div>
+									<p className="mt-0.5 font-heading text-lg font-bold text-[#16A34A]">
+										{formatSalary(job.salary)}
+									</p>
+								</div>
+								<div className="flex shrink-0 items-center gap-2">
+									<Button
+										onClick={() => {
+											setApplyOpen(true);
+										}}
+										className="cursor-pointer bg-[#22C55E] text-white transition-colors duration-150 hover:bg-[#16A34A]"
+										size="lg"
+										disabled={!job.isActive}
+									>
+										<Send className="mr-2 h-4 w-4" />
+										Ứng tuyển ngay
+									</Button>
+									<Button
+										onClick={handleToggleSave}
+										disabled={toggleSave.isPending}
+										variant="outline"
+										size="lg"
+										className={cn(
+											"cursor-pointer",
+											saved &&
+												"border-primary bg-primary/10 text-primary hover:bg-primary/15",
+										)}
+									>
+										{saved ? (
+											<>
+												<BookmarkCheck className="mr-2 h-4 w-4" />
+												Đã lưu
+											</>
+										) : (
+											<>
+												<Bookmark className="mr-2 h-4 w-4" />
+												Lưu việc làm
+											</>
+										)}
+									</Button>
+								</div>
+							</div>
 						</CardContent>
 					</Card>
 
@@ -141,38 +210,39 @@ export function JobDetailPage() {
 							/>
 						</CardContent>
 					</Card>
+
+					{/* Similar Jobs */}
+					<Card>
+						<CardContent className="p-5 sm:p-6">
+							<div className="flex items-center gap-2">
+								<Sparkles className="h-4 w-4 text-primary" />
+								<h2 className="font-heading text-base font-semibold text-foreground">
+									Việc làm tương tự
+								</h2>
+							</div>
+							{isLoadingSimilar ? (
+								<div className="mt-4 grid gap-3 lg:grid-cols-2">
+									{Array.from({ length: 4 }).map((_, i) => (
+										<Skeleton key={i} className="h-28 rounded-lg" />
+									))}
+								</div>
+							) : similarJobs && similarJobs.length > 0 ? (
+								<div className="mt-4 grid gap-3 lg:grid-cols-2">
+									{similarJobs.slice(0, 6).map((j) => (
+										<JobCard key={j._id} job={j} />
+									))}
+								</div>
+							) : (
+								<p className="mt-3 text-sm text-muted-foreground">
+									Chưa có việc làm tương tự.
+								</p>
+							)}
+						</CardContent>
+					</Card>
 				</div>
 
 				{/* Sidebar */}
 				<aside className="space-y-4 lg:sticky lg:top-16 lg:self-start">
-					{/* Apply CTA */}
-					<Card>
-						<CardContent className="p-5">
-							<div className="space-y-3">
-								<div>
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-										<Banknote className="h-3.5 w-3.5" />
-										Mức lương
-									</div>
-									<p className="mt-0.5 font-heading text-lg font-bold text-[#16A34A]">
-										{formatSalary(job.salary)}
-									</p>
-								</div>
-								<Button
-									onClick={() => {
-										setApplyOpen(true);
-									}}
-									className="w-full cursor-pointer bg-[#22C55E] text-white transition-colors duration-150 hover:bg-[#16A34A]"
-									size="lg"
-									disabled={!job.isActive}
-								>
-									<Send className="mr-2 h-4 w-4" />
-									Ứng tuyển ngay
-								</Button>
-							</div>
-						</CardContent>
-					</Card>
-
 					<Card>
 						<CardContent className="p-5">
 							<h3 className="font-heading text-sm font-semibold text-foreground">

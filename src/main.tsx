@@ -8,6 +8,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "next-themes";
 import App from "./App";
 
 const queryClient = new QueryClient({
@@ -22,10 +23,12 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById("root")!).render(
 	<QueryClientProvider client={queryClient}>
-		<BrowserRouter>
-			<App />
-			<Toaster richColors position="top-right" />
-		</BrowserRouter>
-		<ReactQueryDevtools initialIsOpen={false} />
+		<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+			<BrowserRouter>
+				<App />
+				<Toaster richColors position="top-right" />
+			</BrowserRouter>
+			<ReactQueryDevtools initialIsOpen={false} />
+		</ThemeProvider>
 	</QueryClientProvider>,
 );

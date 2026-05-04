@@ -28,6 +28,9 @@ export const jobsApi = {
 
   getById: (id: string) => api.get<ApiResponse<Job>>(`/jobs/${id}`),
 
+  getSimilar: (id: string) =>
+    api.get<ApiResponse<Job[]>>(`/jobs/${id}/similar`),
+
   create: (data: CreateJobDto) => api.post<ApiResponse<Job>>("/jobs", data),
 
   update: (id: string, data: Partial<CreateJobDto>) =>
