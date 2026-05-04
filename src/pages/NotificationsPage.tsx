@@ -87,19 +87,17 @@ export function NotificationsPage() {
 	};
 
 	return (
-		<section className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+		<section className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 			{/* Header */}
-			<header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-				<div className="space-y-1.5">
-					<div className="flex items-center gap-3">
-						<div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-							<Inbox className="h-5 w-5" />
-						</div>
-						<h1 className="font-heading text-2xl font-bold tracking-tight text-foreground">
+			<header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<div className="flex items-center gap-2">
+						<Inbox className="h-5 w-5 text-muted-foreground" />
+						<h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
 							Thông báo
 						</h1>
 					</div>
-					<p className="text-sm text-muted-foreground">
+					<p className="mt-1 text-sm text-muted-foreground">
 						{unread > 0
 							? `Bạn có ${unread} thông báo chưa đọc.`
 							: "Bạn đã xem tất cả các thông báo gần đây."}
@@ -156,7 +154,7 @@ export function NotificationsPage() {
 			</div>
 
 			{/* List */}
-			<div className="overflow-hidden rounded-xl border border-border/60 bg-card">
+			<div className="overflow-hidden rounded-lg border border-border bg-card">
 				{showSkeleton ? (
 					<NotificationListSkeleton count={6} />
 				) : items.length === 0 ? (
@@ -164,7 +162,7 @@ export function NotificationsPage() {
 						title={tab === "unread" ? "Không có thông báo chưa đọc" : undefined}
 					/>
 				) : (
-					<ul className="divide-y divide-border/60">
+					<ul className="divide-y divide-border">
 						{items.map((n) => (
 							<li key={n._id}>
 								<NotificationItem

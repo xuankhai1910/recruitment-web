@@ -36,8 +36,8 @@ export function JobDetailPage() {
 		return (
 			<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-					<Skeleton className="h-96 rounded-xl" />
-					<Skeleton className="h-64 rounded-xl" />
+					<Skeleton className="h-96 rounded-lg" />
+					<Skeleton className="h-64 rounded-lg" />
 				</div>
 			</div>
 		);
@@ -80,22 +80,22 @@ export function JobDetailPage() {
 				{/* Main */}
 				<div className="space-y-6">
 					{/* Header card */}
-					<Card className="border border-border/60">
-						<CardContent className="p-6">
+					<Card>
+						<CardContent className="p-5 sm:p-6">
 							<div className="flex items-start gap-4">
 								{job.company?.logo ? (
 									<img
 										src={companyLogoUrl(job.company.logo)}
 										alt={job.company.name}
-										className="h-16 w-16 shrink-0 rounded-xl object-contain"
+										className="h-16 w-16 shrink-0 rounded-md border border-border bg-white object-contain p-1"
 									/>
 								) : (
-									<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-secondary">
-										<Building2 className="h-8 w-8 text-primary/60" />
+									<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
+										<Building2 className="h-7 w-7 text-muted-foreground" />
 									</div>
 								)}
 								<div className="min-w-0 flex-1">
-									<h1 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
+									<h1 className="font-heading text-xl font-bold leading-tight text-foreground sm:text-2xl">
 										{job.name}
 									</h1>
 									<Link
@@ -115,75 +115,24 @@ export function JobDetailPage() {
 								</div>
 							</div>
 
-							<div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-								<div className="rounded-lg bg-[#22C55E]/10 p-3">
-									<div className="flex items-center gap-1.5 text-xs text-[#16A34A]">
-										<Banknote className="h-3.5 w-3.5" />
-										Mức lương
-									</div>
-									<p className="mt-1 font-heading text-sm font-bold text-[#16A34A]">
-										{formatSalary(job.salary)}
-									</p>
-								</div>
-								<div className="rounded-lg bg-secondary p-3">
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-										<MapPin className="h-3.5 w-3.5" />
-										Địa điểm
-									</div>
-									<p className="mt-1 line-clamp-1 font-heading text-sm font-semibold text-foreground">
-										{job.location}
-									</p>
-								</div>
-								<div className="rounded-lg bg-secondary p-3">
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-										<Briefcase className="h-3.5 w-3.5" />
-										Cấp bậc
-									</div>
-									<p className="mt-1 font-heading text-sm font-semibold text-foreground">
-										{job.level}
-									</p>
-								</div>
-								<div className="rounded-lg bg-secondary p-3">
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-										<Users className="h-3.5 w-3.5" />
-										Số lượng
-									</div>
-									<p className="mt-1 font-heading text-sm font-semibold text-foreground">
-										{job.quantity}
-									</p>
-								</div>
-							</div>
-
 							<div className="mt-5 flex flex-wrap gap-2">
 								{job.skills?.map((s) => (
 									<Badge
 										key={s}
-										variant="outline"
-										className="border-primary/30 bg-primary/5 font-normal text-primary"
+										variant="secondary"
+										className="rounded-md bg-primary/5 font-normal text-primary hover:bg-primary/5"
 									>
 										{s}
 									</Badge>
 								))}
 							</div>
-
-							<Button
-								onClick={() => {
-									setApplyOpen(true);
-								}}
-								className="mt-5 w-full cursor-pointer bg-[#22C55E] text-white transition-colors duration-200 hover:bg-[#16A34A] sm:w-auto"
-								size="lg"
-								disabled={!job.isActive}
-							>
-								<Send className="mr-2 h-4 w-4" />
-								Ứng tuyển ngay
-							</Button>
 						</CardContent>
 					</Card>
 
 					{/* Description */}
-					<Card className="border border-border/60">
-						<CardContent className="p-6">
-							<h2 className="font-heading text-lg font-semibold text-foreground">
+					<Card>
+						<CardContent className="p-5 sm:p-6">
+							<h2 className="font-heading text-base font-semibold text-foreground">
 								Mô tả công việc
 							</h2>
 							<div
@@ -195,14 +144,67 @@ export function JobDetailPage() {
 				</div>
 
 				{/* Sidebar */}
-				<aside className="space-y-6 lg:sticky lg:top-20 lg:self-start">
-					<Card className="border border-border/60">
+				<aside className="space-y-4 lg:sticky lg:top-16 lg:self-start">
+					{/* Apply CTA */}
+					<Card>
+						<CardContent className="p-5">
+							<div className="space-y-3">
+								<div>
+									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+										<Banknote className="h-3.5 w-3.5" />
+										Mức lương
+									</div>
+									<p className="mt-0.5 font-heading text-lg font-bold text-[#16A34A]">
+										{formatSalary(job.salary)}
+									</p>
+								</div>
+								<Button
+									onClick={() => {
+										setApplyOpen(true);
+									}}
+									className="w-full cursor-pointer bg-[#22C55E] text-white transition-colors duration-150 hover:bg-[#16A34A]"
+									size="lg"
+									disabled={!job.isActive}
+								>
+									<Send className="mr-2 h-4 w-4" />
+									Ứng tuyển ngay
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
+
+					<Card>
 						<CardContent className="p-5">
 							<h3 className="font-heading text-sm font-semibold text-foreground">
 								Thông tin chung
 							</h3>
-							<dl className="mt-3 space-y-3 text-sm">
-								<div className="flex items-start justify-between gap-3">
+							<dl className="mt-3 space-y-2.5 text-sm">
+								<div className="flex items-center justify-between gap-3">
+									<dt className="flex items-center gap-1.5 text-muted-foreground">
+										<MapPin className="h-3.5 w-3.5" />
+										Địa điểm
+									</dt>
+									<dd className="font-medium text-foreground">
+										{job.location}
+									</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="flex items-center gap-1.5 text-muted-foreground">
+										<Briefcase className="h-3.5 w-3.5" />
+										Cấp bậc
+									</dt>
+									<dd className="font-medium text-foreground">{job.level}</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
+									<dt className="flex items-center gap-1.5 text-muted-foreground">
+										<Users className="h-3.5 w-3.5" />
+										Số lượng
+									</dt>
+									<dd className="font-medium text-foreground">
+										{job.quantity}
+									</dd>
+								</div>
+								<div className="flex items-center justify-between gap-3">
 									<dt className="flex items-center gap-1.5 text-muted-foreground">
 										<Calendar className="h-3.5 w-3.5" />
 										Bắt đầu
@@ -211,7 +213,7 @@ export function JobDetailPage() {
 										{format(new Date(job.startDate), "dd/MM/yyyy")}
 									</dd>
 								</div>
-								<div className="flex items-start justify-between gap-3">
+								<div className="flex items-center justify-between gap-3">
 									<dt className="flex items-center gap-1.5 text-muted-foreground">
 										<Calendar className="h-3.5 w-3.5" />
 										Kết thúc
@@ -224,7 +226,7 @@ export function JobDetailPage() {
 						</CardContent>
 					</Card>
 
-					<Card className="border border-border/60">
+					<Card>
 						<CardContent className="p-5">
 							<h3 className="font-heading text-sm font-semibold text-foreground">
 								Công ty
@@ -237,11 +239,11 @@ export function JobDetailPage() {
 									<img
 										src={companyLogoUrl(job.company.logo)}
 										alt={job.company.name}
-										className="h-12 w-12 shrink-0 rounded-lg object-contain"
+										className="h-12 w-12 shrink-0 rounded-md border border-border bg-white object-contain p-1"
 									/>
 								) : (
-									<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-secondary">
-										<Building2 className="h-6 w-6 text-primary/60" />
+									<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
+										<Building2 className="h-5 w-5 text-muted-foreground" />
 									</div>
 								)}
 								<div className="min-w-0">
@@ -253,46 +255,31 @@ export function JobDetailPage() {
 									</p>
 								</div>
 							</Link>
-						</CardContent>
-					</Card>
 
-					{(company?.email || company?.phone) && (
-						<Card className="border border-border/60">
-							<CardContent className="p-5">
-								<h3 className="font-heading text-sm font-semibold text-foreground">
-									Thông tin liên hệ
-								</h3>
-								<div className="mt-3 space-y-2.5">
+							{(company?.email || company?.phone) && (
+								<div className="mt-4 space-y-2 border-t border-border pt-3">
 									{company?.email && (
-										<div className="flex items-center gap-2.5 text-sm">
-											<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-												<Mail className="h-3.5 w-3.5 text-primary" />
-											</span>
-											<a
-												href={`mailto:${company.email}`}
-												className="min-w-0 truncate text-primary transition-colors duration-150 hover:underline"
-											>
-												{company.email}
-											</a>
-										</div>
+										<a
+											href={`mailto:${company.email}`}
+											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
+										>
+											<Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+											<span className="truncate">{company.email}</span>
+										</a>
 									)}
 									{company?.phone && (
-										<div className="flex items-center gap-2.5 text-sm">
-											<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-												<Phone className="h-3.5 w-3.5 text-primary" />
-											</span>
-											<a
-												href={`tel:${company.phone}`}
-												className="text-primary transition-colors duration-150 hover:underline"
-											>
-												{company.phone}
-											</a>
-										</div>
+										<a
+											href={`tel:${company.phone}`}
+											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
+										>
+											<Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+											{company.phone}
+										</a>
 									)}
 								</div>
-							</CardContent>
-						</Card>
-					)}
+							)}
+						</CardContent>
+					</Card>
 				</aside>
 			</div>
 

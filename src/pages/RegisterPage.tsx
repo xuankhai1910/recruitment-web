@@ -164,26 +164,26 @@ export function RegisterPage() {
 	};
 
 	return (
-		<div className="w-full max-w-xl px-4">
-			<div className="mb-8 flex flex-col items-center">
-				<div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary">
-					<Briefcase className="h-7 w-7 text-primary-foreground" />
+		<div className="w-full max-w-lg px-4">
+			<div className="mb-6 flex flex-col items-center">
+				<div className="mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-primary">
+					<Briefcase className="h-5 w-5 text-primary-foreground" />
 				</div>
-				<h1 className="font-heading text-2xl font-bold text-foreground">
+				<h1 className="font-heading text-xl font-bold text-foreground">
 					Job<span className="text-primary">Finder</span>
 				</h1>
 			</div>
 
-			<Card className="border border-border/60">
-				<CardHeader className="pb-4 text-center">
-					<CardTitle className="font-heading text-xl">Tạo tài khoản</CardTitle>
+			<Card>
+				<CardHeader className="pb-3 text-center">
+					<CardTitle className="font-heading text-lg">Tạo tài khoản</CardTitle>
 					<CardDescription>
 						Đăng ký để bắt đầu tìm kiếm việc làm
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<div className="space-y-2">
+					<form onSubmit={handleSubmit} className="space-y-3.5">
+						<div className="space-y-1.5">
 							<Label htmlFor="name">Họ và tên</Label>
 							<Input
 								id="name"
@@ -193,11 +193,11 @@ export function RegisterPage() {
 									setForm({ ...form, name: e.target.value });
 								}}
 								required
-								className="h-11"
+								className="h-10"
 							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label htmlFor="reg-email">Email</Label>
 							<Input
 								id="reg-email"
@@ -208,11 +208,11 @@ export function RegisterPage() {
 									setForm({ ...form, email: e.target.value });
 								}}
 								required
-								className="h-11"
+								className="h-10"
 							/>
 						</div>
 
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label htmlFor="reg-password">Mật khẩu</Label>
 							<div className="relative">
 								<Input
@@ -226,7 +226,7 @@ export function RegisterPage() {
 									required
 									minLength={6}
 									maxLength={15}
-									className="h-11 pr-10"
+									className="h-10 pr-10"
 								/>
 								<button
 									type="button"
@@ -246,7 +246,7 @@ export function RegisterPage() {
 						</div>
 
 						<div className="grid grid-cols-3 gap-3">
-							<div className="space-y-2">
+							<div className="space-y-1.5">
 								<Label htmlFor="age">Tuổi</Label>
 								<Input
 									id="age"
@@ -259,10 +259,10 @@ export function RegisterPage() {
 									required
 									min={16}
 									max={65}
-									className="h-11"
+									className="h-10"
 								/>
 							</div>
-							<div className="space-y-2">
+							<div className="space-y-1.5">
 								<Label>Giới tính</Label>
 								<Select
 									value={form.gender}
@@ -287,7 +287,7 @@ export function RegisterPage() {
 									</SelectContent>
 								</Select>
 							</div>
-							<div className="space-y-2">
+							<div className="space-y-1.5">
 								<Label>Vai trò</Label>
 								<Select
 									value={form.roleId}
@@ -315,7 +315,7 @@ export function RegisterPage() {
 						</div>
 
 						{isHr ? (
-							<div className="space-y-2">
+							<div className="space-y-1.5">
 								<Label>Công ty</Label>
 								<Popover open={companyOpen} onOpenChange={setCompanyOpen}>
 									<PopoverTrigger asChild>
@@ -387,7 +387,7 @@ export function RegisterPage() {
 							</div>
 						) : null}
 
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label htmlFor="address">Địa chỉ</Label>
 							<Input
 								id="address"
@@ -397,7 +397,7 @@ export function RegisterPage() {
 									setForm({ ...form, address: e.target.value });
 								}}
 								required
-								className="h-11"
+								className="h-10"
 							/>
 						</div>
 

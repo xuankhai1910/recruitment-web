@@ -50,43 +50,47 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --color-success: #22C55E;
+    --color-success-foreground: #FFFFFF;
 }
 
 :root {
-    /* Design system: Flat Design for Recruitment */
-    /* Primary: #0369A1, Secondary: #0EA5E9, CTA: #22C55E, BG: #F0F9FF, Text: #0C4A6E */
-    --background: #F0F9FF;
-    --foreground: #0C4A6E;
+    /* Design system: Minimal Professional (TopDev-inspired) */
+    /* Primary: #0369A1, CTA: #22C55E, BG: #F8FAFC (slate-50), Text: #0F172A (slate-900) */
+    --background: #F8FAFC;
+    --foreground: #0F172A;
     --card: #FFFFFF;
-    --card-foreground: #0C4A6E;
+    --card-foreground: #0F172A;
     --popover: #FFFFFF;
-    --popover-foreground: #0C4A6E;
+    --popover-foreground: #0F172A;
     --primary: #0369A1;
     --primary-foreground: #FFFFFF;
-    --secondary: #E0F2FE;
-    --secondary-foreground: #0369A1;
-    --muted: #F0F9FF;
-    --muted-foreground: #64748B;
-    --accent: #E0F2FE;
-    --accent-foreground: #0369A1;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #0F172A;
+    --muted: #F1F5F9;
+    --muted-foreground: #475569;
+    --accent: #F1F5F9;
+    --accent-foreground: #0F172A;
     --destructive: #EF4444;
-    --border: #BAE6FD;
-    --input: #BAE6FD;
-    --ring: #0EA5E9;
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    --ring: #0369A1;
     --chart-1: #0369A1;
     --chart-2: #0EA5E9;
     --chart-3: #22C55E;
     --chart-4: #F59E0B;
-    --chart-5: #8B5CF6;
-    --radius: 0.625rem;
+    --chart-5: #6366F1;
+    --radius: 0.5rem;
+    --success: #22C55E;
+    --success-foreground: #FFFFFF;
     --sidebar: #FFFFFF;
-    --sidebar-foreground: #0C4A6E;
+    --sidebar-foreground: #0F172A;
     --sidebar-primary: #0369A1;
     --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #E0F2FE;
-    --sidebar-accent-foreground: #0369A1;
-    --sidebar-border: #BAE6FD;
-    --sidebar-ring: #0EA5E9;
+    --sidebar-accent: #F1F5F9;
+    --sidebar-accent-foreground: #0F172A;
+    --sidebar-border: #E2E8F0;
+    --sidebar-ring: #0369A1;
 }
 
 .dark {

@@ -37,18 +37,18 @@ export function Header() {
 		.toUpperCase();
 
 	return (
-		<header className="sticky top-0 z-50 border-b border-border/60 bg-card/90 backdrop-blur-sm">
+		<header className="sticky top-0 z-50 border-b border-border bg-card">
 			<ManageAccountModal open={manageOpen} onOpenChange={setManageOpen} />
-			<div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+			<div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 				{/* Logo */}
 				<Link
 					to="/"
-					className="flex cursor-pointer items-center gap-2.5 transition-opacity duration-200 hover:opacity-80"
+					className="flex cursor-pointer items-center gap-2 transition-opacity duration-200 hover:opacity-80"
 				>
-					<div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-						<Briefcase className="h-5 w-5 text-primary-foreground" />
+					<div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+						<Briefcase className="h-4 w-4 text-primary-foreground" />
 					</div>
-					<span className="font-heading text-xl font-bold text-foreground">
+					<span className="font-heading text-lg font-bold tracking-tight text-foreground">
 						Job<span className="text-primary">Finder</span>
 					</span>
 				</Link>
@@ -63,7 +63,7 @@ export function Header() {
 						<Link
 							key={link.to}
 							to={link.to}
-							className="cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-foreground/70 transition-colors duration-200 hover:bg-accent hover:text-primary"
+							className="cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium text-foreground/70 transition-colors duration-150 hover:text-primary"
 						>
 							{link.label}
 						</Link>
@@ -71,7 +71,7 @@ export function Header() {
 				</nav>
 
 				{/* Auth */}
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-1.5">
 					{isAuthenticated && user ? (
 						<>
 							<NotificationBell />
@@ -79,10 +79,10 @@ export function Header() {
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"
-										className="flex cursor-pointer items-center gap-2 rounded-full px-2 transition-colors duration-200 hover:bg-accent"
+										className="flex h-9 cursor-pointer items-center gap-2 rounded-md px-1.5 transition-colors duration-150 hover:bg-muted"
 									>
-										<Avatar className="h-8 w-8">
-											<AvatarFallback className="bg-secondary text-sm font-semibold text-secondary-foreground">
+										<Avatar className="h-7 w-7">
+											<AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
 												{initials}
 											</AvatarFallback>
 										</Avatar>
@@ -97,7 +97,7 @@ export function Header() {
 										<p className="font-heading text-sm font-semibold text-foreground">
 											{user.name}
 										</p>
-										<p className="text-xs text-muted-foreground">
+										<p className="truncate text-xs text-muted-foreground">
 											{user.email}
 										</p>
 									</div>
@@ -140,7 +140,7 @@ export function Header() {
 						<>
 							<Button
 								variant="ghost"
-								className="cursor-pointer text-sm font-medium text-foreground/70 transition-colors duration-200 hover:text-primary"
+								className="h-9 cursor-pointer px-3 text-sm font-medium text-foreground/80 hover:text-primary"
 								onClick={() => {
 									navigate("/login");
 								}}
@@ -148,7 +148,7 @@ export function Header() {
 								Đăng nhập
 							</Button>
 							<Button
-								className="cursor-pointer bg-primary text-sm font-semibold text-primary-foreground transition-colors duration-200 hover:bg-primary/90"
+								className="h-9 cursor-pointer bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors duration-150 hover:bg-primary/90"
 								onClick={() => {
 									navigate("/register");
 								}}

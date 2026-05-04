@@ -73,7 +73,7 @@ export default function RolePage() {
 			label: "Thao tác",
 			className: "w-[18%] text-center",
 			render: (row) => (
-				<div className="flex items-center gap-1">
+				<div className="flex items-center justify-center gap-1">
 					<Access permission={ALL_PERMISSIONS.ROLES.UPDATE} hideChildren>
 						<Button
 							variant="ghost"

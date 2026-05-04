@@ -114,11 +114,11 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
 	return (
 		<div className="flex h-full flex-col">
 			{/* Logo */}
-			<Link to="/" className="flex h-16 items-center gap-2.5 px-4">
-				<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-					<Briefcase className="h-4 w-4 text-primary-foreground" />
+			<Link to="/" className="flex h-14 items-center gap-2 px-4">
+				<div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
+					<Briefcase className="h-3.5 w-3.5 text-primary-foreground" />
 				</div>
-				<span className="font-heading text-lg font-bold text-foreground">
+				<span className="font-heading text-base font-bold text-foreground">
 					Job<span className="text-primary">Finder</span>
 				</span>
 			</Link>
@@ -126,13 +126,13 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
 			<Separator />
 
 			{/* Nav */}
-			<nav className="flex-1 space-y-1 overflow-y-auto p-3">
+			<nav className="flex-1 space-y-0.5 overflow-y-auto p-2">
 				{visibleItems.map((item) => (
 					<Link
 						key={item.path}
 						to={item.path}
 						onClick={onNavigate}
-						className={`flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150 ${
+						className={`flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150 ${
 							isActive(item.path)
 								? "bg-primary/10 text-primary"
 								: "text-foreground/70 hover:bg-accent hover:text-foreground"
@@ -147,21 +147,23 @@ export function AdminSidebar({ onNavigate }: { onNavigate?: () => void }) {
 			<Separator />
 
 			{/* User */}
-			<div className="p-3">
+			<div className="p-2">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button
 							variant="ghost"
-							className="w-full cursor-pointer justify-start gap-3 px-3 py-6"
+							className="h-auto w-full cursor-pointer justify-start gap-2.5 px-2 py-2"
 						>
-							<Avatar className="h-8 w-8">
-								<AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">
+							<Avatar className="h-7 w-7">
+								<AvatarFallback className="bg-primary/10 text-[11px] font-semibold text-primary">
 									{initials}
 								</AvatarFallback>
 							</Avatar>
-							<div className="flex-1 text-left">
-								<p className="text-sm font-medium leading-none">{user?.name}</p>
-								<p className="mt-0.5 text-xs text-muted-foreground">
+							<div className="flex-1 overflow-hidden text-left">
+								<p className="truncate text-xs font-medium leading-none">
+									{user?.name}
+								</p>
+								<p className="mt-0.5 truncate text-[11px] text-muted-foreground">
 									{user?.role.name}
 								</p>
 							</div>

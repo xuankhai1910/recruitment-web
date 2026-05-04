@@ -15,14 +15,13 @@ export function getScoreBadge(score: number) {
 	if (score >= 0.8)
 		return {
 			label: "Rất phù hợp",
-			className:
-				"bg-gradient-to-r from-emerald-500 to-green-500 text-white border-transparent",
+			className: "bg-[#22C55E] text-white border-transparent",
 			ringClass: "ring-emerald-200",
 		};
 	if (score >= 0.6)
 		return {
 			label: "Phù hợp",
-			className: "bg-blue-500 text-white border-transparent",
+			className: "bg-primary text-primary-foreground border-transparent",
 			ringClass: "ring-blue-200",
 		};
 	if (score >= 0.4)
@@ -46,58 +45,54 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 
 	return (
 		<Link to={`/jobs/${job._id}`} className="group block">
-			<Card
-				className={`relative overflow-hidden border border-border/60 transition-all duration-200 hover:border-primary/40 hover:bg-accent/30 hover:shadow-md`}
-			>
-				{/* Score ribbon */}
-				<div className="absolute right-0 top-0 z-10 flex items-center gap-1 rounded-bl-lg px-3 py-1.5 text-xs font-bold shadow-sm">
+			<Card className="relative cursor-pointer transition-colors duration-150 hover:border-primary/50">
+				{/* Score badge */}
+				<div className="absolute right-3 top-3 z-10">
 					<Badge
-						className={`gap-1 px-2.5 py-1 text-xs font-semibold ${badge.className}`}
+						className={`gap-1 px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}
 					>
 						<Sparkles className="h-3 w-3" />
 						{percent}% · {badge.label}
 					</Badge>
 				</div>
 
-				<CardContent className="flex gap-4 p-5 pt-6">
+				<CardContent className="flex gap-4 p-4 sm:p-5">
 					{job.company?.logo ? (
 						<img
 							src={companyLogoUrl(job.company.logo)}
 							alt={job.company.name}
-							className="h-14 w-14 shrink-0 rounded-lg object-contain"
+							className="h-14 w-14 shrink-0 rounded-md border border-border bg-white object-contain p-1"
 						/>
 					) : (
-						<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-secondary">
-							<Building2 className="h-7 w-7 text-primary/60" />
+						<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
+							<Building2 className="h-6 w-6 text-muted-foreground" />
 						</div>
 					)}
 
 					<div className="min-w-0 flex-1">
-						<div className="flex items-start justify-between gap-4">
-							<div className="min-w-0 pr-32 sm:pr-36">
-								<h3 className="line-clamp-1 font-heading text-base font-semibold text-foreground transition-colors duration-200 group-hover:text-primary">
-									{job.name}
-								</h3>
-								<p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
-									{job.company?.name}
-								</p>
-							</div>
+						<div className="min-w-0 pr-28 sm:pr-32">
+							<h3 className="line-clamp-1 font-heading text-base font-semibold text-foreground transition-colors duration-150 group-hover:text-primary">
+								{job.name}
+							</h3>
+							<p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
+								{job.company?.name}
+							</p>
 						</div>
 
-						<div className="mt-3 flex flex-wrap items-center gap-2">
-							<span className="rounded-md bg-emerald-500/10 px-2.5 py-0.5 font-heading text-sm font-bold text-emerald-700">
+						<div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+							<span className="font-heading text-sm font-semibold text-[#16A34A]">
 								{formatSalaryCompact(job.salary)}
 							</span>
-							<Badge variant="secondary" className="gap-1 font-normal">
-								<MapPin className="h-3 w-3" />
+							<span className="inline-flex items-center gap-1">
+								<MapPin className="h-3.5 w-3.5" />
 								{job.location}
-							</Badge>
-							<Badge variant="secondary" className="gap-1 font-normal">
-								<Banknote className="h-3 w-3" />
+							</span>
+							<span className="inline-flex items-center gap-1">
+								<Banknote className="h-3.5 w-3.5" />
 								{job.level}
-							</Badge>
-							<span className="ml-auto hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
-								<Clock className="h-3 w-3" />
+							</span>
+							<span className="ml-auto hidden items-center gap-1 sm:inline-flex">
+								<Clock className="h-3.5 w-3.5" />
 								{formatDistanceToNow(new Date(job.createdAt), {
 									addSuffix: true,
 									locale: vi,
@@ -107,17 +102,17 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 
 						{/* Skills with matched highlighted */}
 						{job.skills && job.skills.length > 0 && (
-							<div className="mt-2.5 flex flex-wrap gap-1">
+							<div className="mt-2.5 flex flex-wrap gap-1.5">
 								{job.skills.slice(0, 6).map((s) => {
 									const matched = matchedSet.has(s.toLowerCase());
 									return (
 										<Badge
 											key={s}
-											variant="outline"
+											variant="secondary"
 											className={
 												matched
-													? "border-emerald-200 bg-emerald-50 font-medium text-emerald-700"
-													: "font-normal"
+													? "rounded-md border border-emerald-200 bg-emerald-50 font-medium text-emerald-700 hover:bg-emerald-50"
+													: "rounded-md bg-muted font-normal text-foreground/80 hover:bg-muted"
 											}
 										>
 											{matched && "✓ "}
@@ -126,7 +121,10 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 									);
 								})}
 								{job.skills.length > 6 && (
-									<Badge variant="outline" className="font-normal">
+									<Badge
+										variant="secondary"
+										className="rounded-md bg-muted font-normal hover:bg-muted"
+									>
 										+{job.skills.length - 6}
 									</Badge>
 								)}
