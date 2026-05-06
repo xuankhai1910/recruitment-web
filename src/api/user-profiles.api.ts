@@ -16,5 +16,14 @@ export const userProfilesApi = {
     api.delete<ApiResponse<{ deleted: boolean }>>("/user-profiles/me"),
 
   exportPdf: () =>
-    api.post("/user-profiles/me/export-pdf", null, { responseType: "blob" }),
+    api
+      .post<
+        ApiResponse<{
+          fileName: string;
+          filePath: string;
+          url: string;
+          templateId?: string;
+        }>
+      >("/user-profiles/me/export-pdf", {})
+      .then((r) => r.data.data),
 };

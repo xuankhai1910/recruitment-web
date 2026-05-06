@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -47,8 +47,8 @@ import {
 	useUpsertProfile,
 } from "@/hooks/useUserProfile";
 import { useUser } from "@/hooks/useUsers";
-import { userProfilesApi } from "@/api/user-profiles.api";
 import { CvPreview } from "@/components/common/cv-builder/CvPreview";
+import { downloadNodeAsPdf } from "@/lib/pdf";
 import type {
 	CvTemplate,
 	UpsertUserProfileDto,
@@ -325,24 +325,19 @@ function CvBuilderForm({
 
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [exporting, setExporting] = useState(false);
+	const printRef = useRef<HTMLDivElement>(null);
 
 	const handleExportPdf = async () => {
+		if (!printRef.current) return;
 		try {
 			setExporting(true);
-			const res = await userProfilesApi.exportPdf();
-			const blob = new Blob([res.data as BlobPart], {
-				type: "application/pdf",
-			});
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = `${values.personalInfo.fullName || "CV"}.pdf`;
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			URL.revokeObjectURL(url);
+			await downloadNodeAsPdf(
+				printRef.current,
+				values.personalInfo.fullName || "CV",
+			);
 			toast.success("Đã tải CV PDF");
-		} catch {
+		} catch (e) {
+			console.error(e);
 			toast.error("Không thể tải PDF");
 		} finally {
 			setExporting(false);
@@ -421,7 +416,7 @@ function CvBuilderForm({
 							onClick={handleExportPdf}
 						>
 							<Download className="mr-1.5 h-4 w-4" />
-							{exporting ? "Đang tải..." : "PDF"}
+							{exporting ? "Đang tạo..." : "PDF"}
 						</Button>
 
 						<Button
@@ -884,6 +879,35 @@ function CvBuilderForm({
 					</div>
 				</DialogContent>
 			</Dialog>
+
+			{/* Offscreen render target for PDF capture (kept off-canvas, never visible) */}
+			<div
+				aria-hidden="true"
+				style={{
+					position: "fixed",
+					left: "-10000px",
+					top: 0,
+					width: "794px",
+					pointerEvents: "none",
+				}}
+			>
+				<div ref={printRef}>
+					<CvPreview
+						profile={
+							{
+								...(profile ?? ({} as UserProfile)),
+								...values,
+								_id: profile?._id ?? "",
+								userId: profile?.userId ?? "",
+								completionScore: completion,
+								createdAt: profile?.createdAt ?? new Date().toISOString(),
+								updatedAt: profile?.updatedAt ?? new Date().toISOString(),
+							} as UserProfile
+						}
+						template={values.templateId}
+					/>
+				</div>
+			</div>
 		</form>
 	);
 }

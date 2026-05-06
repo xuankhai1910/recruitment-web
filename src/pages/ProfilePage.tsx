@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -28,7 +28,8 @@ import {
 import { useAuthStore } from "@/stores/auth.store";
 import { useUser } from "@/hooks/useUsers";
 import { useMyProfile } from "@/hooks/useUserProfile";
-import { userProfilesApi } from "@/api/user-profiles.api";
+import { CvPreview } from "@/components/common/cv-builder/CvPreview";
+import { downloadNodeAsPdf } from "@/lib/pdf";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -113,25 +114,20 @@ export function ProfilePage() {
 	const { data: profile, isLoading: profileLoading } = useMyProfile();
 	const isLoading = userLoading || profileLoading;
 
+	const printRef = useRef<HTMLDivElement>(null);
 	const [exporting, setExporting] = useState(false);
 
 	const handleExportPdf = async () => {
+		if (!printRef.current) return;
 		try {
 			setExporting(true);
-			const res = await userProfilesApi.exportPdf();
-			const blob = new Blob([res.data as BlobPart], {
-				type: "application/pdf",
-			});
-			const url = URL.createObjectURL(blob);
-			const a = document.createElement("a");
-			a.href = url;
-			a.download = `${profile?.personalInfo.fullName || "CV"}.pdf`;
-			document.body.appendChild(a);
-			a.click();
-			a.remove();
-			URL.revokeObjectURL(url);
+			await downloadNodeAsPdf(
+				printRef.current,
+				profile?.personalInfo.fullName || "CV",
+			);
 			toast.success("Đã tải CV PDF");
-		} catch {
+		} catch (e) {
+			console.error(e);
 			toast.error("Không thể tải PDF");
 		} finally {
 			setExporting(false);
@@ -594,7 +590,7 @@ export function ProfilePage() {
 								disabled={exporting || !profile}
 							>
 								<Download className="mr-2 h-4 w-4" />
-								{exporting ? "Đang tải..." : "Tải CV PDF"}
+								{exporting ? "Đang tạo PDF..." : "Tải CV PDF"}
 							</Button>
 							<Button
 								className="w-full cursor-pointer"
@@ -620,6 +616,22 @@ export function ProfilePage() {
 						</CardContent>
 					</Card>
 				</aside>
+			</div>
+
+			{/* Offscreen render target for PDF capture (kept off-canvas, never visible) */}
+			<div
+				aria-hidden="true"
+				style={{
+					position: "fixed",
+					left: "-10000px",
+					top: 0,
+					width: "794px",
+					pointerEvents: "none",
+				}}
+			>
+				<div ref={printRef}>
+					<CvPreview profile={profile} />
+				</div>
 			</div>
 		</div>
 	);
