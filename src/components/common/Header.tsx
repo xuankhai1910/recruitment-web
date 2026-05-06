@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/useAuth";
-import { ManageAccountModal } from "@/components/common/ManageAccountModal";
 import { NotificationBell } from "@/components/common/notification";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -20,13 +18,13 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Settings,
+	UserCircle,
 } from "lucide-react";
 
 export function Header() {
 	const { isAuthenticated, user } = useAuthStore();
 	const navigate = useNavigate();
 	const logout = useLogout();
-	const [manageOpen, setManageOpen] = useState(false);
 
 	const isAdmin = user?.role?.name && user.role.name !== "NORMAL_USER";
 
@@ -39,7 +37,6 @@ export function Header() {
 
 	return (
 		<header className="sticky top-0 z-50 border-b border-border bg-card">
-			<ManageAccountModal open={manageOpen} onOpenChange={setManageOpen} />
 			<div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 				{/* Logo */}
 				<Link
@@ -107,22 +104,34 @@ export function Header() {
 									<DropdownMenuItem
 										className="cursor-pointer gap-2 transition-colors duration-150"
 										onClick={() => {
-											setManageOpen(true);
+											navigate("/profile");
+										}}
+									>
+										<UserCircle className="h-4 w-4" />
+										Hồ sơ cá nhân
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										className="cursor-pointer gap-2 transition-colors duration-150"
+										onClick={() => {
+											navigate("/account");
 										}}
 									>
 										<Settings className="h-4 w-4" />
 										Quản lý tài khoản
 									</DropdownMenuItem>
 									{isAdmin && (
-										<DropdownMenuItem
-											className="cursor-pointer gap-2 transition-colors duration-150"
-											onClick={() => {
-												navigate("/admin");
-											}}
-										>
-											<LayoutDashboard className="h-4 w-4" />
-											Trang quản trị
-										</DropdownMenuItem>
+										<>
+											<DropdownMenuSeparator />
+											<DropdownMenuItem
+												className="cursor-pointer gap-2 transition-colors duration-150"
+												onClick={() => {
+													navigate("/admin");
+												}}
+											>
+												<LayoutDashboard className="h-4 w-4" />
+												Trang quản trị
+											</DropdownMenuItem>
+										</>
 									)}
 									<DropdownMenuSeparator />
 									<DropdownMenuItem

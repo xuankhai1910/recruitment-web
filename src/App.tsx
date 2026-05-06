@@ -1,12 +1,23 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 import { authApi } from "@/api/auth.api";
 import { MainLayout } from "@/layouts/MainLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
+import { AccountLayout } from "@/layouts/AccountLayout";
 import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
+import { AuthenticatedRoute } from "@/components/guards/AuthenticatedRoute";
 import { HomePage } from "@/pages/HomePage";
+import { ProfilePage } from "@/pages/ProfilePage";
+import {
+	CvBuilderPage,
+	RecommendationCvPage,
+	ResumesPage,
+	SavedJobsPage,
+	SubscriberPage,
+	SettingsPage,
+} from "@/pages/account";
 import { JobsPage } from "@/pages/JobsPage";
 import { JobDetailPage } from "@/pages/JobDetailPage";
 import { RecommendedJobsPage } from "@/pages/RecommendedJobsPage";
@@ -76,8 +87,24 @@ export default function App() {
 					path="/tools/salary-calculator"
 					element={<SalaryCalculatorPage />}
 				/>
-				<Route element={<ProtectedRoute />}>
+				<Route element={<AuthenticatedRoute />}>
 					<Route path="/notifications" element={<NotificationsPage />} />
+					<Route path="/profile" element={<ProfilePage />} />
+					<Route element={<AccountLayout />}>
+						<Route
+							path="/account"
+							element={<Navigate to="/account/cv-builder" replace />}
+						/>
+						<Route path="/account/cv-builder" element={<CvBuilderPage />} />
+						<Route
+							path="/account/recommendation"
+							element={<RecommendationCvPage />}
+						/>
+						<Route path="/account/resumes" element={<ResumesPage />} />
+						<Route path="/account/saved-jobs" element={<SavedJobsPage />} />
+						<Route path="/account/subscriber" element={<SubscriberPage />} />
+						<Route path="/account/settings" element={<SettingsPage />} />
+					</Route>
 				</Route>
 			</Route>
 

@@ -29,7 +29,6 @@ import {
 	useRecommendedJobs,
 } from "@/hooks/useCvRecommendation";
 import { RecommendedJobCard } from "@/components/common/RecommendedJobCard";
-import { ManageAccountModal } from "@/components/common/ManageAccountModal";
 import { extractOriginalFileName } from "@/lib/format";
 
 const LIMIT_OPTIONS = [10, 20, 30, 50];
@@ -43,7 +42,6 @@ export function RecommendedJobsPage() {
 
 	const [limit, setLimit] = useState<number>(20);
 	const [minScore, setMinScore] = useState<string>("0");
-	const [manageOpen, setManageOpen] = useState(false);
 
 	const { data, isLoading, isFetching, refetch, dataUpdatedAt, error } =
 		useRecommendedJobs(limit, isAuthenticated && hasCv);
@@ -176,7 +174,7 @@ export function RecommendedJobsPage() {
 								size="sm"
 								variant="outline"
 								onClick={() => {
-									setManageOpen(true);
+									navigate("/account/recommendation");
 								}}
 								className="cursor-pointer border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:text-violet-700"
 							>
@@ -202,7 +200,7 @@ export function RecommendedJobsPage() {
 						</p>
 						<Button
 							onClick={() => {
-								setManageOpen(true);
+								navigate("/account/recommendation");
 							}}
 							className="mt-5 cursor-pointer bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white transition-opacity duration-150 hover:opacity-90"
 						>
@@ -310,7 +308,7 @@ export function RecommendedJobsPage() {
 									<Button
 										variant="outline"
 										onClick={() => {
-											setManageOpen(true);
+											navigate("/account/recommendation");
 										}}
 										className="cursor-pointer"
 									>
@@ -333,8 +331,6 @@ export function RecommendedJobsPage() {
 					</>
 				)}
 			</div>
-
-			<ManageAccountModal open={manageOpen} onOpenChange={setManageOpen} />
 		</div>
 	);
 }

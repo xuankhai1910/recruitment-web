@@ -6,12 +6,13 @@ import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
 import type { RecommendedJobItem } from "@/types/cv-recommendation";
 import { formatSalaryCompact, companyLogoUrl } from "@/lib/format";
+import { JobBookmarkButton } from "@/components/common/JobBookmarkButton";
 
 interface RecommendedJobCardProps {
 	item: RecommendedJobItem;
 }
 
-export function getScoreBadge(score: number) {
+function getScoreBadge(score: number) {
 	if (score >= 0.8)
 		return {
 			label: "Rất phù hợp",
@@ -46,8 +47,8 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 	return (
 		<Link to={`/jobs/${job._id}`} className="group block">
 			<Card className="relative cursor-pointer transition-colors duration-150 hover:border-primary/50">
-				{/* Score badge */}
-				<div className="absolute right-3 top-3 z-10">
+				<div className="absolute right-3 top-3 z-10 flex items-center gap-2">
+					<JobBookmarkButton jobId={job._id} />
 					<Badge
 						className={`gap-1 px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}
 					>

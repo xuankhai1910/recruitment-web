@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,11 +14,11 @@ import {
 	useRecommendedJobs,
 } from "@/hooks/useCvRecommendation";
 import { RecommendedJobCard } from "@/components/common/RecommendedJobCard";
-import { ManageAccountModal } from "@/components/common/ManageAccountModal";
 
 const HOME_LIMIT = 4;
 
 export function RecommendedJobs() {
+	const navigate = useNavigate();
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 	const { data: cvData, isLoading: cvLoading } = useRecommendationCv();
 	const hasCv = !!cvData?.recommendationCv;
@@ -30,8 +29,6 @@ export function RecommendedJobs() {
 		isFetching,
 		refetch,
 	} = useRecommendedJobs(HOME_LIMIT, isAuthenticated && hasCv);
-
-	const [manageOpen, setManageOpen] = useState(false);
 
 	// Hide entirely for guests
 	if (!isAuthenticated) return null;
@@ -50,40 +47,37 @@ export function RecommendedJobs() {
 	// No CV yet → CTA banner
 	if (!hasCv) {
 		return (
-			<>
-				<section className="px-4 py-10 sm:py-12">
-					<div className="mx-auto max-w-7xl">
-						<div className="rounded-lg border border-border bg-card p-5 sm:p-6">
-							<div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-								<div className="flex items-start gap-4">
-									<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-										<Brain className="h-5 w-5" />
-									</div>
-									<div className="space-y-1">
-										<h2 className="font-heading text-base font-semibold text-foreground sm:text-lg">
-											Nhận gợi ý việc làm dành riêng cho bạn
-										</h2>
-										<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-											Thiết lập CV để AI phân tích kỹ năng và tự động khớp với
-											các vị trí phù hợp nhất từ hàng nghìn tin tuyển dụng.
-										</p>
-									</div>
+			<section className="px-4 py-10 sm:py-12">
+				<div className="mx-auto max-w-7xl">
+					<div className="rounded-lg border border-border bg-card p-5 sm:p-6">
+						<div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex items-start gap-4">
+								<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+									<Brain className="h-5 w-5" />
 								</div>
-								<Button
-									onClick={() => {
-										setManageOpen(true);
-									}}
-									className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
-								>
-									<UserPlus className="mr-2 h-4 w-4" />
-									Thiết lập ngay
-								</Button>
+								<div className="space-y-1">
+									<h2 className="font-heading text-base font-semibold text-foreground sm:text-lg">
+										Nhận gợi ý việc làm dành riêng cho bạn
+									</h2>
+									<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+										Thiết lập CV để AI phân tích kỹ năng và tự động khớp với các
+										vị trí phù hợp nhất từ hàng nghìn tin tuyển dụng.
+									</p>
+								</div>
 							</div>
+							<Button
+								onClick={() => {
+									navigate("/account/recommendation");
+								}}
+								className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+							>
+								<UserPlus className="mr-2 h-4 w-4" />
+								Thiết lập ngay
+							</Button>
 						</div>
 					</div>
-				</section>
-				<ManageAccountModal open={manageOpen} onOpenChange={setManageOpen} />
-			</>
+				</div>
+			</section>
 		);
 	}
 
@@ -147,7 +141,7 @@ export function RecommendedJobs() {
 						<Button
 							variant="outline"
 							onClick={() => {
-								setManageOpen(true);
+								navigate("/account/recommendation");
 							}}
 							className="cursor-pointer"
 						>
@@ -162,7 +156,6 @@ export function RecommendedJobs() {
 					</div>
 				)}
 			</div>
-			<ManageAccountModal open={manageOpen} onOpenChange={setManageOpen} />
 		</section>
 	);
 }
