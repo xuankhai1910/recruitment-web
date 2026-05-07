@@ -7,6 +7,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const PAGE_SIZE = 5;
+const SKELETON_KEYS = [
+	"company-sk-1",
+	"company-sk-2",
+	"company-sk-3",
+	"company-sk-4",
+	"company-sk-5",
+];
 
 export function TopCompanies() {
 	const [page, setPage] = useState(1);
@@ -20,15 +27,15 @@ export function TopCompanies() {
 	const companies = data?.result ?? [];
 
 	return (
-		<section className="border-y border-border bg-card px-4 py-12">
+		<section className="bg-white px-4 py-8">
 			<div className="mx-auto max-w-7xl">
 				{/* Section header */}
 				<div className="mb-6 flex items-end justify-between">
 					<div>
-						<h2 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
+						<h2 className="text-lg font-bold text-slate-900">
 							Công ty hàng đầu
 						</h2>
-						<p className="mt-1 text-sm text-muted-foreground">
+						<p className="mt-1 text-sm text-slate-500">
 							Các nhà tuyển dụng uy tín đang tìm kiếm nhân tài
 						</p>
 					</div>
@@ -66,20 +73,20 @@ export function TopCompanies() {
 				{/* Grid */}
 				{isLoading ? (
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-						{Array.from({ length: PAGE_SIZE }).map((_, i) => (
-							<Skeleton key={i} className="h-40 rounded-lg" />
+						{SKELETON_KEYS.map((key) => (
+							<Skeleton key={key} className="h-40 rounded-xl" />
 						))}
 					</div>
 				) : companies.length === 0 ? (
 					<div className="flex flex-col items-center gap-3 py-16">
-						<Building2 className="h-12 w-12 text-muted-foreground/40" />
-						<p className="text-muted-foreground">Chưa có công ty nào</p>
+						<Building2 className="h-12 w-12 text-slate-300" />
+						<p className="text-slate-500">Chưa có công ty nào</p>
 					</div>
 				) : (
 					<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
 						{companies.map((c) => (
 							<Link key={c._id} to={`/companies/${c._id}`}>
-								<Card className="group h-full cursor-pointer transition-colors duration-150 hover:border-primary/50">
+								<Card className="group h-full cursor-pointer rounded-xl border-slate-100 bg-white transition-all duration-150 hover:border-blue-200 hover:shadow-sm">
 									<CardContent className="flex flex-col items-center p-5 text-center">
 										{c.logo ? (
 											<img
@@ -89,17 +96,17 @@ export function TopCompanies() {
 														: `${import.meta.env.VITE_STATIC_URL}/images/company/${c.logo}`
 												}
 												alt={c.name}
-												className="mb-3 h-14 w-14 rounded-md border border-border bg-white object-contain p-1"
+												className="mb-3 h-14 w-14 rounded-md border border-slate-200 bg-white object-contain p-1"
 											/>
 										) : (
-											<div className="mb-3 flex h-14 w-14 items-center justify-center rounded-md border border-border bg-muted">
-												<Building2 className="h-7 w-7 text-muted-foreground" />
+											<div className="mb-3 flex h-14 w-14 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
+												<Building2 className="h-7 w-7 text-slate-400" />
 											</div>
 										)}
-										<h3 className="line-clamp-1 font-heading text-sm font-semibold text-foreground transition-colors duration-150 group-hover:text-primary">
+										<h3 className="line-clamp-1 text-sm font-semibold text-slate-900 transition-colors duration-150 group-hover:text-blue-600">
 											{c.name}
 										</h3>
-										<p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
+										<p className="mt-1.5 flex items-center gap-1 text-xs text-slate-400">
 											<MapPin className="h-3 w-3 shrink-0" />
 											<span className="line-clamp-1">{c.address}</span>
 										</p>

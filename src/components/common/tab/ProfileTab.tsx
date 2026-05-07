@@ -111,7 +111,7 @@ export function ProfileTab() {
 			<Button
 				onClick={handleSave}
 				disabled={update.isPending}
-				className="cursor-pointer bg-primary text-primary-foreground transition-colors duration-150 hover:bg-primary/90"
+				className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 			>
 				{update.isPending ? "Đang lưu..." : "Lưu thay đổi"}
 			</Button>
@@ -119,8 +119,8 @@ export function ProfileTab() {
 			{/* Job Seeking toggle */}
 			<div className="mt-4 flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-4">
 				<div className="flex items-start gap-3">
-					<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10">
-						<Search className="h-4 w-4 text-primary" />
+					<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-blue-50">
+						<Search className="h-4 w-4 text-blue-600" />
 					</div>
 					<div className="min-w-0">
 						<p className="font-heading text-sm font-semibold text-foreground">
@@ -147,7 +147,7 @@ export function ProfileTab() {
 					}}
 					className={cn(
 						"relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors",
-						jobSeeking ? "bg-[#22C55E]" : "bg-muted",
+						jobSeeking ? "bg-blue-600" : "bg-muted",
 						updateJobSeeking.isPending && "opacity-60",
 					)}
 				>

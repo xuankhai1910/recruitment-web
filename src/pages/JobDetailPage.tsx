@@ -33,6 +33,13 @@ import { formatSalary } from "@/lib/constants";
 import { companyLogoUrl } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+const SIMILAR_JOB_SKELETON_KEYS = [
+	"similar-job-sk-1",
+	"similar-job-sk-2",
+	"similar-job-sk-3",
+	"similar-job-sk-4",
+];
+
 export function JobDetailPage() {
 	const { id = "" } = useParams<{ id: string }>();
 	const navigate = useNavigate();
@@ -67,11 +74,11 @@ export function JobDetailPage() {
 	if (!job) {
 		return (
 			<div className="mx-auto max-w-3xl px-4 py-20 text-center">
-				<Briefcase className="mx-auto h-12 w-12 text-muted-foreground/40" />
-				<h2 className="mt-4 font-heading text-xl font-semibold text-foreground">
+				<Briefcase className="mx-auto h-12 w-12 text-slate-300" />
+				<h2 className="mt-4 text-xl font-semibold text-slate-900">
 					Không tìm thấy công việc
 				</h2>
-				<p className="mt-1 text-sm text-muted-foreground">
+				<p className="mt-1 text-sm text-slate-500">
 					Công việc có thể đã được gỡ xuống hoặc không tồn tại.
 				</p>
 				<Button
@@ -91,7 +98,7 @@ export function JobDetailPage() {
 			{/* Back link */}
 			<Link
 				to="/jobs"
-				className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-primary"
+				className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-sm text-slate-500 transition-colors duration-150 hover:text-blue-600"
 			>
 				<ArrowLeft className="h-4 w-4" />
 				Quay lại danh sách
@@ -101,31 +108,31 @@ export function JobDetailPage() {
 				{/* Main */}
 				<div className="space-y-6">
 					{/* Header card */}
-					<Card>
+					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5 sm:p-6">
 							<div className="flex items-start gap-4">
 								{job.company?.logo ? (
 									<img
 										src={companyLogoUrl(job.company.logo)}
 										alt={job.company.name}
-										className="h-16 w-16 shrink-0 rounded-md border border-border bg-white object-contain p-1"
+										className="h-14 w-14 shrink-0 rounded-md border border-slate-200 bg-white object-contain p-1"
 									/>
 								) : (
-									<div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-										<Building2 className="h-7 w-7 text-muted-foreground" />
+									<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
+										<Building2 className="h-6 w-6 text-slate-400" />
 									</div>
 								)}
 								<div className="min-w-0 flex-1">
-									<h1 className="font-heading text-xl font-bold leading-tight text-foreground sm:text-2xl">
+									<h1 className="text-xl font-bold leading-tight text-slate-900">
 										{job.name}
 									</h1>
 									<Link
 										to={`/companies/${job.company._id}`}
-										className="mt-1 inline-block cursor-pointer text-sm text-muted-foreground transition-colors duration-150 hover:text-primary"
+										className="mt-1 inline-block cursor-pointer text-sm text-slate-500 transition-colors duration-150 hover:text-blue-600"
 									>
 										{job.company.name}
 									</Link>
-									<div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+									<div className="mt-2 flex items-center gap-1 text-xs text-slate-500">
 										<Clock className="h-3 w-3" />
 										Đăng{" "}
 										{formatDistanceToNow(new Date(job.createdAt), {
@@ -141,20 +148,20 @@ export function JobDetailPage() {
 									<Badge
 										key={s}
 										variant="secondary"
-										className="rounded-md bg-primary/5 font-normal text-primary hover:bg-primary/5"
+										className="rounded-md bg-blue-50 font-normal text-blue-700 hover:bg-blue-50"
 									>
 										{s}
 									</Badge>
 								))}
 							</div>
 
-							<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+							<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
 								<div>
-									<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									<div className="flex items-center gap-1.5 text-xs text-slate-500">
 										<Banknote className="h-3.5 w-3.5" />
 										Mức lương
 									</div>
-									<p className="mt-0.5 font-heading text-lg font-bold text-[#16A34A]">
+									<p className="mt-0.5 text-lg font-bold text-blue-600">
 										{formatSalary(job.salary)}
 									</p>
 								</div>
@@ -163,7 +170,7 @@ export function JobDetailPage() {
 										onClick={() => {
 											setApplyOpen(true);
 										}}
-										className="cursor-pointer bg-[#22C55E] text-white transition-colors duration-150 hover:bg-[#16A34A]"
+										className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 										size="lg"
 										disabled={!job.isActive}
 									>
@@ -176,9 +183,9 @@ export function JobDetailPage() {
 										variant="outline"
 										size="lg"
 										className={cn(
-											"cursor-pointer",
+											"cursor-pointer border-slate-200 text-slate-700 hover:border-blue-300 hover:text-blue-700",
 											saved &&
-												"border-primary bg-primary/10 text-primary hover:bg-primary/15",
+												"border-blue-400 bg-blue-50 text-blue-600 hover:bg-blue-50 hover:text-blue-600",
 										)}
 									>
 										{saved ? (
@@ -199,41 +206,41 @@ export function JobDetailPage() {
 					</Card>
 
 					{/* Description */}
-					<Card>
+					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5 sm:p-6">
-							<h2 className="font-heading text-base font-semibold text-foreground">
+							<h2 className="text-base font-semibold text-slate-900">
 								Mô tả công việc
 							</h2>
 							<div
-								className="prose prose-sm mt-3 max-w-none text-foreground/90 prose-headings:font-heading prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground prose-ul:my-2 prose-ol:my-2"
+								className="prose prose-sm mt-3 max-w-none text-slate-700 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900 prose-ul:my-2 prose-ol:my-2"
 								dangerouslySetInnerHTML={{ __html: job.description }}
 							/>
 						</CardContent>
 					</Card>
 
 					{/* Similar Jobs */}
-					<Card>
+					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5 sm:p-6">
 							<div className="flex items-center gap-2">
-								<Sparkles className="h-4 w-4 text-primary" />
-								<h2 className="font-heading text-base font-semibold text-foreground">
+								<Sparkles className="h-4 w-4 text-blue-600" />
+								<h2 className="text-base font-semibold text-slate-900">
 									Việc làm tương tự
 								</h2>
 							</div>
 							{isLoadingSimilar ? (
-								<div className="mt-4 grid gap-3 lg:grid-cols-2">
-									{Array.from({ length: 4 }).map((_, i) => (
-										<Skeleton key={i} className="h-28 rounded-lg" />
+								<div className="mt-4 grid gap-4 lg:grid-cols-2">
+									{SIMILAR_JOB_SKELETON_KEYS.map((key) => (
+										<Skeleton key={key} className="h-52 rounded-xl" />
 									))}
 								</div>
 							) : similarJobs && similarJobs.length > 0 ? (
-								<div className="mt-4 grid gap-3 lg:grid-cols-2">
+								<div className="mt-4 grid gap-4 lg:grid-cols-2">
 									{similarJobs.slice(0, 6).map((j) => (
-										<JobCard key={j._id} job={j} />
+										<JobCard key={j._id} job={j} variant="card" />
 									))}
 								</div>
 							) : (
-								<p className="mt-3 text-sm text-muted-foreground">
+								<p className="mt-3 text-sm text-slate-500">
 									Chưa có việc làm tương tự.
 								</p>
 							)}
@@ -243,52 +250,48 @@ export function JobDetailPage() {
 
 				{/* Sidebar */}
 				<aside className="space-y-4 lg:sticky lg:top-16 lg:self-start">
-					<Card>
+					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5">
-							<h3 className="font-heading text-sm font-semibold text-foreground">
+							<h3 className="text-sm font-semibold text-slate-900">
 								Thông tin chung
 							</h3>
 							<dl className="mt-3 space-y-2.5 text-sm">
 								<div className="flex items-center justify-between gap-3">
-									<dt className="flex items-center gap-1.5 text-muted-foreground">
+									<dt className="flex items-center gap-1.5 text-slate-500">
 										<MapPin className="h-3.5 w-3.5" />
 										Địa điểm
 									</dt>
-									<dd className="font-medium text-foreground">
-										{job.location}
-									</dd>
+									<dd className="font-medium text-slate-900">{job.location}</dd>
 								</div>
 								<div className="flex items-center justify-between gap-3">
-									<dt className="flex items-center gap-1.5 text-muted-foreground">
+									<dt className="flex items-center gap-1.5 text-slate-500">
 										<Briefcase className="h-3.5 w-3.5" />
 										Cấp bậc
 									</dt>
-									<dd className="font-medium text-foreground">{job.level}</dd>
+									<dd className="font-medium text-slate-900">{job.level}</dd>
 								</div>
 								<div className="flex items-center justify-between gap-3">
-									<dt className="flex items-center gap-1.5 text-muted-foreground">
+									<dt className="flex items-center gap-1.5 text-slate-500">
 										<Users className="h-3.5 w-3.5" />
 										Số lượng
 									</dt>
-									<dd className="font-medium text-foreground">
-										{job.quantity}
-									</dd>
+									<dd className="font-medium text-slate-900">{job.quantity}</dd>
 								</div>
 								<div className="flex items-center justify-between gap-3">
-									<dt className="flex items-center gap-1.5 text-muted-foreground">
+									<dt className="flex items-center gap-1.5 text-slate-500">
 										<Calendar className="h-3.5 w-3.5" />
 										Bắt đầu
 									</dt>
-									<dd className="text-foreground">
+									<dd className="text-slate-900">
 										{format(new Date(job.startDate), "dd/MM/yyyy")}
 									</dd>
 								</div>
 								<div className="flex items-center justify-between gap-3">
-									<dt className="flex items-center gap-1.5 text-muted-foreground">
+									<dt className="flex items-center gap-1.5 text-slate-500">
 										<Calendar className="h-3.5 w-3.5" />
 										Kết thúc
 									</dt>
-									<dd className="text-foreground">
+									<dd className="text-slate-900">
 										{format(new Date(job.endDate), "dd/MM/yyyy")}
 									</dd>
 								</div>
@@ -296,11 +299,9 @@ export function JobDetailPage() {
 						</CardContent>
 					</Card>
 
-					<Card>
+					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5">
-							<h3 className="font-heading text-sm font-semibold text-foreground">
-								Công ty
-							</h3>
+							<h3 className="text-sm font-semibold text-slate-900">Công ty</h3>
 							<Link
 								to={`/companies/${job.company._id}`}
 								className="mt-3 flex cursor-pointer items-center gap-3 transition-opacity duration-150 hover:opacity-80"
@@ -309,40 +310,40 @@ export function JobDetailPage() {
 									<img
 										src={companyLogoUrl(job.company.logo)}
 										alt={job.company.name}
-										className="h-12 w-12 shrink-0 rounded-md border border-border bg-white object-contain p-1"
+										className="h-12 w-12 shrink-0 rounded-md border border-slate-200 bg-white object-contain p-1"
 									/>
 								) : (
-									<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-										<Building2 className="h-5 w-5 text-muted-foreground" />
+									<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50">
+										<Building2 className="h-5 w-5 text-slate-400" />
 									</div>
 								)}
 								<div className="min-w-0">
-									<p className="line-clamp-1 font-heading text-sm font-semibold text-foreground">
+									<p className="line-clamp-1 text-sm font-semibold text-slate-900">
 										{job.company.name}
 									</p>
-									<p className="mt-0.5 text-xs text-primary">
+									<p className="mt-0.5 text-xs text-blue-600">
 										Xem hồ sơ công ty →
 									</p>
 								</div>
 							</Link>
 
 							{(company?.email || company?.phone) && (
-								<div className="mt-4 space-y-2 border-t border-border pt-3">
+								<div className="mt-4 space-y-2 border-t border-slate-200 pt-3">
 									{company?.email && (
 										<a
 											href={`mailto:${company.email}`}
-											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
+											className="flex items-center gap-2 text-sm text-slate-600 transition-colors duration-150 hover:text-blue-600"
 										>
-											<Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+											<Mail className="h-3.5 w-3.5 shrink-0 text-slate-400" />
 											<span className="truncate">{company.email}</span>
 										</a>
 									)}
 									{company?.phone && (
 										<a
 											href={`tel:${company.phone}`}
-											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
+											className="flex items-center gap-2 text-sm text-slate-600 transition-colors duration-150 hover:text-blue-600"
 										>
-											<Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+											<Phone className="h-3.5 w-3.5 shrink-0 text-slate-400" />
 											{company.phone}
 										</a>
 									)}

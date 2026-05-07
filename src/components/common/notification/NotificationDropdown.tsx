@@ -41,7 +41,7 @@ export function NotificationDropdown({
 						Thông báo
 					</h3>
 					{unread > 0 && (
-						<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+						<span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
 							{unread} mới
 						</span>
 					)}
@@ -54,7 +54,7 @@ export function NotificationDropdown({
 						</span>
 					)}
 					{isFetching && !showSkeleton && (
-						<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary/60" />
+						<span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
 					)}
 				</div>
 				<Button
@@ -98,7 +98,7 @@ export function NotificationDropdown({
 				<Link
 					to="/notifications"
 					onClick={onItemNavigate}
-					className="block w-full rounded-md py-1.5 text-center text-xs font-semibold text-primary transition-colors duration-150 hover:bg-primary/5"
+					className="block w-full rounded-md py-1.5 text-center text-xs font-semibold text-blue-600 transition-colors duration-150 hover:bg-blue-50"
 				>
 					Xem tất cả thông báo
 				</Link>

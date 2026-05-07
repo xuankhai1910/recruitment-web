@@ -68,7 +68,7 @@ export function RecommendedJobsPage() {
 		return (
 			<div className="px-4 py-16">
 				<div className="mx-auto max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
-					<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+					<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
 						<Brain className="h-6 w-6" />
 					</div>
 					<h2 className="font-heading text-lg font-semibold text-foreground">
@@ -91,7 +91,7 @@ export function RecommendedJobsPage() {
 							onClick={() => {
 								navigate("/login");
 							}}
-							className="cursor-pointer"
+							className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 						>
 							Đăng nhập
 						</Button>
@@ -116,23 +116,23 @@ export function RecommendedJobsPage() {
 				</div>
 
 				{/* Hero header */}
-				<div className="mb-6 overflow-hidden rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50/60 p-5 shadow-sm sm:p-6">
+				<div className="mb-6 overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm sm:p-6">
 					<div className="flex flex-wrap items-start justify-between gap-4">
 						<div className="flex items-start gap-3">
-							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-md">
+							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md">
 								<Sparkles className="h-6 w-6" />
 							</div>
 							<div className="space-y-1">
-								<h1 className="flex items-center gap-2 font-heading text-2xl font-bold text-violet-950">
+								<h1 className="flex items-center gap-2 font-heading text-2xl font-bold text-slate-900">
 									Việc làm gợi ý cho bạn
-									<Badge className="bg-gradient-to-r from-violet-100 to-fuchsia-100 font-semibold text-violet-700">
+									<Badge className="bg-blue-100 font-semibold text-blue-700">
 										AI
 									</Badge>
 								</h1>
 								{cvData?.recommendationCv ? (
-									<p className="text-sm text-violet-900/80">
+									<p className="text-sm text-slate-600">
 										Dựa trên CV{" "}
-										<span className="font-medium text-violet-950">
+										<span className="font-medium text-slate-900">
 											{extractOriginalFileName(
 												cvData.recommendationCv.resumeUrl,
 											)}
@@ -148,7 +148,7 @@ export function RecommendedJobsPage() {
 										)}
 									</p>
 								) : (
-									<p className="text-sm text-violet-900/80">
+									<p className="text-sm text-slate-600">
 										Bạn chưa thiết lập CV để nhận gợi ý.
 									</p>
 								)}
@@ -176,7 +176,7 @@ export function RecommendedJobsPage() {
 								onClick={() => {
 									navigate("/account/recommendation");
 								}}
-								className="cursor-pointer border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:text-violet-700"
+								className="cursor-pointer border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-700"
 							>
 								<Settings2 className="mr-1.5 h-3.5 w-3.5" />
 								{hasCv ? "Đổi CV" : "Thiết lập CV"}
@@ -188,7 +188,7 @@ export function RecommendedJobsPage() {
 				{/* Empty CV state */}
 				{!cvLoading && !hasCv && (
 					<div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
 							<Brain className="h-7 w-7" />
 						</div>
 						<h3 className="font-heading text-base font-semibold text-foreground">
@@ -202,7 +202,7 @@ export function RecommendedJobsPage() {
 							onClick={() => {
 								navigate("/account/recommendation");
 							}}
-							className="mt-5 cursor-pointer bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white transition-opacity duration-150 hover:opacity-90"
+							className="mt-5 cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 						>
 							<Sparkles className="mr-2 h-4 w-4" />
 							Thiết lập CV ngay

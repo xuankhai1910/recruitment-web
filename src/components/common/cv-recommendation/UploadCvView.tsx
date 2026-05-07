@@ -41,16 +41,16 @@ export function UploadCvView({ onBack, onSubmit }: UploadCvViewProps) {
 		<div className="space-y-4">
 			<BackButton onClick={handleBack} />
 
-			<div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-fuchsia-50/50 p-4">
+			<div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
 				<div className="flex items-start gap-3">
-					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-sm">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
 						<Sparkles className="h-5 w-5" />
 					</div>
 					<div className="space-y-1">
-						<p className="font-heading text-sm font-semibold text-violet-950">
+						<p className="font-heading text-sm font-semibold text-slate-900">
 							Upload CV để nhận gợi ý việc làm
 						</p>
-						<p className="text-xs leading-5 text-violet-900/80">
+						<p className="text-xs leading-5 text-slate-600">
 							File CV (PDF, ≤ 5MB) sẽ được phân tích bằng AI để gợi ý các vị trí
 							phù hợp với kỹ năng & kinh nghiệm của bạn.
 						</p>
@@ -60,8 +60,8 @@ export function UploadCvView({ onBack, onSubmit }: UploadCvViewProps) {
 
 			{pendingFile ? (
 				<div className="flex items-center gap-3 rounded-lg border border-border bg-muted/40 p-3">
-					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-						<FileText className="h-5 w-5 text-primary" />
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+						<FileText className="h-5 w-5 text-blue-600" />
 					</div>
 					<div className="min-w-0 flex-1">
 						<p
@@ -91,13 +91,13 @@ export function UploadCvView({ onBack, onSubmit }: UploadCvViewProps) {
 					{...getRootProps()}
 					className={`flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 text-center transition-colors duration-200 ${
 						isDragActive
-							? "border-primary bg-primary/5"
-							: "border-border hover:border-primary/50 hover:bg-accent/30"
+							? "border-blue-400 bg-blue-50"
+							: "border-border hover:border-blue-300 hover:bg-blue-50"
 					}`}
 				>
 					<input {...getInputProps()} />
-					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-						<Upload className="h-6 w-6 text-primary" />
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+						<Upload className="h-6 w-6 text-blue-600" />
 					</div>
 					<div>
 						<p className="text-sm font-medium text-foreground">
@@ -123,7 +123,7 @@ export function UploadCvView({ onBack, onSubmit }: UploadCvViewProps) {
 						if (pendingFile) void onSubmit(pendingFile);
 					}}
 					disabled={!pendingFile}
-					className="cursor-pointer bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white transition-opacity duration-150 hover:opacity-90"
+					className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 				>
 					<Sparkles className="mr-2 h-4 w-4" />
 					Phân tích & thiết lập

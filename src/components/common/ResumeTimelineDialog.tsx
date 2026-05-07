@@ -31,8 +31,8 @@ const STATUS_STYLE: Record<string, { dot: string; badge: string }> = {
 		badge: "bg-blue-50 text-blue-700 border-blue-200",
 	},
 	APPROVED: {
-		dot: "bg-green-500",
-		badge: "bg-green-50 text-green-700 border-green-200",
+		dot: "bg-blue-500",
+		badge: "bg-blue-50 text-blue-700 border-blue-200",
 	},
 	REJECTED: {
 		dot: "bg-red-500",
@@ -93,7 +93,7 @@ export function ResumeTimelineDialog({
 				<div className="space-y-4">
 					<div className="rounded-lg border border-border bg-muted/30 p-3">
 						<div className="flex items-center gap-2">
-							<FileSearch className="h-4 w-4 text-primary" />
+							<FileSearch className="h-4 w-4 text-blue-600" />
 							<p className="line-clamp-1 font-heading text-sm font-semibold text-foreground">
 								{job.name}
 							</p>
@@ -121,7 +121,7 @@ export function ResumeTimelineDialog({
 											className={cn(
 												"flex h-8 w-8 items-center justify-center rounded-full ring-2 ring-offset-2 ring-offset-card",
 												reached ? style.dot : "bg-muted",
-												isCurrent ? "ring-primary" : "ring-transparent",
+												isCurrent ? "ring-blue-500" : "ring-transparent",
 											)}
 										>
 											{reached && (
@@ -132,7 +132,7 @@ export function ResumeTimelineDialog({
 											className={cn(
 												"mt-1 text-[10px] font-medium",
 												isCurrent
-													? "text-primary"
+													? "text-blue-600"
 													: reached
 														? "text-foreground"
 														: "text-muted-foreground",
@@ -145,7 +145,7 @@ export function ResumeTimelineDialog({
 										<div
 											className={cn(
 												"mb-4 h-0.5 flex-1",
-												reached ? "bg-primary/60" : "bg-muted",
+												reached ? "bg-blue-500" : "bg-muted",
 											)}
 										/>
 									)}
@@ -179,7 +179,7 @@ export function ResumeTimelineDialog({
 												className={cn(
 													"absolute -left-[11px] top-0 flex h-5 w-5 items-center justify-center rounded-full",
 													style?.dot ?? "bg-muted",
-													isLast && "ring-4 ring-primary/20",
+													isLast && "ring-4 ring-blue-200",
 												)}
 											>
 												<Icon className="h-3 w-3 text-white" />

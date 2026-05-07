@@ -5,7 +5,7 @@ import { Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { JobCard } from "@/components/common/JobCard";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 8;
 
 export function LatestJobs() {
 	const [page, setPage] = useState(1);
@@ -25,10 +25,10 @@ export function LatestJobs() {
 				{/* Section header */}
 				<div className="mb-6 flex items-end justify-between">
 					<div>
-						<h2 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
+						<h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
 							Việc làm mới nhất
 						</h2>
-						<p className="mt-1 text-sm text-muted-foreground">
+						<p className="mt-1 text-sm text-slate-500">
 							Cập nhật liên tục các cơ hội việc làm hấp dẫn
 						</p>
 					</div>
@@ -63,14 +63,14 @@ export function LatestJobs() {
 					)}
 				</div>
 
-				{/* Job list */}
+				{/* Job grid */}
 				{isLoading ? (
-					<div className="space-y-3">
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						{Array.from(
 							{ length: PAGE_SIZE },
 							(_, index) => `latest-job-skeleton-${index}`,
 						).map((skeletonId) => (
-							<Skeleton key={skeletonId} className="h-24 rounded-lg" />
+							<Skeleton key={skeletonId} className="h-52 rounded-xl" />
 						))}
 					</div>
 				) : jobs.length === 0 ? (
@@ -79,9 +79,9 @@ export function LatestJobs() {
 						<p className="text-muted-foreground">Chưa có việc làm nào</p>
 					</div>
 				) : (
-					<div className="flex flex-col gap-3">
+					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						{jobs.map((job) => (
-							<JobCard key={job._id} job={job} />
+							<JobCard key={job._id} job={job} variant="card" />
 						))}
 					</div>
 				)}

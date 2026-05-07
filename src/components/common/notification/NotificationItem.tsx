@@ -56,7 +56,7 @@ export function NotificationItem({
 			className={cn(
 				"group flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-3 text-left transition-colors duration-150",
 				"hover:bg-accent focus-visible:bg-accent focus-visible:outline-none",
-				!notification.isRead && "bg-primary/[0.04]",
+				!notification.isRead && "bg-blue-50/70",
 				className,
 			)}
 			aria-label={notification.title}
@@ -83,7 +83,7 @@ export function NotificationItem({
 					</p>
 					{!notification.isRead && (
 						<span
-							className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary"
+							className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500"
 							role="status"
 							aria-label="Chưa đọc"
 						/>

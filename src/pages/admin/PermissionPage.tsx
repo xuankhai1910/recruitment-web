@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Plus, Pencil, Eye, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import {
+	Plus,
+	Pencil,
+	Eye,
+	RotateCcw,
+	ArrowUpDown,
+	ArrowUp,
+	ArrowDown,
+} from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -48,16 +56,32 @@ export default function PermissionPage() {
 	};
 
 	const SortIcon = ({ field }: { field: "name" | "apiPath" }) => {
-		if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
-		return sortDir === "asc"
-			? <ArrowUp className="h-3.5 w-3.5 text-primary" />
-			: <ArrowDown className="h-3.5 w-3.5 text-primary" />;
+		if (sortField !== field)
+			return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
+		return sortDir === "asc" ? (
+			<ArrowUp className="h-3.5 w-3.5 text-primary" />
+		) : (
+			<ArrowDown className="h-3.5 w-3.5 text-primary" />
+		);
 	};
 
-	const sortParam = sortField ? (sortDir === "asc" ? sortField : `-${sortField}`) : undefined;
+	const sortParam = sortField
+		? sortDir === "asc"
+			? sortField
+			: `-${sortField}`
+		: undefined;
 
 	const { data, isLoading } = useQuery({
-		queryKey: ["permissions", page, pageSize, search, methods, modules, sortField, sortDir],
+		queryKey: [
+			"permissions",
+			page,
+			pageSize,
+			search,
+			methods,
+			modules,
+			sortField,
+			sortDir,
+		],
 		queryFn: () =>
 			permissionsApi
 				.getList({
@@ -170,7 +194,7 @@ export default function PermissionPage() {
 			label: "Thao tác",
 			className: "w-[12%] text-center",
 			render: (row) => (
-				<div className="flex items-center gap-1">
+				<div className="flex items-center gap-1 justify-center">
 					<Button
 						variant="ghost"
 						size="icon"

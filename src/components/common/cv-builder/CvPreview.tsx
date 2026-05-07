@@ -110,7 +110,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 									</div>
 									<div className="mt-1 h-1 w-full rounded-full bg-slate-700">
 										<div
-											className="h-full rounded-full bg-sky-400"
+											className="h-full rounded-full bg-blue-500"
 											style={{ width: `${SKILL_LEVEL_PCT[s.level] ?? 50}%` }}
 										/>
 									</div>
@@ -159,7 +159,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 			<main className="flex-1 p-7">
 				{profile.summary && (
 					<section>
-						<h3 className="mb-2 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-sky-700">
+						<h3 className="mb-2 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-blue-600">
 							Giới thiệu
 						</h3>
 						<p className="whitespace-pre-line text-[12px] text-slate-700">
@@ -170,7 +170,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 
 				{profile.experiences?.length > 0 && (
 					<section className="mt-5">
-						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-sky-700">
+						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-blue-600">
 							<Briefcase className="h-4 w-4" /> Kinh nghiệm làm việc
 						</h3>
 						<div className="space-y-3">
@@ -185,7 +185,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 											{e.isCurrent ? "Hiện tại" : fmt(e.endDate)}
 										</span>
 									</div>
-									<p className="text-[12px] font-medium text-sky-700">
+									<p className="text-[12px] font-medium text-blue-600">
 										{e.company}
 									</p>
 									<p className="mt-1 whitespace-pre-line text-[11.5px] text-slate-700">
@@ -199,7 +199,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 
 				{profile.education?.length > 0 && (
 					<section className="mt-5">
-						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-sky-700">
+						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-blue-600">
 							<GraduationCap className="h-4 w-4" /> Học vấn
 						</h3>
 						<div className="space-y-3">
@@ -230,7 +230,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 
 				{profile.projects?.length > 0 && (
 					<section className="mt-5">
-						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-sky-700">
+						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-blue-600">
 							<Wrench className="h-4 w-4" /> Dự án
 						</h3>
 						<div className="space-y-3">
@@ -253,7 +253,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 										{pr.description}
 									</p>
 									{pr.url && (
-										<p className="text-[11px] text-sky-700">{pr.url}</p>
+										<p className="text-[11px] text-blue-600">{pr.url}</p>
 									)}
 								</div>
 							))}
@@ -263,7 +263,7 @@ function ModernTemplate({ profile }: { profile: UserProfile }) {
 
 				{profile.awards?.length > 0 && (
 					<section className="mt-5">
-						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-sky-700">
+						<h3 className="mb-2 flex items-center gap-1.5 border-b border-slate-200 pb-1 font-heading text-base font-bold uppercase text-blue-600">
 							<Star className="h-4 w-4" /> Giải thưởng
 						</h3>
 						<ul className="space-y-1 text-[11.5px] text-slate-700">

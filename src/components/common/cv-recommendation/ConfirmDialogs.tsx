@@ -52,7 +52,10 @@ export function ReplaceCvDialog({
 					>
 						Hủy
 					</Button>
-					<Button onClick={onUploadNew} className="cursor-pointer">
+					<Button
+						onClick={onUploadNew}
+						className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+					>
 						<Upload className="mr-2 h-4 w-4" />
 						Upload mới
 					</Button>

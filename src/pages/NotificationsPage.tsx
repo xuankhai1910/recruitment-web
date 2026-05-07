@@ -127,7 +127,7 @@ export function NotificationsPage() {
 						<TabsTrigger value="unread" className="cursor-pointer">
 							Chưa đọc
 							{unread > 0 && (
-								<span className="ml-1.5 rounded-full bg-primary/15 px-1.5 text-[10px] font-bold text-primary">
+								<span className="ml-1.5 rounded-full bg-blue-100 px-1.5 text-[10px] font-bold text-blue-700">
 									{unread}
 								</span>
 							)}

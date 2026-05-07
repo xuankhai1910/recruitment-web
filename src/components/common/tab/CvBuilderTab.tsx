@@ -231,8 +231,8 @@ export function CvBuilderTab() {
 	if (!profile && !editing) {
 		return (
 			<div className="flex flex-col items-center gap-4 rounded-xl border border-dashed border-border/60 py-14">
-				<div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-					<FileEdit className="h-6 w-6 text-primary" />
+				<div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
+					<FileEdit className="h-6 w-6 text-blue-600" />
 				</div>
 				<div className="text-center">
 					<p className="font-heading text-base font-semibold text-foreground">
@@ -244,7 +244,7 @@ export function CvBuilderTab() {
 					</p>
 				</div>
 				<Button
-					className="cursor-pointer bg-[#22C55E] text-white hover:bg-[#16A34A]"
+					className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 					size="lg"
 					onClick={() => {
 						setEditing(true);
@@ -364,13 +364,13 @@ function CvBuilderForm({
 							<span className="font-medium text-muted-foreground">
 								Hoàn thiện hồ sơ
 							</span>
-							<span className="font-heading font-semibold text-primary">
+							<span className="font-heading font-semibold text-blue-600">
 								{completion}%
 							</span>
 						</div>
 						<div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
 							<div
-								className="h-full rounded-full bg-gradient-to-r from-primary to-[#22C55E] transition-all"
+								className="h-full rounded-full bg-blue-500 transition-all"
 								style={{ width: `${completion}%` }}
 							/>
 						</div>
@@ -422,7 +422,7 @@ function CvBuilderForm({
 						<Button
 							type="submit"
 							size="sm"
-							className="h-9 cursor-pointer bg-[#22C55E] text-white hover:bg-[#16A34A]"
+							className="h-9 cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 							disabled={isSaving}
 						>
 							<Save className="mr-1.5 h-4 w-4" />
@@ -936,7 +936,7 @@ function CollapsibleCard({
 				}}
 			>
 				<span className="inline-flex items-center gap-2 font-heading text-sm font-semibold text-foreground">
-					<Icon className="h-4 w-4 text-primary" />
+					<Icon className="h-4 w-4 text-blue-500" />
 					{title}
 				</span>
 				{open ? (

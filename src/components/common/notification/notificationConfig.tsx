@@ -32,7 +32,7 @@ export const NOTIFICATION_ICON: Record<NotificationType, IconRenderer> = {
 };
 
 export const NOTIFICATION_ACCENT: Record<NotificationType, string> = {
-	NEW_RESUME_RECEIVED: "bg-primary/10 text-primary",
+	NEW_RESUME_RECEIVED: "bg-blue-100 text-blue-700",
 	RESUME_SUBMITTED: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
 	RESUME_STATUS_CHANGED: "bg-secondary/40 text-secondary-foreground",
 };
@@ -41,7 +41,7 @@ export function getNotificationAccent(n: AppNotification): string {
 	if (n.type === "RESUME_STATUS_CHANGED") {
 		switch (n.data.status) {
 			case "APPROVED":
-				return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
+				return "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
 			case "REJECTED":
 				return "bg-destructive/10 text-destructive";
 			case "REVIEWING":

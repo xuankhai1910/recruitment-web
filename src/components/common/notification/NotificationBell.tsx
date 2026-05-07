@@ -31,7 +31,7 @@ export function NotificationBell() {
 					<Bell className="h-5 w-5 text-foreground/80" />
 					{unread > 0 && (
 						<span
-							className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold leading-none text-destructive-foreground ring-2 ring-card"
+							className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-card"
 							aria-hidden
 						>
 							{badge}

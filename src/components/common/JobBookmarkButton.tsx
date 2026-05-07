@@ -36,9 +36,9 @@ export function JobBookmarkButton({
 			disabled={toggle.isPending}
 			aria-label={saved ? "Bỏ lưu" : "Lưu việc làm"}
 			className={cn(
-				"inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-border bg-card/80 text-muted-foreground backdrop-blur transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-70",
-				saved && "border-primary bg-primary/10 text-primary",
+				"inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-border bg-card/80 text-muted-foreground backdrop-blur transition-colors hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-70",
 				className,
+				saved && "border-blue-400 bg-blue-50 text-blue-600",
 			)}
 		>
 			{saved ? (

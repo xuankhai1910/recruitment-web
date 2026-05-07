@@ -166,11 +166,9 @@ export function RegisterPage() {
 	return (
 		<div className="w-full max-w-lg px-4">
 			<div className="mb-6 flex flex-col items-center">
-				<div className="mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-primary">
-					<Briefcase className="h-5 w-5 text-primary-foreground" />
-				</div>
+				<Briefcase className="mb-3 h-8 w-8 text-blue-600" />
 				<h1 className="font-heading text-xl font-bold text-foreground">
-					Job<span className="text-primary">Finder</span>
+					Job<span className="text-blue-600">Finder</span>
 				</h1>
 			</div>
 
@@ -404,7 +402,7 @@ export function RegisterPage() {
 						<Button
 							type="submit"
 							disabled={register.isPending}
-							className="h-11 w-full cursor-pointer bg-primary text-base font-semibold text-primary-foreground transition-colors duration-200 hover:bg-primary/90"
+							className="h-11 w-full cursor-pointer rounded-lg bg-blue-600 text-base font-semibold text-white transition-colors duration-200 hover:bg-blue-700"
 						>
 							{register.isPending ? (
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -417,7 +415,7 @@ export function RegisterPage() {
 						Đã có tài khoản?{" "}
 						<Link
 							to="/login"
-							className="cursor-pointer font-semibold text-primary transition-colors duration-200 hover:text-primary/80"
+							className="cursor-pointer font-semibold text-blue-600 transition-colors duration-200 hover:text-blue-700"
 						>
 							Đăng nhập
 						</Link>

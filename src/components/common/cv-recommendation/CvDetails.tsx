@@ -55,7 +55,7 @@ export function CvDetails({
 			<div className="flex flex-wrap items-center gap-2">
 				<Button
 					onClick={onView}
-					className="cursor-pointer bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white transition-opacity duration-150 hover:opacity-90"
+					className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 				>
 					<Sparkles className="mr-2 h-4 w-4" />
 					Xem việc gợi ý
@@ -96,7 +96,7 @@ function CvFileCard({
 	return (
 		<div className="rounded-xl border border-border bg-card p-4">
 			<div className="flex flex-wrap items-start gap-3">
-				<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+				<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
 					<FileText className="h-6 w-6" />
 				</div>
 				<div className="min-w-0 flex-1">
@@ -109,7 +109,7 @@ function CvFileCard({
 						</p>
 						<Badge
 							variant="outline"
-							className="shrink-0 border-emerald-200 bg-emerald-50 font-normal text-emerald-700"
+							className="shrink-0 border-blue-200 bg-blue-50 font-normal text-blue-700"
 						>
 							<CheckCircle2 className="mr-1 h-3 w-3" />
 							Đang dùng
@@ -161,13 +161,13 @@ function AnalysisCard({ analysis }: { analysis: CvAnalysis }) {
 	const { extractedData } = analysis;
 
 	return (
-		<div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50/60 to-fuchsia-50/30 p-4">
+		<div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
 			<div className="mb-3 flex items-center justify-between gap-2">
 				<div className="flex items-center gap-2">
-					<div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white">
+					<div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600 text-white">
 						<Brain className="h-4 w-4" />
 					</div>
-					<p className="font-heading text-sm font-semibold text-violet-950">
+					<p className="font-heading text-sm font-semibold text-slate-900">
 						Phân tích bởi AI
 					</p>
 				</div>
@@ -175,7 +175,7 @@ function AnalysisCard({ analysis }: { analysis: CvAnalysis }) {
 					variant="outline"
 					className={
 						isAi
-							? "border-violet-200 bg-white font-normal text-violet-700"
+							? "border-blue-200 bg-white font-normal text-blue-700"
 							: "border-amber-200 bg-amber-50 font-normal text-amber-700"
 					}
 				>
@@ -221,10 +221,10 @@ function AnalysisCard({ analysis }: { analysis: CvAnalysis }) {
 				</InfoRow>
 			</div>
 
-			<Separator className="my-3 bg-violet-200/60" />
+			<Separator className="my-3 bg-blue-200/60" />
 
 			<div>
-				<p className="mb-2 text-xs font-semibold uppercase tracking-wide text-violet-900/70">
+				<p className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-700">
 					Kỹ năng ({extractedData.skills.length})
 				</p>
 				{extractedData.skills.length === 0 ? (
@@ -237,7 +237,7 @@ function AnalysisCard({ analysis }: { analysis: CvAnalysis }) {
 							<Badge
 								key={s}
 								variant="outline"
-								className="border-violet-200 bg-white font-normal text-violet-800"
+								className="border-blue-200 bg-white font-normal text-blue-700"
 							>
 								{s}
 							</Badge>
@@ -261,8 +261,8 @@ function InfoRow({
 	valueClass?: string;
 }) {
 	return (
-		<div className="rounded-lg border border-violet-100 bg-white/70 p-3">
-			<div className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-violet-900/70">
+		<div className="rounded-lg border border-blue-100 bg-white/70 p-3">
+			<div className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
 				<Icon className="h-3.5 w-3.5" />
 				{label}
 			</div>

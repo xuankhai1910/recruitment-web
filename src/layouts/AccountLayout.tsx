@@ -38,7 +38,7 @@ export function AccountLayout() {
 							cn(
 								"flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors duration-150 cursor-pointer",
 								isActive
-									? "bg-primary/10 text-primary font-medium"
+									? "bg-blue-50 text-blue-600 font-medium"
 									: "text-foreground/70 hover:bg-accent hover:text-foreground",
 							)
 						}
@@ -64,7 +64,7 @@ export function AccountLayout() {
 									cn(
 										"flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors duration-150 cursor-pointer",
 										isActive
-											? "bg-primary/10 text-primary font-medium"
+											? "bg-blue-50 text-blue-600 font-medium"
 											: "text-foreground/70 hover:bg-accent hover:text-foreground",
 									)
 								}

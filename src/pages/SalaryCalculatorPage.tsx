@@ -59,8 +59,8 @@ export function SalaryCalculatorPage() {
 	return (
 		<div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
 			<div className="mb-6 flex items-center gap-3">
-				<div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
-					<Calculator className="h-5 w-5 text-primary" />
+				<div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-50">
+					<Calculator className="h-5 w-5 text-blue-600" />
 				</div>
 				<div>
 					<h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
@@ -158,7 +158,7 @@ export function SalaryCalculatorPage() {
 							<Button
 								type="submit"
 								disabled={calc.isPending}
-								className="w-full cursor-pointer bg-[#22C55E] text-white hover:bg-[#16A34A]"
+								className="w-full cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 								size="lg"
 							>
 								{calc.isPending ? "Đang tính..." : "Tính ngay"}
@@ -226,7 +226,7 @@ function SalaryResult({ data }: { data: SalaryBreakdown }) {
 		{
 			label: "Net",
 			value: data.net,
-			color: "#22C55E",
+			color: "#2563EB",
 			icon: Coins,
 		},
 	];
@@ -242,9 +242,9 @@ function SalaryResult({ data }: { data: SalaryBreakdown }) {
 						{formatSalary(data.gross)}
 					</p>
 				</div>
-				<div className="rounded-lg border border-[#22C55E]/30 bg-[#22C55E]/10 p-3">
-					<p className="text-xs text-[#16A34A]">Thực nhận (Net)</p>
-					<p className="mt-0.5 font-heading text-lg font-bold text-[#16A34A]">
+				<div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+					<p className="text-xs text-blue-600">Thực nhận (Net)</p>
+					<p className="mt-0.5 font-heading text-lg font-bold text-blue-600">
 						{formatSalary(data.net)}
 					</p>
 				</div>

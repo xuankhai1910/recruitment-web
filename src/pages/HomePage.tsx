@@ -5,11 +5,11 @@ import { RecommendedJobs } from "@/components/common/RecommendedJobs";
 
 export function HomePage() {
 	return (
-		<>
+		<div className="bg-white [&>section+section]:mt-8">
 			<HeroSearch />
 			<RecommendedJobs />
 			<TopCompanies />
 			<LatestJobs />
-		</>
+		</div>
 	);
 }

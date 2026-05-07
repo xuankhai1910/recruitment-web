@@ -13,7 +13,7 @@ import type { Resume } from "@/types/resume";
 const RESUME_STATUS_STYLE: Record<string, string> = {
 	PENDING: "bg-amber-50 text-amber-700 border-amber-200",
 	REVIEWING: "bg-blue-50 text-blue-700 border-blue-200",
-	APPROVED: "bg-green-50 text-green-700 border-green-200",
+	APPROVED: "bg-blue-50 text-blue-700 border-blue-200",
 	REJECTED: "bg-red-50 text-red-700 border-red-200",
 };
 
@@ -62,13 +62,13 @@ export function ResumesTab() {
 						<button
 							key={r._id}
 							type="button"
-							className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card p-3 text-left transition-colors hover:border-primary/40 hover:bg-primary/5"
+							className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border/60 bg-card p-3 text-left transition-colors hover:border-blue-300 hover:bg-blue-50"
 							onClick={() => {
 								setSelected(r);
 							}}
 						>
-							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary/10">
-								<FileText className="h-5 w-5 text-primary" />
+							<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+								<FileText className="h-5 w-5 text-blue-600" />
 							</div>
 							<div className="min-w-0 flex-1">
 								<p className="line-clamp-1 text-sm font-semibold text-foreground">

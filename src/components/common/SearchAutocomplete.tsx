@@ -217,7 +217,7 @@ export function SearchAutocomplete({
 											: "hover:bg-accent/60",
 									)}
 								>
-									<Sparkles className="h-3.5 w-3.5 shrink-0 text-primary" />
+									<Sparkles className="h-3.5 w-3.5 shrink-0 text-blue-600" />
 									<span className="flex-1 truncate">{s}</span>
 								</button>
 							))}

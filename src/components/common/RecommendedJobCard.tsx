@@ -1,139 +1,149 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Banknote, Building2, Clock, MapPin, Sparkles } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import type { RecommendedJobItem } from "@/types/cv-recommendation";
-import { formatSalaryCompact, companyLogoUrl } from "@/lib/format";
+import { Banknote, Briefcase, Building2, Clock, MapPin } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
 import { JobBookmarkButton } from "@/components/common/JobBookmarkButton";
+import { companyLogoUrl, formatSalaryCompact } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { RecommendedJobItem } from "@/types/cv-recommendation";
 
 interface RecommendedJobCardProps {
 	item: RecommendedJobItem;
 }
 
 function getScoreBadge(score: number) {
-	if (score >= 0.8)
+	if (score >= 0.8) {
 		return {
 			label: "Rất phù hợp",
-			className: "bg-[#22C55E] text-white border-transparent",
-			ringClass: "ring-emerald-200",
+			className: "bg-blue-600 text-white",
 		};
-	if (score >= 0.6)
+	}
+	if (score >= 0.6) {
 		return {
 			label: "Phù hợp",
-			className: "bg-primary text-primary-foreground border-transparent",
-			ringClass: "ring-blue-200",
+			className: "bg-blue-500 text-white",
 		};
-	if (score >= 0.4)
+	}
+	if (score >= 0.4) {
 		return {
 			label: "Tương đối",
-			className: "bg-amber-500 text-white border-transparent",
-			ringClass: "ring-amber-200",
+			className: "bg-blue-200 text-blue-800",
 		};
+	}
 	return {
 		label: "Ít phù hợp",
-		className: "bg-muted text-muted-foreground border-transparent",
-		ringClass: "ring-border",
+		className: "bg-slate-100 text-slate-600",
 	};
+}
+
+function salaryLabel(salary: number) {
+	return salary > 0 ? formatSalaryCompact(salary) : "Thỏa thuận";
 }
 
 export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 	const { job, score, matchedSkills } = item;
 	const badge = getScoreBadge(score);
 	const percent = Math.round(score * 100);
-	const matchedSet = new Set(matchedSkills.map((s) => s.toLowerCase()));
+	const matchedSet = new Set(matchedSkills.map((skill) => skill.toLowerCase()));
 
 	return (
-		<Link to={`/jobs/${job._id}`} className="group block">
-			<Card className="relative cursor-pointer transition-colors duration-150 hover:border-primary/50">
-				<div className="absolute right-3 top-3 z-10 flex items-center gap-2">
-					<JobBookmarkButton jobId={job._id} />
-					<Badge
-						className={`gap-1 px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}
-					>
-						<Sparkles className="h-3 w-3" />
-						{percent}% · {badge.label}
-					</Badge>
-				</div>
-
-				<CardContent className="flex gap-4 p-4 sm:p-5">
+		<div className="group relative h-full rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md">
+			<Link to={`/jobs/${job._id}`} className="block h-full pr-1">
+				<div className="flex items-start gap-3 pr-36">
 					{job.company?.logo ? (
 						<img
 							src={companyLogoUrl(job.company.logo)}
 							alt={job.company.name}
-							className="h-14 w-14 shrink-0 rounded-md border border-border bg-white object-contain p-1"
+							className="h-10 w-10 shrink-0 rounded-lg border border-slate-200 bg-white object-contain p-1"
 						/>
 					) : (
-						<div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-							<Building2 className="h-6 w-6 text-muted-foreground" />
+						<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+							<Building2 className="h-5 w-5 text-slate-400" />
 						</div>
 					)}
 
 					<div className="min-w-0 flex-1">
-						<div className="min-w-0 pr-28 sm:pr-32">
-							<h3 className="line-clamp-1 font-heading text-base font-semibold text-foreground transition-colors duration-150 group-hover:text-primary">
-								{job.name}
-							</h3>
-							<p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">
-								{job.company?.name}
-							</p>
-						</div>
+						<h3 className="line-clamp-2 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
+							{job.name}
+						</h3>
+						<p className="mt-1 line-clamp-1 text-xs text-slate-500">
+							{job.company?.name}
+						</p>
+					</div>
+				</div>
 
-						<div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-							<span className="font-heading text-sm font-semibold text-[#16A34A]">
-								{formatSalaryCompact(job.salary)}
-							</span>
-							<span className="inline-flex items-center gap-1">
-								<MapPin className="h-3.5 w-3.5" />
-								{job.location}
-							</span>
-							<span className="inline-flex items-center gap-1">
-								<Banknote className="h-3.5 w-3.5" />
-								{job.level}
-							</span>
-							<span className="ml-auto hidden items-center gap-1 sm:inline-flex">
-								<Clock className="h-3.5 w-3.5" />
-								{formatDistanceToNow(new Date(job.createdAt), {
-									addSuffix: true,
-									locale: vi,
-								})}
-							</span>
-						</div>
+				<div className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-blue-600">
+					<Banknote className="h-3.5 w-3.5" />
+					<span>{salaryLabel(job.salary)}</span>
+				</div>
 
-						{/* Skills with matched highlighted */}
-						{job.skills && job.skills.length > 0 && (
-							<div className="mt-2.5 flex flex-wrap gap-1.5">
-								{job.skills.slice(0, 6).map((s) => {
-									const matched = matchedSet.has(s.toLowerCase());
-									return (
-										<Badge
-											key={s}
-											variant="secondary"
-											className={
-												matched
-													? "rounded-md border border-emerald-200 bg-emerald-50 font-medium text-emerald-700 hover:bg-emerald-50"
-													: "rounded-md bg-muted font-normal text-foreground/80 hover:bg-muted"
-											}
-										>
-											{matched && "✓ "}
-											{s}
-										</Badge>
-									);
-								})}
-								{job.skills.length > 6 && (
-									<Badge
-										variant="secondary"
-										className="rounded-md bg-muted font-normal hover:bg-muted"
-									>
-										+{job.skills.length - 6}
-									</Badge>
-								)}
-							</div>
+				<div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2 text-xs text-slate-400">
+					<span className="inline-flex min-w-0 items-center gap-1">
+						<MapPin className="h-3.5 w-3.5 shrink-0" />
+						<span className="truncate">{job.location}</span>
+					</span>
+					<span className="inline-flex min-w-0 items-center gap-1">
+						<Briefcase className="h-3.5 w-3.5 shrink-0" />
+						<span className="truncate">{job.level}</span>
+					</span>
+					<span className="inline-flex min-w-0 items-center gap-1 col-span-2">
+						<Clock className="h-3.5 w-3.5 shrink-0" />
+						<span className="truncate">
+							{formatDistanceToNow(new Date(job.createdAt), {
+								addSuffix: true,
+								locale: vi,
+							})}
+						</span>
+					</span>
+				</div>
+
+				{job.skills && job.skills.length > 0 && (
+					<div className="mt-3 flex flex-wrap gap-1.5">
+						{job.skills.slice(0, 6).map((skill) => {
+							const matched = matchedSet.has(skill.toLowerCase());
+							return (
+								<Badge
+									key={skill}
+									variant="secondary"
+									className={cn(
+										"rounded-md px-2 py-0.5 text-xs font-normal",
+										matched
+											? "border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50"
+											: "bg-slate-100 text-slate-600 hover:bg-slate-100",
+									)}
+								>
+									{skill}
+								</Badge>
+							);
+						})}
+						{job.skills.length > 6 && (
+							<Badge
+								variant="secondary"
+								className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-normal text-slate-600 hover:bg-slate-100"
+							>
+								+{job.skills.length - 6}
+							</Badge>
 						)}
 					</div>
-				</CardContent>
-			</Card>
-		</Link>
+				)}
+			</Link>
+
+			<div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+				<JobBookmarkButton
+					jobId={job._id}
+					className="h-7 w-7 rounded-md border-slate-200 bg-white text-slate-400 hover:border-blue-300 hover:text-blue-600"
+				/>
+				<span
+					className={cn(
+						"inline-flex h-7 items-center rounded-md px-2 text-[11px] font-semibold",
+						badge.className,
+					)}
+				>
+					{percent}% · {badge.label}
+				</span>
+			</div>
+		</div>
 	);
 }

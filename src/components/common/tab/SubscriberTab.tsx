@@ -89,16 +89,16 @@ export function SubscriberTab() {
 
 	return (
 		<div className="space-y-4">
-			<div className="rounded-xl border border-sky-200 bg-sky-50/70 p-4 text-sky-950">
+			<div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-950">
 				<div className="flex items-start gap-3">
-					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-600 text-white">
+					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
 						<Bell className="h-5 w-5" />
 					</div>
 					<div className="space-y-1">
 						<p className="text-sm font-semibold">
 							Cài đặt email gợi ý việc làm
 						</p>
-						<p className="text-xs leading-5 text-sky-800">
+						<p className="text-xs leading-5 text-blue-700">
 							Lưu lại những kỹ năng bạn đang có để hệ thống của chúng tôi có thể
 							gợi ý việc làm phù hợp với bạn.
 						</p>
@@ -139,7 +139,7 @@ export function SubscriberTab() {
 									onClick={() => {
 										setSkills([]);
 									}}
-									className="cursor-pointer text-xs font-medium text-primary transition-colors duration-150 hover:text-primary/80"
+									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
 								>
 									Bỏ chọn tất cả
 								</button>
@@ -149,7 +149,7 @@ export function SubscriberTab() {
 									onClick={() => {
 										setSkills([...SKILLS_LIST]);
 									}}
-									className="cursor-pointer text-xs font-medium text-primary transition-colors duration-150 hover:text-primary/80"
+									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
 								>
 									Chọn tất cả
 								</button>
@@ -188,7 +188,7 @@ export function SubscriberTab() {
 				<Button
 					onClick={handleSave}
 					disabled={isSaving || isTriggering}
-					className="cursor-pointer bg-primary text-primary-foreground transition-colors duration-150 hover:bg-primary/90"
+					className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 				>
 					{isSaving ? "Đang lưu..." : sub ? "Cập nhật" : "Đăng ký"}
 				</Button>
@@ -197,7 +197,7 @@ export function SubscriberTab() {
 					onClick={handleStartNotifications}
 					disabled={isSaving || isTriggering || !hasSelectedSkills}
 					variant="outline"
-					className="cursor-pointer border-emerald-300 bg-emerald-50 text-emerald-700 transition-colors duration-150 hover:bg-emerald-100"
+					className="cursor-pointer border-blue-200 bg-blue-50 text-blue-700 transition-colors duration-150 hover:bg-blue-100"
 				>
 					<Mail className="mr-2 h-4 w-4" />
 					{isTriggering ? "Đang gửi email kiểm tra..." : previewButtonLabel}

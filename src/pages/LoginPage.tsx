@@ -32,11 +32,9 @@ export function LoginPage() {
 		<div className="w-full max-w-sm px-4">
 			{/* Logo */}
 			<div className="mb-6 flex flex-col items-center">
-				<div className="mb-3 flex h-11 w-11 items-center justify-center rounded-md bg-primary">
-					<Briefcase className="h-5 w-5 text-primary-foreground" />
-				</div>
+				<Briefcase className="mb-3 h-8 w-8 text-blue-600" />
 				<h1 className="font-heading text-xl font-bold text-foreground">
-					Job<span className="text-primary">Finder</span>
+					Job<span className="text-blue-600">Finder</span>
 				</h1>
 			</div>
 
@@ -71,7 +69,7 @@ export function LoginPage() {
 								<Label htmlFor="password">Mật khẩu</Label>
 								<Link
 									to="/forgot-password"
-									className="cursor-pointer text-xs font-medium text-primary transition-colors duration-150 hover:text-primary/80"
+									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
 								>
 									Quên mật khẩu?
 								</Link>
@@ -108,7 +106,7 @@ export function LoginPage() {
 						<Button
 							type="submit"
 							disabled={login.isPending}
-							className="h-10 w-full cursor-pointer bg-primary text-sm font-semibold text-primary-foreground transition-colors duration-150 hover:bg-primary/90"
+							className="h-10 w-full cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
 						>
 							{login.isPending ? (
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -121,7 +119,7 @@ export function LoginPage() {
 						Chưa có tài khoản?{" "}
 						<Link
 							to="/register"
-							className="cursor-pointer font-semibold text-primary transition-colors duration-150 hover:text-primary/80"
+							className="cursor-pointer font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700"
 						>
 							Đăng ký ngay
 						</Link>

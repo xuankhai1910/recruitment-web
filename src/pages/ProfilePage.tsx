@@ -76,7 +76,7 @@ function ProfileSection({
 		<Card>
 			<CardContent className="p-5">
 				<h2 className="flex items-center gap-2 font-heading text-base font-semibold text-foreground mb-3">
-					<Icon className="h-4 w-4 text-primary" />
+					<Icon className="h-4 w-4 text-blue-500" />
 					{title}
 				</h2>
 				{children}
@@ -151,7 +151,7 @@ export function ProfilePage() {
 			<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 				<Card>
 					<CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-						<div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 p-3 text-primary">
+						<div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 p-3 text-blue-700">
 							<FileEdit className="h-8 w-8" />
 						</div>
 						<h2 className="font-heading text-base font-semibold text-foreground">
@@ -166,7 +166,7 @@ export function ProfilePage() {
 								onClick={() => {
 									navigate("/account/cv-builder");
 								}}
-								className="cursor-pointer bg-[#22C55E] text-white hover:bg-[#16A34A]"
+								className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 							>
 								<Sparkles className="mr-2 h-4 w-4" />
 								Tạo CV ngay
@@ -210,7 +210,7 @@ export function ProfilePage() {
 						<CardContent className="p-5 sm:p-6">
 							<div className="flex flex-row items-start gap-4">
 								<Avatar className="h-20 w-20">
-									<AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
+									<AvatarFallback className="bg-blue-100 text-xl font-bold text-blue-700">
 										{initials}
 									</AvatarFallback>
 								</Avatar>
@@ -225,7 +225,7 @@ export function ProfilePage() {
 									)}
 									{fullUser?.isJobSeeking && (
 										<div className="mt-2 flex items-center gap-2">
-											<Badge className="bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20 font-normal text-xs">
+											<Badge className="border border-blue-200 bg-blue-50 text-xs font-normal text-blue-600">
 												Đang tìm việc
 											</Badge>
 										</div>
@@ -310,13 +310,13 @@ export function ProfilePage() {
 										<span className="text-muted-foreground">
 											Hoàn thiện hồ sơ
 										</span>
-										<span className="font-heading font-semibold text-primary">
+										<span className="font-heading font-semibold text-blue-600">
 											{completionScore}%
 										</span>
 									</div>
 									<div className="h-2 rounded-full bg-muted overflow-hidden">
 										<div
-											className="h-full rounded-full bg-gradient-to-r from-primary to-[#22C55E] transition-all"
+											className="h-full rounded-full bg-blue-500 transition-all"
 											style={{ width: `${completionScore}%` }}
 										/>
 									</div>
@@ -370,11 +370,11 @@ export function ProfilePage() {
 								<ol className="relative ml-3 border-l-2 border-border space-y-4">
 									{profile.experiences.map((exp, i) => (
 										<li key={`${exp.company}-${i}`} className="relative pl-6">
-											<span className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-primary bg-card" />
+											<span className="absolute -left-2.25 top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-card" />
 											<p className="font-heading text-sm font-semibold text-foreground">
 												{exp.position}
 											</p>
-											<p className="text-sm text-primary">{exp.company}</p>
+											<p className="text-sm text-blue-600">{exp.company}</p>
 											<p className="text-xs text-muted-foreground mt-0.5">
 												{fmt(exp.startDate)} –{" "}
 												{exp.isCurrent ? "Hiện tại" : fmt(exp.endDate)}
@@ -395,7 +395,7 @@ export function ProfilePage() {
 								<ol className="relative ml-3 border-l-2 border-border space-y-4">
 									{profile.education.map((edu, i) => (
 										<li key={`${edu.school}-${i}`} className="relative pl-6">
-											<span className="absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-border bg-card" />
+											<span className="absolute -left-2.25 top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-card" />
 											<p className="font-heading text-sm font-semibold text-foreground">
 												{edu.school}
 											</p>
@@ -455,7 +455,7 @@ export function ProfilePage() {
 													href={proj.url}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="text-xs text-primary hover:underline mt-1 inline-block"
+													className="mt-1 inline-block text-xs text-blue-600 hover:underline"
 												>
 													{proj.url}
 												</a>
@@ -486,7 +486,7 @@ export function ProfilePage() {
 													href={c.url}
 													target="_blank"
 													rel="noopener noreferrer"
-													className="ml-2 text-xs text-primary hover:underline"
+													className="ml-2 text-xs text-blue-600 hover:underline"
 												>
 													Xem
 												</a>
@@ -604,7 +604,7 @@ export function ProfilePage() {
 								Xem việc gợi ý
 							</Button>
 							<Button
-								className="w-full cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90"
+								className="w-full cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 								size="sm"
 								onClick={() => {
 									navigate("/account/cv-builder");

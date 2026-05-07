@@ -33,19 +33,19 @@ export function HeroSearch() {
 	};
 
 	return (
-		<section className="relative bg-primary px-4 py-12 sm:py-16">
-			<div className="mx-auto max-w-4xl text-center">
-				<h1 className="font-heading text-2xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
+		<section className="bg-linear-to-r from-blue-600 to-blue-700 px-4 py-10 sm:py-14">
+			<div className="mx-auto max-w-3xl text-center">
+				<h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
 					Tìm kiếm việc làm mơ ước
 				</h1>
-				<p className="mx-auto mt-3 max-w-xl text-sm text-primary-foreground/80 sm:text-base">
+				<p className="mx-auto mt-3 max-w-xl text-sm text-blue-100 sm:text-base">
 					Hàng nghìn cơ hội việc làm từ các công ty hàng đầu đang chờ bạn
 				</p>
 
 				{/* Search bar */}
 				<form
 					onSubmit={handleSearch}
-					className="mx-auto mt-8 flex max-w-3xl flex-col gap-2 rounded-lg bg-card p-2 sm:flex-row sm:items-center"
+					className="mx-auto mt-7 flex max-w-3xl flex-col gap-2 rounded-xl bg-white p-1.5 shadow-lg sm:flex-row sm:items-center"
 				>
 					<div className="relative flex-1">
 						<SearchAutocomplete
@@ -57,19 +57,19 @@ export function HeroSearch() {
 							}}
 							placeholder="Tên công việc, kỹ năng..."
 							showIcon
-							inputClassName="h-11 border-0 bg-transparent pl-10 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0"
+							inputClassName="h-11 border-0 bg-transparent pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0"
 						/>
 					</div>
 
-					<div className="hidden h-6 w-px bg-border sm:block" />
+					<div className="hidden h-6 w-px bg-slate-200 sm:block" />
 
-					<div className="flex-1">
+					<div className="flex-1 [&_button]:h-11 [&_button]:text-sm">
 						<LocationMultiSelect value={locations} onChange={setLocations} />
 					</div>
 
 					<Button
 						type="submit"
-						className="h-11 min-w-32 cursor-pointer bg-[#22C55E] text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#16A34A]"
+						className="h-11 min-w-32 cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
 					>
 						<Search className="mr-2 h-4 w-4" />
 						Tìm kiếm
@@ -78,7 +78,7 @@ export function HeroSearch() {
 
 				{/* Popular keywords */}
 				<div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-					<span className="flex items-center gap-1 text-xs text-primary-foreground/70">
+					<span className="flex items-center gap-1 text-xs text-blue-200">
 						<TrendingUp className="h-3.5 w-3.5" />
 						Phổ biến:
 					</span>
@@ -89,7 +89,7 @@ export function HeroSearch() {
 							onClick={() => {
 								setKeyword(kw);
 							}}
-							className="cursor-pointer rounded-md border border-primary-foreground/25 px-2.5 py-0.5 text-xs text-primary-foreground/90 transition-colors duration-150 hover:bg-primary-foreground/10"
+							className="cursor-pointer rounded-full border border-blue-400/30 px-2.5 py-0.5 text-xs text-blue-100 transition-colors duration-150 hover:bg-blue-500/30"
 						>
 							{kw}
 						</button>
