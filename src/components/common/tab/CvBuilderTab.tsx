@@ -7,10 +7,13 @@ import {
 	Briefcase,
 	ChevronDown,
 	ChevronUp,
+	CheckCircle2,
+	Copy,
 	Download,
 	Eye,
 	FileEdit,
 	GraduationCap,
+	Globe,
 	Plus,
 	Save,
 	Sparkles,
@@ -260,6 +263,7 @@ export function CvBuilderTab() {
 	return (
 		<CvBuilderForm
 			profile={profile ?? null}
+			userId={user?._id}
 			defaults={{
 				fullName: fullUser?.name,
 				email: fullUser?.email,
@@ -279,6 +283,7 @@ export function CvBuilderTab() {
 
 interface CvBuilderFormProps {
 	profile: UserProfile | null;
+	userId?: string;
 	defaults: { fullName?: string; email?: string; address?: string };
 	onSave: (data: UpsertUserProfileDto) => Promise<void>;
 	onDelete: () => Promise<void>;
@@ -287,6 +292,7 @@ interface CvBuilderFormProps {
 
 function CvBuilderForm({
 	profile,
+	userId,
 	defaults,
 	onSave,
 	onDelete,
@@ -322,8 +328,15 @@ function CvBuilderForm({
 
 	const values = watch();
 	const completion = useMemo(() => computeCompletion(values), [values]);
+	const publicProfileUrl = userId
+		? `${window.location.origin}/profiles/${userId}`
+		: "";
+	const canSharePublicProfile = Boolean(
+		profile && values.isPublic && publicProfileUrl,
+	);
 
 	const [previewOpen, setPreviewOpen] = useState(false);
+	const [publicSuccessOpen, setPublicSuccessOpen] = useState(false);
 	const [exporting, setExporting] = useState(false);
 	const printRef = useRef<HTMLDivElement>(null);
 
@@ -344,9 +357,23 @@ function CvBuilderForm({
 		}
 	};
 
+	const copyPublicProfileUrl = async () => {
+		if (!publicProfileUrl) return;
+		try {
+			await navigator.clipboard.writeText(publicProfileUrl);
+			toast.success("Đã sao chép link hồ sơ công khai");
+		} catch {
+			toast.error("Không thể sao chép link hồ sơ");
+		}
+	};
+
 	const submit = handleSubmit(
 		async (data) => {
+			const shouldShowPublicDialog = data.isPublic && !profile?.isPublic;
 			await onSave(data as UpsertUserProfileDto);
+			if (shouldShowPublicDialog) {
+				setPublicSuccessOpen(true);
+			}
 		},
 		(errs) => {
 			console.error("CV form errors:", errs);
@@ -379,10 +406,47 @@ function CvBuilderForm({
 					<div className="flex flex-wrap items-center gap-2">
 						<Controller
 							control={control}
+							name="isPublic"
+							render={({ field }) => (
+								<button
+									type="button"
+									role="switch"
+									aria-checked={field.value}
+									className={cn(
+										"flex h-9 cursor-pointer items-center gap-2 rounded-md border px-3 text-sm transition-colors",
+										field.value
+											? "border-blue-200 bg-blue-50 text-blue-700"
+											: "border-border bg-background text-muted-foreground hover:bg-muted/50",
+									)}
+									onClick={() => {
+										field.onChange(!field.value);
+									}}
+								>
+									<Globe className="h-4 w-4" />
+									<span>Công khai</span>
+									<span
+										className={cn(
+											"relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+											field.value ? "bg-blue-600" : "bg-muted",
+										)}
+									>
+										<span
+											className={cn(
+												"inline-block h-4 w-4 rounded-full bg-white shadow transition-transform",
+												field.value ? "translate-x-4" : "translate-x-0.5",
+											)}
+										/>
+									</span>
+								</button>
+							)}
+						/>
+
+						<Controller
+							control={control}
 							name="templateId"
 							render={({ field }) => (
 								<Select value={field.value} onValueChange={field.onChange}>
-									<SelectTrigger className="h-9 w-[140px]">
+									<SelectTrigger className="h-9 w-35">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
@@ -430,6 +494,35 @@ function CvBuilderForm({
 						</Button>
 					</div>
 				</div>
+
+				{values.isPublic && (
+					<div className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+						{canSharePublicProfile ? (
+							<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+								<a
+									href={publicProfileUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="min-w-0 truncate font-medium text-blue-600 hover:underline"
+								>
+									{publicProfileUrl}
+								</a>
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="h-8 cursor-pointer"
+									onClick={copyPublicProfileUrl}
+								>
+									<Copy className="mr-1.5 h-3.5 w-3.5" />
+									Sao chép
+								</Button>
+							</div>
+						) : (
+							<p>Lưu CV để tạo link hồ sơ công khai cho nhà tuyển dụng.</p>
+						)}
+					</div>
+				)}
 			</div>
 
 			{/* Section: Personal */}
@@ -857,7 +950,7 @@ function CvBuilderForm({
 			)}
 
 			<Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-				<DialogContent className="max-h-[92vh] w-[96vw] !max-w-4xl overflow-y-auto p-0 sm:!max-w-4xl">
+				<DialogContent className="max-h-[92vh] w-[96vw] max-w-4xl! overflow-y-auto p-0 sm:max-w-4xl!">
 					<DialogHeader className="border-b border-border px-5 py-3">
 						<DialogTitle className="font-heading">Xem trước CV</DialogTitle>
 					</DialogHeader>
@@ -876,6 +969,55 @@ function CvBuilderForm({
 							}
 							template={values.templateId}
 						/>
+					</div>
+				</DialogContent>
+			</Dialog>
+
+			<Dialog open={publicSuccessOpen} onOpenChange={setPublicSuccessOpen}>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<div className="mb-2 flex h-11 w-11 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+							<CheckCircle2 className="h-6 w-6" />
+						</div>
+						<DialogTitle className="font-heading text-lg">
+							CV đã được công khai
+						</DialogTitle>
+					</DialogHeader>
+					<p className="text-sm leading-6 text-muted-foreground">
+						Bạn đã công khai CV và đang ở trong chế độ tìm việc. Nhà tuyển dụng
+						sẽ có thể tìm thấy profile của bạn.
+					</p>
+					{publicProfileUrl && (
+						<div className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+							<a
+								href={publicProfileUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="block truncate font-medium text-blue-600 hover:underline"
+							>
+								{publicProfileUrl}
+							</a>
+						</div>
+					)}
+					<div className="flex justify-end gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							className="cursor-pointer"
+							onClick={copyPublicProfileUrl}
+						>
+							<Copy className="mr-2 h-4 w-4" />
+							Sao chép link
+						</Button>
+						<Button
+							type="button"
+							className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+							onClick={() => {
+								setPublicSuccessOpen(false);
+							}}
+						>
+							Đã hiểu
+						</Button>
 					</div>
 				</DialogContent>
 			</Dialog>
@@ -1076,7 +1218,7 @@ function SkillsField({
 				)}
 				{skills.map((s, idx) => (
 					<div
-						key={`${s.name}-${idx}`}
+						key={s.name}
 						className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted/40 py-0.5 pl-2 pr-1"
 					>
 						<span className="text-sm font-medium text-foreground">
@@ -1088,7 +1230,7 @@ function SkillsField({
 								onLevelChange(idx, v as (typeof SKILL_LEVELS)[number]);
 							}}
 						>
-							<SelectTrigger className="h-6 w-[110px] text-xs">
+							<SelectTrigger className="h-6 w-27.5 text-xs">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -1132,7 +1274,7 @@ function SkillsField({
 						setLevel(v as (typeof SKILL_LEVELS)[number]);
 					}}
 				>
-					<SelectTrigger className="w-[140px]">
+					<SelectTrigger className="w-35">
 						<SelectValue />
 					</SelectTrigger>
 					<SelectContent>

@@ -10,6 +10,7 @@ import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AuthenticatedRoute } from "@/components/guards/AuthenticatedRoute";
 import { HomePage } from "@/pages/HomePage";
 import { ProfilePage } from "@/pages/ProfilePage";
+import { PublicProfilePage } from "@/pages/PublicProfilePage";
 import {
 	CvBuilderPage,
 	RecommendationCvPage,
@@ -83,6 +84,7 @@ export default function App() {
 				<Route path="/jobs/:id" element={<JobDetailPage />} />
 				<Route path="/companies" element={<CompaniesPage />} />
 				<Route path="/companies/:id" element={<CompanyDetailPage />} />
+				<Route path="/profiles/:userId" element={<PublicProfilePage />} />
 				<Route
 					path="/tools/salary-calculator"
 					element={<SalaryCalculatorPage />}

@@ -92,6 +92,19 @@ export interface UserProfile {
   updatedAt: string;
 }
 
+export type PublicProfile = Omit<UserProfile, "references"> & {
+  references?: ProfileReference[];
+};
+
+export interface PublicUserProfileResponse {
+  user: {
+    _id: string;
+    name?: string;
+    isJobSeeking: boolean;
+  };
+  profile: PublicProfile;
+}
+
 export type UpsertUserProfileDto = Omit<
   UserProfile,
   "_id" | "userId" | "completionScore" | "createdAt" | "updatedAt"

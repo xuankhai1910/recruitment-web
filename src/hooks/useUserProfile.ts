@@ -11,6 +11,16 @@ export function useMyProfile() {
   });
 }
 
+export function usePublicUserProfile(userId: string) {
+  return useQuery({
+    queryKey: ["user-profile", "public", userId],
+    queryFn: () =>
+      userProfilesApi.getPublicProfileByUserId(userId).then((r) => r.data.data),
+    enabled: !!userId,
+    retry: false,
+  });
+}
+
 export function useUpsertProfile() {
   const qc = useQueryClient();
   return useMutation({
@@ -19,6 +29,7 @@ export function useUpsertProfile() {
     onSuccess: (profile) => {
       qc.setQueryData(["user-profile", "me"], profile);
       qc.invalidateQueries({ queryKey: ["user-profile"] });
+      qc.invalidateQueries({ queryKey: ["users"] });
       toast.success("Đã lưu CV thành công");
     },
     onError: () => {
@@ -35,6 +46,7 @@ export function useUpdateProfile() {
     onSuccess: (profile) => {
       qc.setQueryData(["user-profile", "me"], profile);
       qc.invalidateQueries({ queryKey: ["user-profile"] });
+      qc.invalidateQueries({ queryKey: ["users"] });
       toast.success("Cập nhật CV thành công");
     },
     onError: () => {
@@ -50,6 +62,7 @@ export function useDeleteProfile() {
     onSuccess: () => {
       qc.setQueryData(["user-profile", "me"], null);
       qc.invalidateQueries({ queryKey: ["user-profile"] });
+      qc.invalidateQueries({ queryKey: ["users"] });
       toast.success("Đã xóa CV");
     },
   });

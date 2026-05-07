@@ -1,10 +1,19 @@
 import { api } from "@/lib/axios";
 import type { ApiResponse } from "@/types/api";
-import type { UpsertUserProfileDto, UserProfile } from "@/types/user-profile";
+import type {
+  PublicUserProfileResponse,
+  UpsertUserProfileDto,
+  UserProfile,
+} from "@/types/user-profile";
 
 export const userProfilesApi = {
   getMyProfile: () =>
     api.get<ApiResponse<UserProfile | null>>("/user-profiles/me"),
+
+  getPublicProfileByUserId: (userId: string) =>
+    api.get<ApiResponse<PublicUserProfileResponse>>(
+      `/user-profiles/public/user/${userId}`,
+    ),
 
   upsertProfile: (data: UpsertUserProfileDto) =>
     api.post<ApiResponse<UserProfile>>("/user-profiles", data),
