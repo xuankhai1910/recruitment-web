@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApplyModal } from "@/components/common/ApplyModal";
 import { JobCard } from "@/components/common/JobCard";
-import { LoginRequiredDialog } from "@/components/common/LoginRequiredDialog";
+import { LoginRequiredDialog } from "@/components/dialog/LoginRequiredDialog";
 import { toast } from "sonner";
 import {
 	ArrowLeft,
