@@ -35,6 +35,7 @@ import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
 import { useCompaniesDropdown } from "@/hooks/useCompanies";
 import { SKILLS_LIST, LEVEL_LIST } from "@/lib/constants";
 import { LOCATIONS } from "@/lib/locations";
+import { useCurrentUser } from "@/stores/auth.store";
 import type { Job } from "@/types/job";
 
 const jobSchema = z.object({
@@ -61,6 +62,8 @@ interface JobModalProps {
 
 export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 	const isEdit = !!job;
+	const currentUser = useCurrentUser();
+	const isAdmin = currentUser?.role.name === "SUPER_ADMIN";
 	const createJob = useCreateJob();
 	const updateJob = useUpdateJob();
 	const { data: companiesData } = useCompaniesDropdown(open);
@@ -108,7 +111,7 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 					salary: 0,
 					quantity: 1,
 					level: "",
-					companyId: "",
+					companyId: !isAdmin ? (currentUser?.company?._id ?? "") : "",
 					startDate: "",
 					endDate: "",
 					isActive: true,
@@ -116,7 +119,7 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 				});
 			}
 		}
-	}, [open, job, form]);
+	}, [open, job, form, isAdmin, currentUser?.company?._id]);
 
 	const submitting = createJob.isPending || updateJob.isPending;
 
@@ -350,9 +353,19 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									<FormLabel>
 										Thuộc công ty <span className="text-destructive">*</span>
 									</FormLabel>
-									<Select value={field.value} onValueChange={field.onChange}>
+									<Select
+										value={field.value}
+										onValueChange={field.onChange}
+										disabled={!isAdmin}
+									>
 										<FormControl>
-											<SelectTrigger className="cursor-pointer">
+											<SelectTrigger
+												className={
+													isAdmin
+														? "cursor-pointer"
+														: "cursor-not-allowed opacity-70"
+												}
+											>
 												<SelectValue placeholder="Chọn công ty" />
 											</SelectTrigger>
 										</FormControl>
