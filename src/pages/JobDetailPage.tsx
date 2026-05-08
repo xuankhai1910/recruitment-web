@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { ApplyModal } from "@/components/common/ApplyModal";
 import { JobCard } from "@/components/common/JobCard";
+import { LoginRequiredDialog } from "@/components/common/LoginRequiredDialog";
 import { toast } from "sonner";
 import {
 	ArrowLeft,
@@ -51,6 +52,7 @@ export function JobDetailPage() {
 	const toggleSave = useToggleSaveJob();
 	const saved = savedCheck ?? false;
 	const [applyOpen, setApplyOpen] = useState(false);
+	const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
 	const handleToggleSave = () => {
 		if (!isAuthenticated) {
@@ -168,6 +170,10 @@ export function JobDetailPage() {
 								<div className="flex shrink-0 items-center gap-2">
 									<Button
 										onClick={() => {
+											if (!isAuthenticated) {
+												setLoginDialogOpen(true);
+												return;
+											}
 											setApplyOpen(true);
 										}}
 										className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
@@ -355,6 +361,11 @@ export function JobDetailPage() {
 			</div>
 
 			<ApplyModal open={applyOpen} onOpenChange={setApplyOpen} job={job} />
+			<LoginRequiredDialog
+				open={loginDialogOpen}
+				onOpenChange={setLoginDialogOpen}
+				description="Bạn cần đăng nhập để ứng tuyển công việc này."
+			/>
 		</div>
 	);
 }
