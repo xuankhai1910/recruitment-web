@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import { Bell, ChevronDown, Mail } from "lucide-react";
+import { Bell, Mail } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSendTestJobAlertMail } from "@/hooks/useMail";
 import {
@@ -18,7 +12,6 @@ import {
 	useMySubscriber,
 	useUpdateSubscriber,
 } from "@/hooks/useSubscribers";
-import { SKILLS_LIST } from "@/lib/constants";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function SubscriberTab() {
@@ -28,21 +21,25 @@ export function SubscriberTab() {
 	const updateSub = useUpdateSubscriber();
 	const sendTestJobAlertMail = useSendTestJobAlertMail();
 	const [skills, setSkills] = useState<string[]>([]);
-	const [pickerOpen, setPickerOpen] = useState(false);
+	const [skillsInput, setSkillsInput] = useState("");
 
 	useEffect(() => {
-		setSkills(sub?.skills ?? []);
+		const initial = sub?.skills ?? [];
+		setSkills(initial);
+		setSkillsInput(initial.join(", "));
 	}, [sub]);
+
+	const commitSkillsInput = (raw: string) => {
+		const parsed = raw
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
+		setSkills(parsed);
+	};
 
 	const hasSkillChanges =
 		skills.length !== (sub?.skills?.length ?? 0) ||
 		skills.some((skill) => !(sub?.skills ?? []).includes(skill));
-
-	const toggle = (s: string) => {
-		setSkills((prev) =>
-			prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
-		);
-	};
 
 	const saveSubscriber = async () => {
 		if (!user) return;
@@ -107,81 +104,22 @@ export function SubscriberTab() {
 			</div>
 
 			<div>
-				<Label className="mb-1.5 block">Kỹ năng quan tâm</Label>
-				<Popover open={pickerOpen} onOpenChange={setPickerOpen}>
-					<PopoverTrigger asChild>
-						<button
-							type="button"
-							className="flex min-h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-input bg-background px-3 py-2 text-left text-sm transition-colors duration-150 hover:bg-accent/30"
-						>
-							<div className="flex flex-1 flex-wrap gap-1.5">
-								{skills.length === 0 ? (
-									<span className="text-muted-foreground">Chọn kỹ năng...</span>
-								) : (
-									skills.map((s) => (
-										<Badge key={s} variant="secondary" className="font-normal">
-											{s}
-										</Badge>
-									))
-								)}
-							</div>
-							<ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
-						</button>
-					</PopoverTrigger>
-					<PopoverContent align="start" className="w-72 gap-0 p-0">
-						<div className="flex items-center justify-between border-b border-border/60 px-3 py-2.5">
-							<span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-								{skills.length}/{SKILLS_LIST.length} đã chọn
-							</span>
-							{skills.length === SKILLS_LIST.length ? (
-								<button
-									type="button"
-									onClick={() => {
-										setSkills([]);
-									}}
-									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
-								>
-									Bỏ chọn tất cả
-								</button>
-							) : (
-								<button
-									type="button"
-									onClick={() => {
-										setSkills([...SKILLS_LIST]);
-									}}
-									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
-								>
-									Chọn tất cả
-								</button>
-							)}
-						</div>
-						<div
-							className="max-h-64 overflow-y-auto overscroll-contain p-1.5"
-							onWheel={(e) => {
-								e.stopPropagation();
-							}}
-						>
-							{SKILLS_LIST.map((s) => {
-								const checked = skills.includes(s);
-								return (
-									<label
-										key={s}
-										className="flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors duration-150 hover:bg-accent"
-									>
-										<Checkbox
-											checked={checked}
-											onCheckedChange={() => {
-												toggle(s);
-											}}
-											className="cursor-pointer"
-										/>
-										<span className={checked ? "font-medium" : ""}>{s}</span>
-									</label>
-								);
-							})}
-						</div>
-					</PopoverContent>
-				</Popover>
+				<Label htmlFor="subscriber-skills" className="mb-1.5 block">
+					Kỹ năng quan tâm
+				</Label>
+				<Input
+					id="subscriber-skills"
+					value={skillsInput}
+					placeholder="VD: React, Node.js, Java"
+					onChange={(e) => {
+						setSkillsInput(e.target.value);
+						commitSkillsInput(e.target.value);
+					}}
+					onBlur={() => commitSkillsInput(skillsInput)}
+				/>
+				<p className="mt-1.5 text-xs text-muted-foreground">
+					Nhập kỹ năng bạn quan tâm, ngăn cách bằng dấu phẩy.
+				</p>
 			</div>
 
 			<div className="grid gap-3 sm:grid-cols-2">

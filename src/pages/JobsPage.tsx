@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -30,12 +30,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	LEVEL_LIST,
-	SALARY_RANGES,
-	SKILLS_LIST,
-	formatSalary,
-} from "@/lib/constants";
+import { LEVEL_LIST, SALARY_RANGES, formatSalary } from "@/lib/constants";
+import { Input } from "@/components/ui/input";
 import { companyLogoUrl } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
@@ -98,6 +94,54 @@ function FilterPill({
 				{children}
 			</PopoverContent>
 		</Popover>
+	);
+}
+
+function parseSkillsInput(input: string): string[] {
+	return input
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
+}
+
+function SkillsFilterInput({
+	value,
+	onChange,
+}: {
+	value: string[];
+	onChange: (next: string[]) => void;
+}) {
+	const [draft, setDraft] = useState(value.join(", "));
+
+	useEffect(() => {
+		setDraft(value.join(", "));
+	}, [value]);
+
+	const commit = () => {
+		const next = parseSkillsInput(draft);
+		const same =
+			next.length === value.length && next.every((s, i) => s === value[i]);
+		if (!same) onChange(next);
+	};
+
+	return (
+		<div className="space-y-2 p-3">
+			<Input
+				value={draft}
+				placeholder="VD: React, Node.js, Java"
+				onChange={(e) => setDraft(e.target.value)}
+				onBlur={commit}
+				onKeyDown={(e) => {
+					if (e.key === "Enter") {
+						e.preventDefault();
+						commit();
+					}
+				}}
+			/>
+			<p className="text-xs text-slate-500">
+				Nhập kỹ năng, ngăn cách bằng dấu phẩy.
+			</p>
+		</div>
 	);
 }
 
@@ -397,35 +441,16 @@ export function JobsPage() {
 						<div className="border-b border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900">
 							Kỹ năng
 						</div>
-						<div className="max-h-72 overflow-y-auto p-1.5">
-							{SKILLS_LIST.map((item) => {
-								const checked = selectedSkills.includes(item);
-								return (
-									<div
-										key={item}
-										className="flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors hover:bg-slate-50"
-									>
-										<Checkbox
-											id={`skill-${item}`}
-											checked={checked}
-											onCheckedChange={() => setMultiParam("skills", item)}
-											className="cursor-pointer"
-										/>
-										<label
-											htmlFor={`skill-${item}`}
-											className={cn(
-												"cursor-pointer",
-												checked
-													? "font-medium text-blue-700"
-													: "text-slate-700",
-											)}
-										>
-											{item}
-										</label>
-									</div>
-								);
-							})}
-						</div>
+						<SkillsFilterInput
+							value={selectedSkills}
+							onChange={(next) => {
+								setParams((params) => {
+									if (next.length > 0) params.set("skills", next.join(","));
+									else params.delete("skills");
+									params.set("current", "1");
+								});
+							}}
+						/>
 					</FilterPill>
 
 					{activeFilterCount > 0 && (

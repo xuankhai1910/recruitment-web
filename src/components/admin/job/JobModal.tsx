@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,7 +33,7 @@ import {
 import { RichTextEditor } from "@/components/common/RichTextEditor";
 import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
 import { useCompaniesDropdown } from "@/hooks/useCompanies";
-import { SKILLS_LIST, LEVEL_LIST } from "@/lib/constants";
+import { LEVEL_LIST } from "@/lib/constants";
 import { LOCATIONS } from "@/lib/locations";
 import { useCurrentUser } from "@/stores/auth.store";
 import type { Job } from "@/types/job";
@@ -70,6 +70,8 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 
 	const companies = useMemo(() => companiesData?.result ?? [], [companiesData]);
 
+	const [skillsInput, setSkillsInput] = useState("");
+
 	const form = useForm<JobFormValues>({
 		resolver: zodResolver(jobSchema),
 		defaultValues: {
@@ -103,6 +105,7 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 					isActive: job.isActive,
 					description: job.description,
 				});
+				setSkillsInput(job.skills.join(", "));
 			} else {
 				form.reset({
 					name: "",
@@ -117,6 +120,7 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 					isActive: true,
 					description: "",
 				});
+				setSkillsInput("");
 			}
 		}
 	}, [open, job, form, isAdmin, currentUser?.company?._id]);
@@ -205,34 +209,27 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									<FormLabel>
 										Kỹ năng yêu cầu <span className="text-destructive">*</span>
 									</FormLabel>
-									<div className="flex flex-wrap gap-3">
-										{SKILLS_LIST.map((skill) => (
-											<div
-												key={skill}
-												className="flex items-center gap-1.5 text-sm"
-											>
-												<Checkbox
-													id={`skill-${skill}`}
-													checked={field.value.includes(skill)}
-													onCheckedChange={(checked) => {
-														if (checked) {
-															field.onChange([...field.value, skill]);
-														} else {
-															field.onChange(
-																field.value.filter((s: string) => s !== skill),
-															);
-														}
-													}}
-												/>
-												<label
-													htmlFor={`skill-${skill}`}
-													className="cursor-pointer select-none"
-												>
-													{skill}
-												</label>
-											</div>
-										))}
-									</div>
+									<FormControl>
+										<Input
+											placeholder="VD: React, Node.js, Java"
+											value={skillsInput}
+											onChange={(e) => {
+												const raw = e.target.value;
+												setSkillsInput(raw);
+												const parsed = raw
+													.split(",")
+													.map((s) => s.trim())
+													.filter(Boolean);
+												field.onChange(parsed);
+											}}
+											onBlur={() => {
+												setSkillsInput(field.value.join(", "));
+											}}
+										/>
+									</FormControl>
+									<p className="text-xs text-muted-foreground">
+										Nhập kỹ năng, ngăn cách bằng dấu phẩy.
+									</p>
 									<FormMessage />
 								</FormItem>
 							)}

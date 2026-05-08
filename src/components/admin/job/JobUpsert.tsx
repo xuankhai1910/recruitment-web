@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useJob, useCreateJob, useUpdateJob } from "@/hooks/useJobs";
-import { SKILLS_LIST, LEVEL_LIST } from "@/lib/constants";
+import { LEVEL_LIST } from "@/lib/constants";
 import { LOCATIONS } from "@/lib/locations";
 import { companiesApi } from "@/api/companies.api";
 import type { CreateJobDto } from "@/types/job";
@@ -53,6 +53,8 @@ export default function JobUpsert() {
 		description: "",
 	});
 
+	const [skillsInput, setSkillsInput] = useState("");
+
 	useEffect(() => {
 		if (job) {
 			setForm({
@@ -74,16 +76,16 @@ export default function JobUpsert() {
 				isActive: job.isActive,
 				description: job.description,
 			});
+			setSkillsInput((job.skills ?? []).join(", "));
 		}
 	}, [job]);
 
-	const toggleSkill = (skill: string) => {
-		setForm((prev) => ({
-			...prev,
-			skills: prev.skills.includes(skill)
-				? prev.skills.filter((s) => s !== skill)
-				: [...prev.skills, skill],
-		}));
+	const commitSkillsInput = (raw: string) => {
+		const parsed = raw
+			.split(",")
+			.map((s) => s.trim())
+			.filter(Boolean);
+		setForm((p) => ({ ...p, skills: parsed }));
 	};
 
 	const submitting = createJob.isPending || updateJob.isPending;
@@ -138,23 +140,20 @@ export default function JobUpsert() {
 
 				{/* Skills */}
 				<div className="space-y-2">
-					<Label>Kỹ năng yêu cầu</Label>
-					<div className="flex flex-wrap gap-3">
-						{SKILLS_LIST.map((skill) => (
-							<label
-								key={skill}
-								className="flex items-center gap-1.5 text-sm cursor-pointer select-none"
-							>
-								<Checkbox
-									checked={form.skills.includes(skill)}
-									onCheckedChange={() => {
-										toggleSkill(skill);
-									}}
-								/>
-								{skill}
-							</label>
-						))}
-					</div>
+					<Label htmlFor="skills">Kỹ năng yêu cầu</Label>
+					<Input
+						id="skills"
+						value={skillsInput}
+						placeholder="VD: React, Node.js, Java"
+						onChange={(e) => {
+							setSkillsInput(e.target.value);
+							commitSkillsInput(e.target.value);
+						}}
+						onBlur={() => commitSkillsInput(skillsInput)}
+					/>
+					<p className="text-xs text-muted-foreground">
+						Nhập kỹ năng, ngăn cách bằng dấu phẩy.
+					</p>
 				</div>
 
 				{/* Location + Level */}

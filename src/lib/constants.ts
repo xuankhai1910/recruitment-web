@@ -1,16 +1,3 @@
-export const SKILLS_LIST = [
-  "REACT.JS",
-  "REACT NATIVE",
-  "VUE.JS",
-  "ANGULAR",
-  "NEST.JS",
-  "TYPESCRIPT",
-  "JAVA",
-  "FRONTEND",
-  "BACKEND",
-  "FULLSTACK",
-] as const;
-
 export const LEVEL_LIST = [
   "INTERN",
   "FRESHER",

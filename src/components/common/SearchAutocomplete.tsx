@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Clock, Search, Sparkles, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Clock, Search, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
-import { SKILLS_LIST } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "jobfinder:recent-searches";
@@ -59,19 +58,9 @@ export function SearchAutocomplete({
 	showIcon = true,
 }: SearchAutocompleteProps) {
 	const [open, setOpen] = useState(false);
-	const [debounced, setDebounced] = useState(value);
 	const [recent, setRecent] = useState<string[]>(() => readRecent());
 	const [activeIndex, setActiveIndex] = useState(-1);
 	const wrapperRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const t = setTimeout(() => {
-			setDebounced(value);
-		}, 200);
-		return () => {
-			clearTimeout(t);
-		};
-	}, [value]);
 
 	useEffect(() => {
 		const handleClick = (e: MouseEvent) => {
@@ -88,19 +77,8 @@ export function SearchAutocomplete({
 		};
 	}, []);
 
-	const skillSuggestions = useMemo(() => {
-		const q = debounced.trim().toLowerCase();
-		if (q.length < 2) return [];
-		return SKILLS_LIST.filter((s) => s.toLowerCase().includes(q)).slice(0, 6);
-	}, [debounced]);
-
 	const showRecent = value.trim().length === 0 && recent.length > 0;
-	const showSkills = skillSuggestions.length > 0;
-	const flatList = showRecent
-		? recent
-		: showSkills
-			? (skillSuggestions as unknown as string[])
-			: [];
+	const flatList = showRecent ? recent : [];
 
 	const commit = (term: string) => {
 		onChange(term);
@@ -156,73 +134,41 @@ export function SearchAutocomplete({
 				/>
 			</div>
 
-			{open && (showRecent || showSkills) && (
+			{open && showRecent && (
 				<div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md">
-					{showRecent && (
-						<div className="py-1">
-							<div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-								Tìm kiếm gần đây
-							</div>
-							{recent.map((s, idx) => (
-								<button
-									key={s}
-									type="button"
-									onMouseDown={(e) => {
-										e.preventDefault();
-										commit(s);
-									}}
-									onMouseEnter={() => {
-										setActiveIndex(idx);
-									}}
-									className={cn(
-										"flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
-										activeIndex === idx
-											? "bg-accent text-accent-foreground"
-											: "hover:bg-accent/60",
-									)}
-								>
-									<Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-									<span className="flex-1 truncate">{s}</span>
-									<X
-										className="h-3.5 w-3.5 shrink-0 text-muted-foreground hover:text-destructive"
-										onClick={(e) => {
-											removeRecent(s, e);
-										}}
-									/>
-								</button>
-							))}
+					<div className="py-1">
+						<div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+							Tìm kiếm gần đây
 						</div>
-					)}
-
-					{showSkills && (
-						<div className="py-1">
-							<div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-								Kỹ năng gợi ý
-							</div>
-							{skillSuggestions.map((s, idx) => (
-								<button
-									key={s}
-									type="button"
-									onMouseDown={(e) => {
-										e.preventDefault();
-										commit(s);
+						{recent.map((s, idx) => (
+							<button
+								key={s}
+								type="button"
+								onMouseDown={(e) => {
+									e.preventDefault();
+									commit(s);
+								}}
+								onMouseEnter={() => {
+									setActiveIndex(idx);
+								}}
+								className={cn(
+									"flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
+									activeIndex === idx
+										? "bg-accent text-accent-foreground"
+										: "hover:bg-accent/60",
+								)}
+							>
+								<Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+								<span className="flex-1 truncate">{s}</span>
+								<X
+									className="h-3.5 w-3.5 shrink-0 text-muted-foreground hover:text-destructive"
+									onClick={(e) => {
+										removeRecent(s, e);
 									}}
-									onMouseEnter={() => {
-										setActiveIndex(idx);
-									}}
-									className={cn(
-										"flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-sm transition-colors",
-										activeIndex === idx
-											? "bg-accent text-accent-foreground"
-											: "hover:bg-accent/60",
-									)}
-								>
-									<Sparkles className="h-3.5 w-3.5 shrink-0 text-blue-600" />
-									<span className="flex-1 truncate">{s}</span>
-								</button>
-							))}
-						</div>
-					)}
+								/>
+							</button>
+						))}
+					</div>
 				</div>
 			)}
 		</div>
