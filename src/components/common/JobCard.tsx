@@ -55,7 +55,7 @@ function CardVariant({ job }: { job: Job }) {
 			<Link to={`/jobs/${job._id}`} className="block flex-1 pr-1">
 				<div className="flex items-start gap-3">
 					<div className="min-w-0 flex-1">
-						<h3 className="line-clamp-2 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
+						<h3 className="line-clamp-2 h-10 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
 							{job.name}
 						</h3>
 						<p className="mt-1 line-clamp-1 text-xs text-slate-500">
