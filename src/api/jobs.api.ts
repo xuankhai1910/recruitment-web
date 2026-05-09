@@ -15,6 +15,8 @@ export interface JobQueryParams extends PaginationParams {
   skills?: string;
   isActive?: boolean;
   "company._id"?: string;
+  /** Free-text search across job name, skills and company name (BE handles OR + alnum-tolerant matching). */
+  keyword?: string;
 }
 
 export const jobsApi = {

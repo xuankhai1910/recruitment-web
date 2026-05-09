@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -31,7 +31,6 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LEVEL_LIST, SALARY_RANGES, formatSalary } from "@/lib/constants";
-import { Input } from "@/components/ui/input";
 import { companyLogoUrl } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
@@ -97,54 +96,6 @@ function FilterPill({
 	);
 }
 
-function parseSkillsInput(input: string): string[] {
-	return input
-		.split(",")
-		.map((s) => s.trim())
-		.filter(Boolean);
-}
-
-function SkillsFilterInput({
-	value,
-	onChange,
-}: {
-	value: string[];
-	onChange: (next: string[]) => void;
-}) {
-	const [draft, setDraft] = useState(value.join(", "));
-
-	useEffect(() => {
-		setDraft(value.join(", "));
-	}, [value]);
-
-	const commit = () => {
-		const next = parseSkillsInput(draft);
-		const same =
-			next.length === value.length && next.every((s, i) => s === value[i]);
-		if (!same) onChange(next);
-	};
-
-	return (
-		<div className="space-y-2 p-3">
-			<Input
-				value={draft}
-				placeholder="VD: React, Node.js, Java"
-				onChange={(e) => setDraft(e.target.value)}
-				onBlur={commit}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") {
-						e.preventDefault();
-						commit();
-					}
-				}}
-			/>
-			<p className="text-xs text-slate-500">
-				Nhập kỹ năng, ngăn cách bằng dấu phẩy.
-			</p>
-		</div>
-	);
-}
-
 function PreviewSkeleton() {
 	return (
 		<div className="space-y-5">
@@ -171,7 +122,6 @@ export function JobsPage() {
 	const keywordParam = searchParams.get("keyword") || "";
 	const locationParam = searchParams.get("location") || "";
 	const levelParam = searchParams.get("level") || "";
-	const skillsParam = searchParams.get("skills") || "";
 	const salaryParam = searchParams.get("salary") || "all";
 
 	const [keywordDraft, setKeywordDraft] = useState({
@@ -202,11 +152,10 @@ export function JobsPage() {
 	};
 
 	const selectedLevels = parseMultiParam(levelParam);
-	const selectedSkills = parseMultiParam(skillsParam);
 	const selectedSalary = SALARY_RANGES.find(
 		(range) => range.key === salaryParam,
 	);
-	const filterResetKey = `${keywordParam}|${locationParam}|${levelParam}|${skillsParam}|${salaryParam}`;
+	const filterResetKey = `${keywordParam}|${locationParam}|${levelParam}|${salaryParam}`;
 
 	const queryParams: Record<string, unknown> = {
 		current: page,
@@ -215,7 +164,7 @@ export function JobsPage() {
 		isActive: true,
 	};
 
-	if (keywordParam) queryParams.name = `/${keywordParam}/i`;
+	if (keywordParam) queryParams.keyword = keywordParam;
 	if (locationParam) {
 		queryParams.location = `/${parseMultiParam(locationParam).join("|")}/i`;
 	}
@@ -223,9 +172,6 @@ export function JobsPage() {
 		const levels = parseMultiParam(levelParam);
 		queryParams.level =
 			levels.length > 1 ? `/${levels.join("|")}/i` : levels[0];
-	}
-	if (skillsParam) {
-		queryParams.skills = `/${parseMultiParam(skillsParam).join("|")}/i`;
 	}
 
 	const range = SALARY_RANGES.find((item) => item.key === salaryParam);
@@ -257,7 +203,7 @@ export function JobsPage() {
 		setSearchParams(params);
 	};
 
-	const setMultiParam = (key: "level" | "skills", value: string) => {
+	const setMultiParam = (key: "level", value: string) => {
 		setParams((params) => {
 			const current = parseMultiParam(params.get(key) || "");
 			const next = current.includes(value)
@@ -329,7 +275,6 @@ export function JobsPage() {
 		(keywordParam ? 1 : 0) +
 		(locationParam ? parseMultiParam(locationParam).length : 0) +
 		selectedLevels.length +
-		selectedSkills.length +
 		(salaryParam !== "all" ? 1 : 0);
 
 	const selectedSortLabel =
@@ -435,22 +380,6 @@ export function JobsPage() {
 								);
 							})}
 						</div>
-					</FilterPill>
-
-					<FilterPill label="Kỹ năng" active={selectedSkills.length > 0}>
-						<div className="border-b border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900">
-							Kỹ năng
-						</div>
-						<SkillsFilterInput
-							value={selectedSkills}
-							onChange={(next) => {
-								setParams((params) => {
-									if (next.length > 0) params.set("skills", next.join(","));
-									else params.delete("skills");
-									params.set("current", "1");
-								});
-							}}
-						/>
 					</FilterPill>
 
 					{activeFilterCount > 0 && (
