@@ -1,11 +1,18 @@
 import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Banknote, Briefcase, Building2, Clock, MapPin } from "lucide-react";
+import {
+	Banknote,
+	Briefcase,
+	Building2,
+	CalendarX2,
+	Clock,
+	MapPin,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { JobBookmarkButton } from "@/components/common/JobBookmarkButton";
-import { companyLogoUrl, formatSalaryCompact } from "@/lib/format";
+import { companyLogoUrl, formatSalaryFull } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Job } from "@/types/job";
 
@@ -13,6 +20,7 @@ interface JobCardProps {
 	job: Job;
 	variant?: "card" | "compact";
 	isSelected?: boolean;
+	showSkills?: boolean;
 	onClick?: () => void;
 }
 
@@ -46,31 +54,31 @@ function timeAgo(job: Job) {
 }
 
 function salaryLabel(job: Job) {
-	return job.salary > 0 ? formatSalaryCompact(job.salary) : "Thỏa thuận";
+	return job.salary > 0 ? formatSalaryFull(job.salary) : "Thỏa thuận";
 }
 
-function CardVariant({ job }: { job: Job }) {
+function CardVariant({ job, showSkills }: { job: Job; showSkills?: boolean }) {
 	return (
 		<div className="group flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 hover:border-blue-300 hover:shadow-md">
 			<Link to={`/jobs/${job._id}`} className="block flex-1 pr-1">
-				<div className="flex items-start gap-3">
+				<div className="flex items-center gap-3">
+					<CompanyLogo job={job} className="h-12 w-12 shrink-0 rounded-lg" />
 					<div className="min-w-0 flex-1">
 						<h3 className="line-clamp-2 h-10 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
 							{job.name}
 						</h3>
-						<p className="mt-1 line-clamp-1 text-xs text-slate-500">
+						<p className="line-clamp-1 text-xs text-slate-500">
 							{job.company?.name}
 						</p>
 					</div>
-					<CompanyLogo job={job} className="h-10 w-10 rounded-lg" />
 				</div>
 
-				<div className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-blue-600">
+				<div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-600">
 					<Banknote className="h-3.5 w-3.5" />
 					<span>{salaryLabel(job)}</span>
 				</div>
 
-				<div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-xs text-slate-400">
+				<div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-400">
 					<span className="inline-flex min-w-0 items-center gap-1">
 						<MapPin className="h-3.5 w-3.5 shrink-0" />
 						<span className="truncate">{job.location}</span>
@@ -79,7 +87,43 @@ function CardVariant({ job }: { job: Job }) {
 						<Briefcase className="h-3.5 w-3.5 shrink-0" />
 						<span className="truncate">{job.level}</span>
 					</span>
+					{!showSkills && (
+						<span className="ml-auto inline-flex items-center gap-1">
+							<CalendarX2 className="h-3.5 w-3.5 shrink-0 text-rose-400" />
+							<span className="font-medium text-rose-500">
+								{format(new Date(job.endDate), "dd/MM/yyyy")}
+							</span>
+						</span>
+					)}
 				</div>
+
+				{showSkills && (
+					<div className="mt-3 flex flex-wrap items-center gap-1">
+						{job.skills.slice(0, 3).map((skill) => (
+							<Badge
+								key={skill}
+								variant="secondary"
+								className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-normal leading-none text-slate-600 hover:bg-slate-100"
+							>
+								{skill}
+							</Badge>
+						))}
+						{job.skills.length > 3 && (
+							<Badge
+								variant="secondary"
+								className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-normal leading-none text-slate-500 hover:bg-slate-100"
+							>
+								+{job.skills.length - 3}
+							</Badge>
+						)}
+						<span className="ml-auto inline-flex items-center gap-1">
+							<CalendarX2 className="h-3.5 w-3.5 shrink-0 text-rose-400" />
+							<span className="text-xs font-medium text-rose-500">
+								{format(new Date(job.endDate), "dd/MM/yyyy")}
+							</span>
+						</span>
+					</div>
+				)}
 			</Link>
 
 			<div className="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
@@ -193,6 +237,7 @@ export function JobCard({
 	job,
 	variant = "card",
 	isSelected,
+	showSkills,
 	onClick,
 }: JobCardProps) {
 	if (variant === "compact") {
@@ -201,5 +246,5 @@ export function JobCard({
 		);
 	}
 
-	return <CardVariant job={job} />;
+	return <CardVariant job={job} showSkills={showSkills} />;
 }

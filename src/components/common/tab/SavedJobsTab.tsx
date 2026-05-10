@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bookmark, BookmarkX, Search } from "lucide-react";
+import { Bookmark, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 import { JobCard } from "@/components/common/JobCard";
-import { useSavedJobs, useToggleSaveJob } from "@/hooks/useSavedJobs";
+import { useSavedJobs } from "@/hooks/useSavedJobs";
 
 const PAGE_SIZE = 5;
 
@@ -27,7 +27,6 @@ export function SavedJobsTab() {
 		...(appliedKeyword ? { name: `/${appliedKeyword}/i` } : {}),
 		sort: "-createdAt",
 	});
-	const toggle = useToggleSaveJob();
 
 	const items = data?.result ?? [];
 	const meta = data?.meta;
@@ -79,24 +78,7 @@ export function SavedJobsTab() {
 			) : (
 				<div className="space-y-3">
 					{items.map((s) => (
-						<div key={s._id} className="relative">
-							<JobCard job={s.jobId} />
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className="absolute right-2 top-2 z-10 h-8 w-8 cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
-								disabled={toggle.isPending}
-								onClick={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-									toggle.mutate(s.jobId._id);
-								}}
-								aria-label="Bỏ lưu"
-							>
-								<BookmarkX className="h-4 w-4" />
-							</Button>
-						</div>
+						<JobCard key={s._id} job={s.jobId} showSkills />
 					))}
 				</div>
 			)}

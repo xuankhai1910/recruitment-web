@@ -9,6 +9,18 @@ export function formatSalaryCompact(salary: number): string {
   return salary.toString();
 }
 
+export function formatSalaryFull(salary: number): string {
+  if (!salary) return "Thỏa thuận";
+  if (salary >= 1_000_000) {
+    const millions = salary / 1_000_000;
+    const formatted = Number.isInteger(millions)
+      ? millions.toString()
+      : millions.toFixed(1);
+    return `${formatted} Triệu VNĐ`;
+  }
+  return `${salary.toLocaleString("vi-VN")} đ`;
+}
+
 export function companyLogoUrl(logo?: string): string {
   if (!logo) return "";
   return logo.startsWith("http")
