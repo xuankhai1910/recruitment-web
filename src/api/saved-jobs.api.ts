@@ -14,7 +14,8 @@ export interface SavedJob {
 }
 
 export interface SavedJobsQueryParams extends PaginationParams {
-  name?: string;
+  /** Free-text search across job name, skills and company name. */
+  keyword?: string;
   location?: string;
 }
 

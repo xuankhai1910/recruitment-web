@@ -24,7 +24,7 @@ export function SavedJobsTab() {
 	const { data, isLoading } = useSavedJobs({
 		current: page,
 		pageSize: PAGE_SIZE,
-		...(appliedKeyword ? { name: `/${appliedKeyword}/i` } : {}),
+		...(appliedKeyword ? { keyword: appliedKeyword } : {}),
 		sort: "-createdAt",
 	});
 
