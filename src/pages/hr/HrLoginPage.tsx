@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useLogin } from "@/hooks/useAuth";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { authApi } from "@/api/auth.api";
+import { useAuthStore } from "@/stores/auth.store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,50 +14,94 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Briefcase, Building2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Building2, Eye, EyeOff, Loader2, Users2 } from "lucide-react";
 
-export function LoginPage() {
+/**
+ * HR Login Page — dùng route /hr/login.
+ * Sau khi đăng nhập, nếu role = HR → /hr.
+ * Nếu role = SUPER_ADMIN → /hr (cho phép admin hỗ trợ HR).
+ * Nếu role khác → toast cảnh báo + logout.
+ */
+export function HrLoginPage() {
 	const navigate = useNavigate();
-	const login = useLogin();
+	const setAuth = useAuthStore((s) => s.setAuth);
+	const clearAuth = useAuthStore((s) => s.clearAuth);
+
 	const [showPassword, setShowPassword] = useState(false);
+	const [submitting, setSubmitting] = useState(false);
 	const [form, setForm] = useState({ username: "", password: "" });
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		login.mutate(form, {
-			onSuccess: () => {
-				navigate("/");
-			},
-		});
+		setSubmitting(true);
+		try {
+			const res = await authApi.login(form);
+			const { access_token, user } = res.data.data;
+			const role = user.role?.name;
+
+			if (role !== "HR" && role !== "SUPER_ADMIN") {
+				// Không cho phép login vào cổng HR — clear + báo lỗi.
+				clearAuth();
+				toast.error("Tài khoản này không phải là nhà tuyển dụng");
+				return;
+			}
+
+			if (role === "HR" && !user.company?._id) {
+				clearAuth();
+				toast.error(
+					"Tài khoản HR chưa được gắn công ty. Vui lòng liên hệ quản trị viên.",
+				);
+				return;
+			}
+
+			setAuth(user, access_token);
+			toast.success("Đăng nhập thành công");
+			navigate("/hr", { replace: true });
+		} catch (err) {
+			const msg = isAxiosError(err)
+				? ((err.response?.data?.message as string) ?? "Đăng nhập thất bại")
+				: "Đăng nhập thất bại";
+			toast.error(Array.isArray(msg) ? msg[0] : msg);
+		} finally {
+			setSubmitting(false);
+		}
 	};
 
 	return (
 		<div className="w-full max-w-sm px-4">
 			{/* Logo */}
 			<div className="mb-6 flex flex-col items-center">
-				<Briefcase className="mb-3 h-8 w-8 text-blue-600" />
+				<div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600">
+					<Building2 className="h-6 w-6" />
+				</div>
 				<h1 className="font-heading text-xl font-bold text-foreground">
-					Job<span className="text-blue-600">Finder</span>
+					Job<span className="text-blue-600">Finder</span>{" "}
+					<span className="text-sm font-medium text-muted-foreground">
+						· HR
+					</span>
 				</h1>
+				<p className="mt-1 text-xs text-muted-foreground">
+					Cổng dành cho nhà tuyển dụng
+				</p>
 			</div>
 
 			<Card>
 				<CardHeader className="pb-3 text-center">
 					<CardTitle className="font-heading text-lg">
-						Chào mừng trở lại
+						Đăng nhập nhà tuyển dụng
 					</CardTitle>
 					<CardDescription>
-						Đăng nhập để tiếp tục tìm kiếm việc làm
+						Quản lý tin tuyển dụng & hồ sơ ứng viên
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form onSubmit={handleSubmit} className="space-y-3.5">
 						<div className="space-y-1.5">
-							<Label htmlFor="email">Email</Label>
+							<Label htmlFor="email">Email công ty</Label>
 							<Input
 								id="email"
 								type="email"
-								placeholder="you@example.com"
+								placeholder="hr@company.com"
 								value={form.username}
 								onChange={(e) => {
 									setForm({ ...form, username: e.target.value });
@@ -65,15 +112,7 @@ export function LoginPage() {
 						</div>
 
 						<div className="space-y-1.5">
-							<div className="flex items-center justify-between">
-								<Label htmlFor="password">Mật khẩu</Label>
-								<Link
-									to="/forgot-password"
-									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
-								>
-									Quên mật khẩu?
-								</Link>
-							</div>
+							<Label htmlFor="password">Mật khẩu</Label>
 							<div className="relative">
 								<Input
 									id="password"
@@ -105,10 +144,10 @@ export function LoginPage() {
 
 						<Button
 							type="submit"
-							disabled={login.isPending}
+							disabled={submitting}
 							className="h-10 w-full cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
 						>
-							{login.isPending ? (
+							{submitting ? (
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 							) : null}
 							Đăng nhập
@@ -118,29 +157,28 @@ export function LoginPage() {
 					<div className="mt-5 text-center text-sm text-muted-foreground">
 						Chưa có tài khoản?{" "}
 						<Link
-							to="/register"
+							to="/hr/register"
 							className="cursor-pointer font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700"
 						>
-							Đăng ký ngay
+							Đăng ký nhà tuyển dụng
 						</Link>
 					</div>
 				</CardContent>
 			</Card>
 
-			{/* HR recruiter CTA */}
 			<Link
-				to="/hr/login"
+				to="/login"
 				className="group mt-4 flex items-center gap-3 rounded-xl border border-border/70 bg-card p-4 transition-all duration-150 hover:border-blue-600/40 hover:bg-blue-50/40 hover:shadow-sm"
 			>
 				<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors duration-150 group-hover:bg-blue-100">
-					<Building2 className="h-5 w-5" />
+					<Users2 className="h-5 w-5" />
 				</div>
 				<div className="flex-1">
 					<p className="text-sm font-semibold text-foreground">
-						Bạn là nhà tuyển dụng?
+						Bạn là người tìm việc?
 					</p>
 					<p className="text-xs text-muted-foreground">
-						Đăng ký hoặc đăng nhập tại đây
+						Quay về cổng đăng nhập ứng viên
 					</p>
 				</div>
 				<span className="text-xs font-semibold text-blue-600 transition-transform duration-150 group-hover:translate-x-0.5">

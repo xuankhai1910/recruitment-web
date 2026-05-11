@@ -12,6 +12,7 @@ import type {
 	NotificationResumeStatus,
 	NotificationType,
 } from "@/types/notification";
+import { useAuthStore } from "@/stores/auth.store";
 
 type IconRenderer = (n: AppNotification) => React.ReactNode;
 
@@ -66,8 +67,11 @@ export function renderNotificationIcon(n: AppNotification): React.ReactNode {
 const NOTIFICATION_ROUTER: Partial<
 	Record<NotificationType, (n: AppNotification) => string | undefined>
 > = {
-	// HR-side: route to the resumes management page (no detail route on FE).
-	NEW_RESUME_RECEIVED: () => "/admin/resume",
+	// HR-side: route to resumes management. HR → /hr/resumes, SUPER_ADMIN → /admin/resume.
+	NEW_RESUME_RECEIVED: () => {
+		const role = useAuthStore.getState().user?.role?.name;
+		return role === "HR" ? "/hr/resumes" : "/admin/resume";
+	},
 
 	// Applicant: send to the job they applied to (FE has no resume detail page).
 	RESUME_SUBMITTED: (n) => (n.data.jobId ? `/jobs/${n.data.jobId}` : undefined),
@@ -86,7 +90,7 @@ export function resolveCtaUrl(n: AppNotification): string {
 
 	const fromBe = n.ctaUrl ?? "";
 	// Whitelist FE-known prefixes — anything else falls back to home.
-	const allowed = ["/jobs", "/companies", "/admin", "/notifications"];
+	const allowed = ["/jobs", "/companies", "/admin", "/hr", "/notifications"];
 	if (allowed.some((p) => fromBe.startsWith(p))) return fromBe;
 	return "/";
 }

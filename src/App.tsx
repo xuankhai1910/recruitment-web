@@ -6,8 +6,10 @@ import { MainLayout } from "@/layouts/MainLayout";
 import { AuthLayout } from "@/layouts/AuthLayout";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { AccountLayout } from "@/layouts/AccountLayout";
+import { HrLayout } from "@/layouts/HrLayout";
 import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AuthenticatedRoute } from "@/components/guards/AuthenticatedRoute";
+import { HrRoute } from "@/components/guards/HrRoute";
 import { HomePage } from "@/pages/HomePage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { PublicProfilePage } from "@/pages/PublicProfilePage";
@@ -38,6 +40,14 @@ import JobPage from "@/pages/admin/JobPage";
 import ResumePage from "@/pages/admin/ResumePage";
 import PermissionPage from "@/pages/admin/PermissionPage";
 import RolePage from "@/pages/admin/RolePage";
+import { HrLoginPage } from "@/pages/hr/HrLoginPage";
+import { HrRegisterPage } from "@/pages/hr/HrRegisterPage";
+import { HrDashboardPage } from "@/pages/hr/HrDashboardPage";
+import { HrJobsPage } from "@/pages/hr/HrJobsPage";
+import { HrResumesPage } from "@/pages/hr/HrResumesPage";
+import { HrCandidatesPage } from "@/pages/hr/HrCandidatesPage";
+import { HrCandidateDetailPage } from "@/pages/hr/HrCandidateDetailPage";
+import { HrCompanyPage } from "@/pages/hr/HrCompanyPage";
 
 export default function App() {
 	const { setAuth, clearAuth, setLoading, isLoading } = useAuthStore();
@@ -74,6 +84,8 @@ export default function App() {
 			<Route element={<AuthLayout />}>
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/register" element={<RegisterPage />} />
+				<Route path="/hr/login" element={<HrLoginPage />} />
+				<Route path="/hr/register" element={<HrRegisterPage />} />
 			</Route>
 
 			{/* Public */}
@@ -120,6 +132,22 @@ export default function App() {
 					<Route path="/admin/resume" element={<ResumePage />} />
 					<Route path="/admin/permission" element={<PermissionPage />} />
 					<Route path="/admin/role" element={<RolePage />} />
+				</Route>
+			</Route>
+
+			{/* HR (protected) */}
+			<Route element={<HrRoute />}>
+				<Route element={<HrLayout />}>
+					<Route path="/hr" element={<HrDashboardPage />} />
+					<Route path="/hr/jobs" element={<HrJobsPage />} />
+					<Route path="/hr/resumes" element={<HrResumesPage />} />
+					<Route path="/hr/candidates" element={<HrCandidatesPage />} />
+					<Route
+						path="/hr/candidates/:userId"
+						element={<HrCandidateDetailPage />}
+					/>
+					<Route path="/hr/notifications" element={<NotificationsPage />} />
+					<Route path="/hr/company" element={<HrCompanyPage />} />
 				</Route>
 			</Route>
 

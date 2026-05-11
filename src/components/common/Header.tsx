@@ -37,6 +37,9 @@ export function Header() {
 	const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
 	const isAdmin = user?.role?.name && user.role.name !== "NORMAL_USER";
+	const isHr = user?.role?.name === "HR";
+	const portalPath = isHr ? "/hr" : "/admin";
+	const portalLabel = isHr ? "Trang nhà tuyển dụng" : "Trang quản trị";
 	const isJobsListPage = pathname === "/jobs";
 	const showHeaderSearch = !isJobsListPage;
 
@@ -195,11 +198,11 @@ export function Header() {
 												<DropdownMenuItem
 													className="cursor-pointer gap-2 transition-colors duration-150"
 													onClick={() => {
-														navigate("/admin");
+														navigate(portalPath);
 													}}
 												>
 													<LayoutDashboard className="h-4 w-4" />
-													Trang quản trị
+													{portalLabel}
 												</DropdownMenuItem>
 											</>
 										)}
