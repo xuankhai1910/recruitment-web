@@ -11,7 +11,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Briefcase, Building2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Briefcase, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export function LoginPage() {
 	const navigate = useNavigate();
@@ -65,15 +65,7 @@ export function LoginPage() {
 						</div>
 
 						<div className="space-y-1.5">
-							<div className="flex items-center justify-between">
-								<Label htmlFor="password">Mật khẩu</Label>
-								<Link
-									to="/forgot-password"
-									className="cursor-pointer text-xs font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700"
-								>
-									Quên mật khẩu?
-								</Link>
-							</div>
+							<Label htmlFor="password">Mật khẩu</Label>
 							<div className="relative">
 								<Input
 									id="password"
@@ -100,6 +92,14 @@ export function LoginPage() {
 										<Eye className="h-4 w-4" />
 									)}
 								</button>
+							</div>
+							<div className="text-right">
+								<Link
+									to="/forgot-password"
+									className="text-xs font-medium text-blue-600 hover:text-blue-700"
+								>
+									Quên mật khẩu?
+								</Link>
 							</div>
 						</div>
 
@@ -128,25 +128,15 @@ export function LoginPage() {
 			</Card>
 
 			{/* HR recruiter CTA */}
-			<Link
-				to="/hr/login"
-				className="group mt-4 flex items-center gap-3 rounded-xl border border-border/70 bg-card p-4 transition-all duration-150 hover:border-blue-600/40 hover:bg-blue-50/40 hover:shadow-sm"
-			>
-				<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors duration-150 group-hover:bg-blue-100">
-					<Building2 className="h-5 w-5" />
-				</div>
-				<div className="flex-1">
-					<p className="text-sm font-semibold text-foreground">
-						Bạn là nhà tuyển dụng?
-					</p>
-					<p className="text-xs text-muted-foreground">
-						Đăng ký hoặc đăng nhập tại đây
-					</p>
-				</div>
-				<span className="text-xs font-semibold text-blue-600 transition-transform duration-150 group-hover:translate-x-0.5">
-					→
-				</span>
-			</Link>
+			<div className="mt-4 text-center text-sm text-muted-foreground">
+				Bạn là nhà tuyển dụng?{" "}
+				<Link
+					to="/hr/login"
+					className="font-semibold text-blue-600 hover:text-blue-700"
+				>
+					Đăng nhập tại đây
+				</Link>
+			</div>
 		</div>
 	);
 }

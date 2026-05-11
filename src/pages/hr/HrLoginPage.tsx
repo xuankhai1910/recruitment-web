@@ -14,7 +14,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Building2, Eye, EyeOff, Loader2, Users2 } from "lucide-react";
+import { Building2, Eye, EyeOff, Loader2 } from "lucide-react";
 
 /**
  * HR Login Page — dùng route /hr/login.
@@ -140,6 +140,14 @@ export function HrLoginPage() {
 									)}
 								</button>
 							</div>
+							<div className="text-right">
+								<Link
+									to="/forgot-password"
+									className="text-xs font-medium text-blue-600 hover:text-blue-700"
+								>
+									Quên mật khẩu?
+								</Link>
+							</div>
 						</div>
 
 						<Button
@@ -166,25 +174,15 @@ export function HrLoginPage() {
 				</CardContent>
 			</Card>
 
-			<Link
-				to="/login"
-				className="group mt-4 flex items-center gap-3 rounded-xl border border-border/70 bg-card p-4 transition-all duration-150 hover:border-blue-600/40 hover:bg-blue-50/40 hover:shadow-sm"
-			>
-				<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors duration-150 group-hover:bg-blue-100">
-					<Users2 className="h-5 w-5" />
-				</div>
-				<div className="flex-1">
-					<p className="text-sm font-semibold text-foreground">
-						Bạn là người tìm việc?
-					</p>
-					<p className="text-xs text-muted-foreground">
-						Quay về cổng đăng nhập ứng viên
-					</p>
-				</div>
-				<span className="text-xs font-semibold text-blue-600 transition-transform duration-150 group-hover:translate-x-0.5">
-					→
-				</span>
-			</Link>
+			<div className="mt-4 text-center text-sm text-muted-foreground">
+				Bạn là người tìm việc?{" "}
+				<Link
+					to="/login"
+					className="font-semibold text-blue-600 hover:text-blue-700"
+				>
+					Đăng nhập tại đây
+				</Link>
+			</div>
 		</div>
 	);
 }

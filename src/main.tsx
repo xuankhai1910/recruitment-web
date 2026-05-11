@@ -26,7 +26,7 @@ createRoot(document.getElementById("root")!).render(
 		<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 			<BrowserRouter>
 				<App />
-				<Toaster richColors position="top-right" />
+				<Toaster richColors position="top-right" duration={3000} />
 			</BrowserRouter>
 			<ReactQueryDevtools initialIsOpen={false} />
 		</ThemeProvider>
