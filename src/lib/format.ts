@@ -16,7 +16,7 @@ export function formatSalaryFull(salary: number): string {
     const formatted = Number.isInteger(millions)
       ? millions.toString()
       : millions.toFixed(1);
-    return `${formatted} Triệu VNĐ`;
+    return `${formatted}M VND`;
   }
   return `${salary.toLocaleString("vi-VN")} đ`;
 }

@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { JobCard } from "@/components/common/JobCard";
+import { JobDetailTooltip } from "@/components/common/JobDetailTooltip";
 
 const PAGE_SIZE = 8;
 
@@ -81,7 +82,11 @@ export function LatestJobs() {
 				) : (
 					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 						{jobs.map((job) => (
-							<JobCard key={job._id} job={job} variant="card" />
+							<JobDetailTooltip key={job._id} job={job}>
+								<div>
+									<JobCard job={job} variant="card" />
+								</div>
+							</JobDetailTooltip>
 						))}
 					</div>
 				)}
