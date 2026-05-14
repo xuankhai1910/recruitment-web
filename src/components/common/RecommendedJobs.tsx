@@ -6,7 +6,6 @@ import {
 	Brain,
 	RefreshCcw,
 	Sparkles,
-	UserPlus,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth.store";
 import {
@@ -50,6 +49,17 @@ export function RecommendedJobs() {
 		return (
 			<section className="px-4 py-8">
 				<div className="mx-auto max-w-7xl">
+					<div className="mb-5">
+						<h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+							Gợi ý dành cho bạn
+							<span className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+								AI
+							</span>
+						</h2>
+						<p className="mt-1 text-sm text-slate-500">
+							Việc làm phù hợp nhất với CV của bạn, chọn lọc bằng AI
+						</p>
+					</div>
 					<div className="rounded-xl border border-blue-200 bg-blue-50 p-5 sm:p-6">
 						<div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-4">
@@ -72,7 +82,6 @@ export function RecommendedJobs() {
 								}}
 								className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
 							>
-								<UserPlus className="mr-2 h-4 w-4" />
 								Thiết lập ngay
 							</Button>
 						</div>
