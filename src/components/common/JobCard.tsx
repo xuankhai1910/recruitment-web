@@ -64,7 +64,7 @@ function CardVariant({ job, showSkills }: { job: Job; showSkills?: boolean }) {
 				<div className="flex items-center gap-3">
 					<CompanyLogo job={job} className="h-12 w-12 shrink-0 rounded-lg" />
 					<div className="min-w-0 flex-1">
-						<h3 className="line-clamp-2 h-10 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
+						<h3 className="line-clamp-2 text-sm font-semibold leading-5 text-blue-700 transition-colors group-hover:text-blue-800">
 							{job.name}
 						</h3>
 						<p className="line-clamp-1 text-xs text-slate-500">
