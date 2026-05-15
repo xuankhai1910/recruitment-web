@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, Mail } from "lucide-react";
+import { Bell, Mail, BellOff } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -9,16 +9,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSendTestJobAlertMail } from "@/hooks/useMail";
 import {
 	useCreateSubscriber,
+	useDeleteSubscriber,
 	useMySubscriber,
 	useUpdateSubscriber,
 } from "@/hooks/useSubscribers";
 import { useAuthStore } from "@/stores/auth.store";
-
 export function SubscriberTab() {
 	const { user } = useAuthStore();
 	const { data: sub, isLoading } = useMySubscriber();
 	const createSub = useCreateSubscriber();
 	const updateSub = useUpdateSubscriber();
+	const deleteSub = useDeleteSubscriber();
 	const sendTestJobAlertMail = useSendTestJobAlertMail();
 	const [skills, setSkills] = useState<string[]>([]);
 	const [skillsInput, setSkillsInput] = useState("");
@@ -55,6 +56,10 @@ export function SubscriberTab() {
 	};
 
 	const handleSave = async () => {
+		if (!skills.length) {
+			toast.error("Nhập ít nhất 1 kỹ năng trước khi đăng ký");
+			return;
+		}
 		await saveSubscriber();
 	};
 
@@ -72,6 +77,7 @@ export function SubscriberTab() {
 	};
 
 	const isSaving = createSub.isPending || updateSub.isPending;
+	const isDeleting = deleteSub.isPending;
 	const isTriggering = sendTestJobAlertMail.isPending;
 	const hasSavedPreferences = !!sub;
 	const hasSelectedSkills = skills.length > 0;
@@ -125,21 +131,37 @@ export function SubscriberTab() {
 			<div className="grid gap-3 sm:grid-cols-2">
 				<Button
 					onClick={handleSave}
-					disabled={isSaving || isTriggering}
+					disabled={isSaving || isTriggering || !hasSelectedSkills}
 					className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
 				>
-					{isSaving ? "Đang lưu..." : sub ? "Cập nhật" : "Đăng ký"}
+					{isSaving
+						? "Đang lưu..."
+						: hasSavedPreferences
+							? "Cập nhật"
+							: "Đăng ký"}
 				</Button>
 
-				<Button
-					onClick={handleStartNotifications}
-					disabled={isSaving || isTriggering || !hasSelectedSkills}
-					variant="outline"
-					className="cursor-pointer border-blue-200 bg-blue-50 text-blue-700 transition-colors duration-150 hover:bg-blue-100"
-				>
-					<Mail className="mr-2 h-4 w-4" />
-					{isTriggering ? "Đang gửi email kiểm tra..." : previewButtonLabel}
-				</Button>
+				{hasSavedPreferences ? (
+					<Button
+						onClick={() => deleteSub.mutate(sub._id)}
+						disabled={isSaving || isTriggering || isDeleting}
+						variant="outline"
+						className="cursor-pointer border-red-200 bg-red-50 text-red-700 transition-colors duration-150 hover:bg-red-100"
+					>
+						<BellOff className="mr-2 h-4 w-4" />
+						{isDeleting ? "Đang hủy..." : "Hủy đăng ký nhận email"}
+					</Button>
+				) : (
+					<Button
+						onClick={handleStartNotifications}
+						disabled={isSaving || isTriggering || !hasSelectedSkills}
+						variant="outline"
+						className="cursor-pointer border-blue-200 bg-blue-50 text-blue-700 transition-colors duration-150 hover:bg-blue-100"
+					>
+						<Mail className="mr-2 h-4 w-4" />
+						{isTriggering ? "Đang gửi email kiểm tra..." : previewButtonLabel}
+					</Button>
+				)}
 			</div>
 		</div>
 	);

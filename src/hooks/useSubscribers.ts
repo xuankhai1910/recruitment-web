@@ -34,3 +34,15 @@ export function useUpdateSubscriber() {
     },
   });
 }
+
+export function useDeleteSubscriber() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      subscribersApi.delete(id).then((r) => r.data.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["subscriber"] });
+      toast.success("Hủy đăng ký nhận email thành công");
+    },
+  });
+}
