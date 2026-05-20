@@ -63,10 +63,13 @@ export function ResumeTimelineDialog({
 }: ResumeTimelineDialogProps) {
 	if (!resume) return null;
 
+	// Guard against null (deleted job/company) — `typeof null === "object"`.
 	const job =
-		typeof resume.jobId === "object" ? resume.jobId : { _id: "", name: "—" };
+		resume.jobId && typeof resume.jobId === "object"
+			? resume.jobId
+			: { _id: "", name: "Việc làm đã bị xóa" };
 	const company =
-		typeof resume.companyId === "object"
+		resume.companyId && typeof resume.companyId === "object"
 			? resume.companyId
 			: { _id: "", name: "—" };
 

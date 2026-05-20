@@ -45,27 +45,34 @@
 }
 
 :root {
-    /* Design system: Minimal Professional (TopDev-inspired) */
-    /* Primary: #2563EB (blue-600), BG: #FFFFFF, Text: #0F172A (slate-900) */
+    /* Design system: Soft Blue Minimal (TopDev-inspired, lighter primary)
+     * Primary blue dropped one step (blue-500) for a softer feel; blue-600
+     * reserved for hover/active. Rose accent (#EC4899) is used for "Thỏa thuận"
+     * and other secondary highlight states (parallel to TopDev's magenta tag). */
     --background: #FFFFFF;
     --foreground: #0F172A;
     --card: #FFFFFF;
     --card-foreground: #0F172A;
     --popover: #FFFFFF;
     --popover-foreground: #0F172A;
-    --primary: #2563EB;
+    --primary: #3B82F6;             /* blue-500 (was #2563EB) */
     --primary-foreground: #FFFFFF;
+    --primary-hover: #2563EB;       /* blue-600 — only for hover/pressed */
+    --primary-soft: #EFF6FF;        /* blue-50 — filter band / banner surface */
+    --primary-soft-active: #DBEAFE; /* blue-100 — active chip background */
     --secondary: #EFF6FF;
-    --secondary-foreground: #0F172A;
+    --secondary-foreground: #1E3A8A;
     --muted: #F8FAFC;
-    --muted-foreground: #64748B;
+    --muted-foreground: #475569;    /* slate-600 — better contrast than 64748B */
     --accent: #EFF6FF;
     --accent-foreground: #1E40AF;
+    --accent-rose: #EC4899;         /* pink-500 — magenta touch for Negotiable */
+    --accent-rose-soft: #FCE7F3;    /* pink-100 */
     --destructive: #EF4444;
     --border: #E2E8F0;
     --input: #E2E8F0;
-    --ring: #2563EB;
-    --chart-1: #2563EB;
+    --ring: #3B82F6;
+    --chart-1: #3B82F6;
     --chart-2: #60A5FA;
     --chart-3: #14B8A6;
     --chart-4: #F59E0B;

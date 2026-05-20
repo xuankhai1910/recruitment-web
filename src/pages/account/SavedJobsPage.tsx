@@ -1,16 +1,16 @@
+import { Bookmark } from "lucide-react";
+import { PageHeader } from "@/components/common/account/PageHeader";
 import { SavedJobsTab } from "@/components/common/tab";
 
 export function SavedJobsPage() {
 	return (
-		<div className="space-y-4">
-			<div>
-				<h1 className="font-heading text-lg font-semibold text-foreground">
-					Việc đã lưu
-				</h1>
-				<p className="text-sm text-muted-foreground">
-					Danh sách việc làm bạn quan tâm
-				</p>
-			</div>
+		<div className="space-y-6">
+			<PageHeader
+				icon={Bookmark}
+				title="Việc đã lưu"
+				description="Danh sách việc làm bạn quan tâm và muốn xem lại"
+				tone="rose"
+			/>
 			<SavedJobsTab />
 		</div>
 	);

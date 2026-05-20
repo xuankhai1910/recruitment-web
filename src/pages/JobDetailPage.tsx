@@ -179,7 +179,7 @@ export function JobDetailPage() {
 											}
 											setApplyOpen(true);
 										}}
-										className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
+										className="cursor-pointer bg-blue-500 text-white shadow-sm shadow-blue-500/20 transition-colors duration-150 hover:bg-blue-600"
 										size="lg"
 										disabled={!job.isActive}
 									>

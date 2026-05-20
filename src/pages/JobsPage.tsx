@@ -74,10 +74,12 @@ function FilterPill({
 	label,
 	active,
 	children,
+	icon: Icon,
 }: {
 	label: string;
 	active: boolean;
 	children: React.ReactNode;
+	icon?: React.ComponentType<{ className?: string }>;
 }) {
 	return (
 		<Popover>
@@ -85,14 +87,15 @@ function FilterPill({
 				<button
 					type="button"
 					className={cn(
-						"inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors duration-150",
+						"inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all duration-150",
 						active
-							? "border-blue-300 bg-blue-50 text-blue-700"
-							: "border-slate-200 bg-white text-slate-600 hover:border-blue-400 hover:text-blue-600",
+							? "border-blue-300 bg-blue-50 text-blue-600 shadow-sm shadow-blue-100"
+							: "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-500",
 					)}
 				>
+					{Icon && <Icon className="h-3.5 w-3.5" />}
 					{label}
-					<ChevronDown className="h-3.5 w-3.5" />
+					<ChevronDown className="h-3.5 w-3.5 opacity-60" />
 				</button>
 			</PopoverTrigger>
 			<PopoverContent align="start" className="w-72 p-0">
@@ -328,7 +331,7 @@ export function JobsPage() {
 					event.preventDefault();
 					applySearch();
 				}}
-				className="sticky top-14 z-40 border-b border-slate-200/60 bg-white px-4 py-3"
+				className="sticky top-24 z-40 border-b border-slate-100 bg-blue-50/40 px-4 py-3 backdrop-blur supports-backdrop-filter:bg-blue-50/60"
 			>
 				<div className="mx-auto flex max-w-7xl flex-col gap-2 sm:flex-row sm:items-center">
 					<SearchAutocomplete
@@ -349,7 +352,7 @@ export function JobsPage() {
 
 					<Button
 						type="submit"
-						className="h-10 cursor-pointer rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
+						className="h-10 cursor-pointer rounded-lg bg-blue-500 px-6 text-sm font-semibold text-white shadow-sm shadow-blue-500/20 transition-colors duration-150 hover:bg-blue-600"
 					>
 						<Search className="mr-2 h-4 w-4" />
 						Tìm kiếm
@@ -357,22 +360,22 @@ export function JobsPage() {
 				</div>
 			</form>
 
-			<div className="border-b border-slate-200/60 bg-slate-50 px-4 py-2">
+			<div className="border-b border-slate-100 bg-white px-4 py-2.5">
 				<div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto">
 					<button
 						type="button"
 						onClick={() => setSpecModalOpen(true)}
 						className={cn(
-							"inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors duration-150",
+							"inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium transition-all duration-150",
 							selectedSpecializations.length > 0
-								? "border-emerald-300 bg-emerald-50 text-emerald-700"
-								: "border-slate-200 bg-white text-slate-600 hover:border-emerald-400 hover:text-emerald-600",
+								? "border-blue-300 bg-blue-50 text-blue-600 shadow-sm shadow-blue-100"
+								: "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-500",
 						)}
 					>
 						<Layers className="h-3.5 w-3.5" />
 						Ngành nghề
 						{selectedSpecializations.length > 0 && (
-							<span className="ml-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+							<span className="ml-1 rounded-full bg-blue-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
 								{selectedSpecializations.length}
 							</span>
 						)}
@@ -401,7 +404,7 @@ export function JobsPage() {
 											className={cn(
 												"cursor-pointer",
 												checked
-													? "font-medium text-blue-700"
+													? "font-medium text-blue-600"
 													: "text-slate-700",
 											)}
 										>
@@ -430,12 +433,12 @@ export function JobsPage() {
 								onClick={() => setSingleParam("workMode", "")}
 								className={cn(
 									"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
-									!workModeParam ? "font-medium text-blue-700" : "text-slate-700",
+									!workModeParam ? "font-medium text-blue-600" : "text-slate-700",
 								)}
 							>
 								Tất cả
 								{!workModeParam && (
-									<span className="h-2 w-2 rounded-full bg-blue-600" />
+									<span className="h-2 w-2 rounded-full bg-blue-500" />
 								)}
 							</button>
 							{WORK_MODES.map((mode) => {
@@ -447,7 +450,7 @@ export function JobsPage() {
 										onClick={() => setSingleParam("workMode", mode)}
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
-											active ? "font-medium text-blue-700" : "text-slate-700",
+											active ? "font-medium text-blue-600" : "text-slate-700",
 										)}
 									>
 										<span className="inline-flex items-center gap-2">
@@ -455,7 +458,7 @@ export function JobsPage() {
 											{mode}
 										</span>
 										{active && (
-											<span className="h-2 w-2 rounded-full bg-blue-600" />
+											<span className="h-2 w-2 rounded-full bg-blue-500" />
 										)}
 									</button>
 								);
@@ -476,12 +479,12 @@ export function JobsPage() {
 								onClick={() => setSingleParam("jobType", "")}
 								className={cn(
 									"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
-									!jobTypeParam ? "font-medium text-blue-700" : "text-slate-700",
+									!jobTypeParam ? "font-medium text-blue-600" : "text-slate-700",
 								)}
 							>
 								Tất cả
 								{!jobTypeParam && (
-									<span className="h-2 w-2 rounded-full bg-blue-600" />
+									<span className="h-2 w-2 rounded-full bg-blue-500" />
 								)}
 							</button>
 							{JOB_TYPES.map((jt) => {
@@ -493,12 +496,12 @@ export function JobsPage() {
 										onClick={() => setSingleParam("jobType", jt)}
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
-											active ? "font-medium text-blue-700" : "text-slate-700",
+											active ? "font-medium text-blue-600" : "text-slate-700",
 										)}
 									>
 										{jt}
 										{active && (
-											<span className="h-2 w-2 rounded-full bg-blue-600" />
+											<span className="h-2 w-2 rounded-full bg-blue-500" />
 										)}
 									</button>
 								);
@@ -522,12 +525,12 @@ export function JobsPage() {
 										onClick={() => changeSalary(range.key)}
 										className={cn(
 											"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
-											active ? "font-medium text-blue-700" : "text-slate-700",
+											active ? "font-medium text-blue-600" : "text-slate-700",
 										)}
 									>
 										{range.label}
 										{active && (
-											<span className="h-2 w-2 rounded-full bg-blue-600" />
+											<span className="h-2 w-2 rounded-full bg-blue-500" />
 										)}
 									</button>
 								);
@@ -771,7 +774,7 @@ export function JobsPage() {
 								<Button
 									onClick={() => setApplyOpen(true)}
 									disabled={!selectedJob.isActive}
-									className="h-10 cursor-pointer rounded-lg bg-blue-600 px-5 text-white transition-colors hover:bg-blue-700"
+									className="h-10 cursor-pointer rounded-lg bg-blue-500 px-5 text-white shadow-sm shadow-blue-500/20 transition-colors hover:bg-blue-600"
 								>
 									<Send className="mr-2 h-4 w-4" />
 									Ứng tuyển

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { jobsApi, type JobQueryParams } from "@/api/jobs.api";
 import type { CreateJobDto } from "@/types/job";
 import { toast } from "sonner";
@@ -16,6 +17,38 @@ export function useJobs(params: JobQueryParams) {
     queryFn: () => jobsApi.getList(params).then((r) => r.data.data),
     placeholderData: (prev) => prev,
   });
+}
+
+/**
+ * Warm the React Query cache for an upcoming `useJobs` call. Used to prefetch
+ * adjacent pages so paginating feels instant (cache hit, no network wait).
+ *
+ * `queryKey` + `queryFn` MUST mirror `useJobs` exactly so the later `useJobs`
+ * call finds this entry. If the prefetch errors (slow Mongo on high offset,
+ * 5xx, network), the entry is evicted — otherwise the next `useQuery` for
+ * the same key would inherit the error and never call `placeholderData`,
+ * leaving the page stuck on a skeleton.
+ */
+export function usePrefetchJobs() {
+  const qc = useQueryClient();
+  return useCallback(
+    (params: JobQueryParams) => {
+      const queryKey = ["jobs", params] as const;
+      void qc
+        .prefetchQuery({
+          queryKey,
+          queryFn: () => jobsApi.getList(params).then((r) => r.data.data),
+          staleTime: 5 * 60 * 1000,
+          retry: 0,
+        })
+        .then(() => {
+          if (qc.getQueryState(queryKey)?.status === "error") {
+            qc.removeQueries({ queryKey, exact: true });
+          }
+        });
+    },
+    [qc],
+  );
 }
 
 // Admin variant — auto filter by user's company (HR) or return all (SUPER_ADMIN)

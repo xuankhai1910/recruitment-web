@@ -39,7 +39,7 @@ export function HeroSearch() {
 	};
 
 	return (
-		<section className="bg-linear-to-r from-blue-600 to-blue-700 px-4 py-10 sm:py-14">
+		<section className="bg-linear-to-r from-blue-500 to-blue-600 px-4 py-10 sm:py-14">
 			<div className="mx-auto max-w-3xl text-center">
 				<h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
 					Tìm kiếm việc làm mơ ước
@@ -96,7 +96,7 @@ export function HeroSearch() {
 
 					<Button
 						type="submit"
-						className="h-11 min-w-32 cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
+						className="h-11 min-w-32 cursor-pointer rounded-lg bg-blue-500 text-sm font-semibold text-white shadow-sm shadow-blue-500/30 transition-colors duration-150 hover:bg-blue-600"
 					>
 						<Search className="mr-2 h-4 w-4" />
 						Tìm kiếm

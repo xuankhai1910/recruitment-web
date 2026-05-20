@@ -1,16 +1,16 @@
+import { FileText } from "lucide-react";
+import { PageHeader } from "@/components/common/account/PageHeader";
 import { ResumesTab } from "@/components/common/tab";
 
 export function ResumesPage() {
 	return (
-		<div className="space-y-4">
-			<div>
-				<h1 className="font-heading text-lg font-semibold text-foreground">
-					CV đã nộp
-				</h1>
-				<p className="text-sm text-muted-foreground">
-					Theo dõi trạng thái các hồ sơ ứng tuyển
-				</p>
-			</div>
+		<div className="space-y-6">
+			<PageHeader
+				icon={FileText}
+				title="CV đã nộp"
+				description="Theo dõi trạng thái các hồ sơ bạn đã ứng tuyển"
+				tone="blue"
+			/>
 			<ResumesTab />
 		</div>
 	);
