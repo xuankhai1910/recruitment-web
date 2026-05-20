@@ -10,6 +10,7 @@ import { useAuthStore } from "@/stores/auth.store";
 import { ApplyModal } from "@/components/common/ApplyModal";
 import { JobCard } from "@/components/common/JobCard";
 import { LocationMultiSelect } from "@/components/common/LocationMultiSelect";
+import { CategorySpecializationModal } from "@/components/common/CategorySpecializationModal";
 import {
 	pushRecentSearch,
 	SearchAutocomplete,
@@ -30,8 +31,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LEVEL_LIST, SALARY_RANGES, formatSalary } from "@/lib/constants";
-import { companyLogoUrl } from "@/lib/format";
+import { LEVEL_LIST, SALARY_RANGES } from "@/lib/constants";
+import { companyLogoUrl, formatJobSalary, formatYearsOfExperience } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
 	ArrowRight,
@@ -45,12 +46,17 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Clock,
+	Layers,
 	MapPin,
+	Monitor,
 	Search,
 	Send,
 	Users,
 	X,
 } from "lucide-react";
+
+const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship", "Freelance"] as const;
+const WORK_MODES = ["Onsite", "Remote", "Hybrid"] as const;
 
 const PAGE_SIZE = 10;
 const SORT_OPTIONS = [
@@ -123,6 +129,10 @@ export function JobsPage() {
 	const locationParam = searchParams.get("location") || "";
 	const levelParam = searchParams.get("level") || "";
 	const salaryParam = searchParams.get("salary") || "all";
+	const specializationParam = searchParams.get("specializations") || "";
+	const jobTypeParam = searchParams.get("jobType") || "";
+	const workModeParam = searchParams.get("workMode") || "";
+	const [specModalOpen, setSpecModalOpen] = useState(false);
 
 	const [keywordDraft, setKeywordDraft] = useState({
 		source: keywordParam,
@@ -152,10 +162,11 @@ export function JobsPage() {
 	};
 
 	const selectedLevels = parseMultiParam(levelParam);
+	const selectedSpecializations = parseMultiParam(specializationParam);
 	const selectedSalary = SALARY_RANGES.find(
 		(range) => range.key === salaryParam,
 	);
-	const filterResetKey = `${keywordParam}|${locationParam}|${levelParam}|${salaryParam}`;
+	const filterResetKey = `${keywordParam}|${locationParam}|${levelParam}|${salaryParam}|${specializationParam}|${jobTypeParam}|${workModeParam}`;
 
 	const queryParams: Record<string, unknown> = {
 		current: page,
@@ -173,10 +184,21 @@ export function JobsPage() {
 		queryParams.level =
 			levels.length > 1 ? `/${levels.join("|")}/i` : levels[0];
 	}
+	if (selectedSpecializations.length > 0) {
+		queryParams.specialization =
+			selectedSpecializations.length > 1
+				? `/${selectedSpecializations
+						.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+						.join("|")}/i`
+				: selectedSpecializations[0];
+	}
+	if (jobTypeParam) queryParams.jobType = jobTypeParam;
+	if (workModeParam) queryParams.workMode = workModeParam;
 
 	const range = SALARY_RANGES.find((item) => item.key === salaryParam);
-	if (range?.min !== undefined) queryParams["salary[$gte]"] = range.min;
-	if (range?.max !== undefined) queryParams["salary[$lte]"] = range.max;
+	// Salary is now an object {min,max,isNegotiable,currency} so use dot-path filters.
+	if (range?.min !== undefined) queryParams["salary.min[$gte]"] = range.min;
+	if (range?.max !== undefined) queryParams["salary.max[$lte]"] = range.max;
 
 	const { data, isLoading } = useJobs(queryParams);
 	const meta = data?.meta;
@@ -212,6 +234,22 @@ export function JobsPage() {
 
 			if (next.length > 0) params.set(key, next.join(","));
 			else params.delete(key);
+			params.set("current", "1");
+		});
+	};
+
+	const setSingleParam = (key: "jobType" | "workMode", value: string) => {
+		setParams((params) => {
+			if (value) params.set(key, value);
+			else params.delete(key);
+			params.set("current", "1");
+		});
+	};
+
+	const applySpecializationSelection = (specs: string[]) => {
+		setParams((params) => {
+			if (specs.length > 0) params.set("specializations", specs.join(","));
+			else params.delete("specializations");
 			params.set("current", "1");
 		});
 	};
@@ -275,6 +313,9 @@ export function JobsPage() {
 		(keywordParam ? 1 : 0) +
 		(locationParam ? parseMultiParam(locationParam).length : 0) +
 		selectedLevels.length +
+		selectedSpecializations.length +
+		(jobTypeParam ? 1 : 0) +
+		(workModeParam ? 1 : 0) +
 		(salaryParam !== "all" ? 1 : 0);
 
 	const selectedSortLabel =
@@ -318,6 +359,25 @@ export function JobsPage() {
 
 			<div className="border-b border-slate-200/60 bg-slate-50 px-4 py-2">
 				<div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto">
+					<button
+						type="button"
+						onClick={() => setSpecModalOpen(true)}
+						className={cn(
+							"inline-flex h-8 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-sm font-medium transition-colors duration-150",
+							selectedSpecializations.length > 0
+								? "border-emerald-300 bg-emerald-50 text-emerald-700"
+								: "border-slate-200 bg-white text-slate-600 hover:border-emerald-400 hover:text-emerald-600",
+						)}
+					>
+						<Layers className="h-3.5 w-3.5" />
+						Ngành nghề
+						{selectedSpecializations.length > 0 && (
+							<span className="ml-1 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+								{selectedSpecializations.length}
+							</span>
+						)}
+					</button>
+
 					<FilterPill label="Cấp bậc" active={selectedLevels.length > 0}>
 						<div className="border-b border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900">
 							Cấp bậc
@@ -348,6 +408,99 @@ export function JobsPage() {
 											{item}
 										</label>
 									</div>
+								);
+							})}
+						</div>
+					</FilterPill>
+
+					<FilterPill
+						label={
+							workModeParam
+								? `Hình thức: ${workModeParam}`
+								: "Hình thức"
+						}
+						active={!!workModeParam}
+					>
+						<div className="border-b border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900">
+							Hình thức làm việc
+						</div>
+						<div className="p-1.5">
+							<button
+								type="button"
+								onClick={() => setSingleParam("workMode", "")}
+								className={cn(
+									"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
+									!workModeParam ? "font-medium text-blue-700" : "text-slate-700",
+								)}
+							>
+								Tất cả
+								{!workModeParam && (
+									<span className="h-2 w-2 rounded-full bg-blue-600" />
+								)}
+							</button>
+							{WORK_MODES.map((mode) => {
+								const active = workModeParam === mode;
+								return (
+									<button
+										key={mode}
+										type="button"
+										onClick={() => setSingleParam("workMode", mode)}
+										className={cn(
+											"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
+											active ? "font-medium text-blue-700" : "text-slate-700",
+										)}
+									>
+										<span className="inline-flex items-center gap-2">
+											<Monitor className="h-3.5 w-3.5" />
+											{mode}
+										</span>
+										{active && (
+											<span className="h-2 w-2 rounded-full bg-blue-600" />
+										)}
+									</button>
+								);
+							})}
+						</div>
+					</FilterPill>
+
+					<FilterPill
+						label={jobTypeParam ? `Loại HĐ: ${jobTypeParam}` : "Loại HĐ"}
+						active={!!jobTypeParam}
+					>
+						<div className="border-b border-slate-200 px-3 py-2 text-sm font-semibold text-slate-900">
+							Loại hình công việc
+						</div>
+						<div className="p-1.5">
+							<button
+								type="button"
+								onClick={() => setSingleParam("jobType", "")}
+								className={cn(
+									"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
+									!jobTypeParam ? "font-medium text-blue-700" : "text-slate-700",
+								)}
+							>
+								Tất cả
+								{!jobTypeParam && (
+									<span className="h-2 w-2 rounded-full bg-blue-600" />
+								)}
+							</button>
+							{JOB_TYPES.map((jt) => {
+								const active = jobTypeParam === jt;
+								return (
+									<button
+										key={jt}
+										type="button"
+										onClick={() => setSingleParam("jobType", jt)}
+										className={cn(
+											"flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-left text-sm transition-colors hover:bg-slate-50",
+											active ? "font-medium text-blue-700" : "text-slate-700",
+										)}
+									>
+										{jt}
+										{active && (
+											<span className="h-2 w-2 rounded-full bg-blue-600" />
+										)}
+									</button>
 								);
 							})}
 						</div>
@@ -532,7 +685,7 @@ export function JobsPage() {
 										Mức lương
 									</p>
 									<p className="mt-1 text-sm font-semibold text-blue-600">
-										{formatSalary(selectedJob.salary)}
+										{formatJobSalary(selectedJob.salary)}
 									</p>
 								</div>
 								<div>
@@ -562,6 +715,42 @@ export function JobsPage() {
 										{selectedJob.quantity}
 									</p>
 								</div>
+							</div>
+
+							<div className="mt-3 flex flex-wrap gap-2">
+								{selectedJob.specialization && (
+									<Badge
+										variant="secondary"
+										className="rounded-md bg-emerald-50 font-normal text-emerald-700 hover:bg-emerald-50"
+									>
+										{selectedJob.specialization}
+									</Badge>
+								)}
+								{selectedJob.jobType && (
+									<Badge
+										variant="secondary"
+										className="rounded-md bg-slate-100 font-normal text-slate-700 hover:bg-slate-100"
+									>
+										{selectedJob.jobType}
+									</Badge>
+								)}
+								{selectedJob.workMode && (
+									<Badge
+										variant="secondary"
+										className="rounded-md bg-slate-100 font-normal text-slate-700 hover:bg-slate-100"
+									>
+										<Monitor className="mr-1 h-3 w-3" />
+										{selectedJob.workMode}
+									</Badge>
+								)}
+								{formatYearsOfExperience(selectedJob.yearsOfExperience) && (
+									<Badge
+										variant="secondary"
+										className="rounded-md bg-slate-100 font-normal text-slate-700 hover:bg-slate-100"
+									>
+										{formatYearsOfExperience(selectedJob.yearsOfExperience)}
+									</Badge>
+								)}
 							</div>
 
 							{selectedJob.skills && selectedJob.skills.length > 0 && (
@@ -628,6 +817,47 @@ export function JobsPage() {
 								/>
 							</section>
 
+							{selectedJob.responsibilities &&
+								selectedJob.responsibilities.length > 0 && (
+									<section className="mt-5">
+										<h2 className="text-base font-bold text-slate-900">
+											Trách nhiệm chính
+										</h2>
+										<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+											{selectedJob.responsibilities.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+									</section>
+								)}
+
+							{selectedJob.requirements &&
+								selectedJob.requirements.length > 0 && (
+									<section className="mt-5">
+										<h2 className="text-base font-bold text-slate-900">
+											Yêu cầu công việc
+										</h2>
+										<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+											{selectedJob.requirements.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+									</section>
+								)}
+
+							{selectedJob.benefits && selectedJob.benefits.length > 0 && (
+								<section className="mt-5">
+									<h2 className="text-base font-bold text-slate-900">
+										Quyền lợi
+									</h2>
+									<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+										{selectedJob.benefits.map((item) => (
+											<li key={item}>{item}</li>
+										))}
+									</ul>
+								</section>
+							)}
+
 							<div className="mt-6 grid gap-3 border-t border-slate-200 pt-4 text-sm text-slate-600 sm:grid-cols-3">
 								<div>
 									<p className="flex items-center gap-1.5 text-xs text-slate-500">
@@ -681,6 +911,15 @@ export function JobsPage() {
 					job={selectedJob}
 				/>
 			)}
+
+			<CategorySpecializationModal
+				open={specModalOpen}
+				onOpenChange={setSpecModalOpen}
+				initialSpecializations={selectedSpecializations}
+				onConfirm={({ specializations }) =>
+					applySpecializationSelection(specializations)
+				}
+			/>
 		</div>
 	);
 }

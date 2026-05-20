@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { LocationMultiSelect } from "@/components/common/LocationMultiSelect";
+import { CategorySpecializationModal } from "@/components/common/CategorySpecializationModal";
 import {
 	SearchAutocomplete,
 	pushRecentSearch,
 } from "@/components/common/SearchAutocomplete";
-import { Search, TrendingUp } from "lucide-react";
+import { ChevronDown, Layers, Search, TrendingUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const POPULAR_KEYWORDS = ["React", "Java", "Python", "Marketing", "Design"];
 
@@ -14,6 +16,8 @@ export function HeroSearch() {
 	const navigate = useNavigate();
 	const [keyword, setKeyword] = useState("");
 	const [locations, setLocations] = useState<string[]>([]);
+	const [specializations, setSpecializations] = useState<string[]>([]);
+	const [specModalOpen, setSpecModalOpen] = useState(false);
 
 	const submitWith = (kw: string) => {
 		const params = new URLSearchParams();
@@ -22,6 +26,8 @@ export function HeroSearch() {
 			pushRecentSearch(kw);
 		}
 		if (locations.length > 0) params.set("location", locations.join(","));
+		if (specializations.length > 0)
+			params.set("specializations", specializations.join(","));
 		params.set("current", "1");
 		params.set("pageSize", "5");
 		navigate(`/jobs?${params.toString()}`);
@@ -47,6 +53,27 @@ export function HeroSearch() {
 					onSubmit={handleSearch}
 					className="mx-auto mt-7 flex max-w-3xl flex-col gap-2 rounded-xl bg-white p-1.5 shadow-lg sm:flex-row sm:items-center"
 				>
+					<button
+						type="button"
+						onClick={() => setSpecModalOpen(true)}
+						className={cn(
+							"flex h-11 shrink-0 items-center gap-2 rounded-lg px-3 text-left text-sm font-medium transition-colors sm:max-w-44",
+							specializations.length > 0
+								? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+								: "text-slate-700 hover:bg-slate-50",
+						)}
+					>
+						<Layers className="h-4 w-4 shrink-0" />
+						<span className="min-w-0 flex-1 truncate">
+							{specializations.length === 0
+								? "Danh mục Nghề"
+								: `Danh mục Nghề (${specializations.length})`}
+						</span>
+						<ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-60" />
+					</button>
+
+					<div className="hidden h-6 w-px bg-slate-200 sm:block" />
+
 					<div className="relative flex-1">
 						<SearchAutocomplete
 							value={keyword}
@@ -75,6 +102,13 @@ export function HeroSearch() {
 						Tìm kiếm
 					</Button>
 				</form>
+
+				<CategorySpecializationModal
+					open={specModalOpen}
+					onOpenChange={setSpecModalOpen}
+					initialSpecializations={specializations}
+					onConfirm={({ specializations: next }) => setSpecializations(next)}
+				/>
 
 				{/* Popular keywords */}
 				<div className="mt-5 flex flex-wrap items-center justify-center gap-2">

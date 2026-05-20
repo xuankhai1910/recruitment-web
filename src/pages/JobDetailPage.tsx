@@ -30,8 +30,11 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { formatSalary } from "@/lib/constants";
-import { companyLogoUrl } from "@/lib/format";
+import {
+	companyLogoUrl,
+	formatJobSalary,
+	formatYearsOfExperience,
+} from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const SIMILAR_JOB_SKELETON_KEYS = [
@@ -164,7 +167,7 @@ export function JobDetailPage() {
 										Mức lương
 									</div>
 									<p className="mt-0.5 text-lg font-bold text-blue-600">
-										{formatSalary(job.salary)}
+										{formatJobSalary(job.salary)}
 									</p>
 								</div>
 								<div className="flex shrink-0 items-center gap-2">
@@ -224,6 +227,51 @@ export function JobDetailPage() {
 						</CardContent>
 					</Card>
 
+					{job.responsibilities && job.responsibilities.length > 0 && (
+						<Card className="rounded-xl border-slate-200">
+							<CardContent className="p-5 sm:p-6">
+								<h2 className="text-base font-semibold text-slate-900">
+									Trách nhiệm chính
+								</h2>
+								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+									{job.responsibilities.map((item) => (
+										<li key={item}>{item}</li>
+									))}
+								</ul>
+							</CardContent>
+						</Card>
+					)}
+
+					{job.requirements && job.requirements.length > 0 && (
+						<Card className="rounded-xl border-slate-200">
+							<CardContent className="p-5 sm:p-6">
+								<h2 className="text-base font-semibold text-slate-900">
+									Yêu cầu công việc
+								</h2>
+								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+									{job.requirements.map((item) => (
+										<li key={item}>{item}</li>
+									))}
+								</ul>
+							</CardContent>
+						</Card>
+					)}
+
+					{job.benefits && job.benefits.length > 0 && (
+						<Card className="rounded-xl border-slate-200">
+							<CardContent className="p-5 sm:p-6">
+								<h2 className="text-base font-semibold text-slate-900">
+									Quyền lợi
+								</h2>
+								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+									{job.benefits.map((item) => (
+										<li key={item}>{item}</li>
+									))}
+								</ul>
+							</CardContent>
+						</Card>
+					)}
+
 					{/* Similar Jobs */}
 					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5 sm:p-6">
@@ -262,6 +310,22 @@ export function JobDetailPage() {
 								Thông tin chung
 							</h3>
 							<dl className="mt-3 space-y-2.5 text-sm">
+								{job.category && (
+									<div className="flex items-center justify-between gap-3">
+										<dt className="text-slate-500">Nghề</dt>
+										<dd className="text-right font-medium text-slate-900">
+											{job.category}
+										</dd>
+									</div>
+								)}
+								{job.specialization && (
+									<div className="flex items-center justify-between gap-3">
+										<dt className="text-slate-500">Chuyên môn</dt>
+										<dd className="text-right font-medium text-slate-900">
+											{job.specialization}
+										</dd>
+									</div>
+								)}
 								<div className="flex items-center justify-between gap-3">
 									<dt className="flex items-center gap-1.5 text-slate-500">
 										<MapPin className="h-3.5 w-3.5" />
@@ -276,6 +340,26 @@ export function JobDetailPage() {
 									</dt>
 									<dd className="font-medium text-slate-900">{job.level}</dd>
 								</div>
+								{job.jobType && (
+									<div className="flex items-center justify-between gap-3">
+										<dt className="text-slate-500">Loại HĐ</dt>
+										<dd className="font-medium text-slate-900">{job.jobType}</dd>
+									</div>
+								)}
+								{job.workMode && (
+									<div className="flex items-center justify-between gap-3">
+										<dt className="text-slate-500">Hình thức</dt>
+										<dd className="font-medium text-slate-900">{job.workMode}</dd>
+									</div>
+								)}
+								{formatYearsOfExperience(job.yearsOfExperience) && (
+									<div className="flex items-center justify-between gap-3">
+										<dt className="text-slate-500">Kinh nghiệm</dt>
+										<dd className="font-medium text-slate-900">
+											{formatYearsOfExperience(job.yearsOfExperience)}
+										</dd>
+									</div>
+								)}
 								<div className="flex items-center justify-between gap-3">
 									<dt className="flex items-center gap-1.5 text-slate-500">
 										<Users className="h-3.5 w-3.5" />

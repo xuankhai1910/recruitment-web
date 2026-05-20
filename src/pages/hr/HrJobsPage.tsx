@@ -21,7 +21,8 @@ import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { JobModal } from "@/components/admin/job/JobModal";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
-import { formatSalary, formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
@@ -62,10 +63,11 @@ export function HrJobsPage() {
 		setPage(1);
 	};
 
-	const sortParam = sortField
+	const sortKey = sortField === "salary" ? "salary.min" : sortField;
+	const sortParam = sortKey
 		? sortDir === "asc"
-			? sortField
-			: `-${sortField}`
+			? sortKey
+			: `-${sortKey}`
 		: undefined;
 
 	const salaryRange = SALARY_RANGES.find((r) => r.key === salaryKey);
@@ -76,8 +78,8 @@ export function HrJobsPage() {
 		sort: sortParam,
 		name: toSearchRegex(search),
 		level: levels.length > 0 ? levels.join(",") : undefined,
-		"salary[$gte]": salaryRange?.min,
-		"salary[$lte]": salaryRange?.max,
+		"salary.min[$gte]": salaryRange?.min,
+		"salary.max[$lte]": salaryRange?.max,
 	});
 	const deleteJob = useDeleteJob();
 
@@ -129,7 +131,7 @@ export function HrJobsPage() {
 					<SortIcon field="salary" />
 				</button>
 			),
-			render: (row) => formatSalary(row.salary),
+			render: (row) => formatJobSalary(row.salary),
 		},
 		{
 			key: "level",

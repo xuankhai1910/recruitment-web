@@ -12,7 +12,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { JobBookmarkButton } from "@/components/common/JobBookmarkButton";
-import { companyLogoUrl, formatSalaryFull } from "@/lib/format";
+import { companyLogoUrl, formatJobSalary } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Job } from "@/types/job";
 
@@ -54,7 +54,7 @@ function timeAgo(job: Job) {
 }
 
 function salaryLabel(job: Job) {
-	return job.salary > 0 ? formatSalaryFull(job.salary) : "Thỏa thuận";
+	return formatJobSalary(job.salary);
 }
 
 function CardVariant({ job, showSkills }: { job: Job; showSkills?: boolean }) {

@@ -7,6 +7,7 @@ import { isAxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -31,33 +32,103 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
-import { useCreateJob, useUpdateJob } from "@/hooks/useJobs";
+import {
+	useCreateJob,
+	useJobTaxonomy,
+	useUpdateJob,
+} from "@/hooks/useJobs";
 import { useCompaniesDropdown } from "@/hooks/useCompanies";
-import { LEVEL_LIST } from "@/lib/constants";
 import { LOCATIONS } from "@/lib/locations";
 import { useCurrentUser } from "@/stores/auth.store";
-import type { Job } from "@/types/job";
+import type { CreateJobDto, Job } from "@/types/job";
 
-const jobSchema = z.object({
-	name: z.string().min(1, "Tên công việc không được để trống"),
-	skills: z.array(z.string()).min(1, "Chọn ít nhất 1 kỹ năng"),
-	location: z.string().min(1, "Vui lòng chọn địa điểm"),
-	salary: z.number().min(0, "Mức lương phải >= 0"),
-	quantity: z.number().min(1, "Số lượng phải >= 1"),
-	level: z.string().min(1, "Vui lòng chọn level"),
-	companyId: z.string().min(1, "Vui lòng chọn công ty"),
-	startDate: z.string().min(1, "Vui lòng chọn ngày bắt đầu"),
-	endDate: z.string().min(1, "Vui lòng chọn ngày kết thúc"),
-	isActive: z.boolean(),
-	description: z.string().min(1, "Mô tả không được để trống"),
-});
+const jobSchema = z
+	.object({
+		name: z.string().min(1, "Tên công việc không được để trống"),
+		category: z.string().min(1, "Vui lòng chọn nghề"),
+		specialization: z.string().min(1, "Vui lòng chọn vị trí chuyên môn"),
+		skills: z.array(z.string()).min(1, "Chọn ít nhất 1 kỹ năng"),
+		location: z.string().min(1, "Vui lòng chọn địa điểm"),
+		salaryNegotiable: z.boolean(),
+		salaryMin: z
+			.union([z.number(), z.nan()])
+			.optional()
+			.transform((v) => (typeof v === "number" && !Number.isNaN(v) ? v : undefined)),
+		salaryMax: z
+			.union([z.number(), z.nan()])
+			.optional()
+			.transform((v) => (typeof v === "number" && !Number.isNaN(v) ? v : undefined)),
+		quantity: z.number().min(1, "Số lượng phải >= 1"),
+		level: z.string().min(1, "Vui lòng chọn cấp bậc"),
+		jobType: z.string().min(1, "Vui lòng chọn loại hình"),
+		workMode: z.string().min(1, "Vui lòng chọn hình thức làm việc"),
+		yoeMin: z
+			.union([z.number(), z.nan()])
+			.optional()
+			.transform((v) => (typeof v === "number" && !Number.isNaN(v) ? v : undefined)),
+		yoeMax: z
+			.union([z.number(), z.nan()])
+			.optional()
+			.transform((v) => (typeof v === "number" && !Number.isNaN(v) ? v : undefined)),
+		benefits: z.string(),
+		requirements: z.string(),
+		responsibilities: z.string(),
+		companyId: z.string().min(1, "Vui lòng chọn công ty"),
+		startDate: z.string().min(1, "Vui lòng chọn ngày bắt đầu"),
+		endDate: z.string().min(1, "Vui lòng chọn ngày kết thúc"),
+		isActive: z.boolean(),
+		description: z.string().min(1, "Mô tả không được để trống"),
+	})
+	.superRefine((data, ctx) => {
+		if (!data.salaryNegotiable) {
+			const hasMin = typeof data.salaryMin === "number" && data.salaryMin >= 0;
+			const hasMax = typeof data.salaryMax === "number" && data.salaryMax >= 0;
+			if (!hasMin && !hasMax) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ["salaryMin"],
+					message:
+						'Vui lòng nhập mức lương min/max hoặc bật "Thỏa thuận"',
+				});
+			}
+			if (
+				hasMin &&
+				hasMax &&
+				(data.salaryMin as number) > (data.salaryMax as number)
+			) {
+				ctx.addIssue({
+					code: z.ZodIssueCode.custom,
+					path: ["salaryMax"],
+					message: "Lương tối đa phải >= lương tối thiểu",
+				});
+			}
+		}
+		if (
+			typeof data.yoeMin === "number" &&
+			typeof data.yoeMax === "number" &&
+			data.yoeMin > data.yoeMax
+		) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ["yoeMax"],
+				message: "Năm KN tối đa phải >= tối thiểu",
+			});
+		}
+	});
 
-type JobFormValues = z.infer<typeof jobSchema>;
+type JobFormValues = z.input<typeof jobSchema>;
 
 interface JobModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	job: Job | null;
+}
+
+function linesToList(text: string): string[] {
+	return text
+		.split("\n")
+		.map((line) => line.trim())
+		.filter(Boolean);
 }
 
 export function JobModal({ open, onOpenChange, job }: JobModalProps) {
@@ -67,8 +138,14 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 	const createJob = useCreateJob();
 	const updateJob = useUpdateJob();
 	const { data: companiesData } = useCompaniesDropdown(open);
+	const { data: taxonomy } = useJobTaxonomy();
 
 	const companies = useMemo(() => companiesData?.result ?? [], [companiesData]);
+	const categories = taxonomy?.categories ?? [];
+	const specMap = taxonomy?.specializationsByCategory ?? {};
+	const levels = taxonomy?.levels ?? [];
+	const jobTypes = taxonomy?.jobTypes ?? [];
+	const workModes = taxonomy?.workModes ?? [];
 
 	const [skillsInput, setSkillsInput] = useState("");
 
@@ -76,11 +153,22 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 		resolver: zodResolver(jobSchema),
 		defaultValues: {
 			name: "",
+			category: "",
+			specialization: "",
 			skills: [],
 			location: "",
-			salary: 0,
+			salaryNegotiable: false,
+			salaryMin: undefined,
+			salaryMax: undefined,
 			quantity: 1,
 			level: "",
+			jobType: "Full-time",
+			workMode: "Onsite",
+			yoeMin: undefined,
+			yoeMax: undefined,
+			benefits: "",
+			requirements: "",
+			responsibilities: "",
 			companyId: "",
 			startDate: "",
 			endDate: "",
@@ -89,16 +177,34 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 		},
 	});
 
+	const watchedCategory = form.watch("category");
+	const watchedNegotiable = form.watch("salaryNegotiable");
+	const specializations = useMemo(
+		() => specMap[watchedCategory] ?? [],
+		[specMap, watchedCategory],
+	);
+
 	useEffect(() => {
 		if (open) {
 			if (job) {
 				form.reset({
 					name: job.name,
+					category: job.category ?? "",
+					specialization: job.specialization ?? "",
 					skills: job.skills,
 					location: job.location,
-					salary: job.salary,
+					salaryNegotiable: !!job.salary?.isNegotiable,
+					salaryMin: job.salary?.min,
+					salaryMax: job.salary?.max,
 					quantity: job.quantity,
 					level: job.level,
+					jobType: job.jobType || "Full-time",
+					workMode: job.workMode || "Onsite",
+					yoeMin: job.yearsOfExperience?.min,
+					yoeMax: job.yearsOfExperience?.max,
+					benefits: (job.benefits ?? []).join("\n"),
+					requirements: (job.requirements ?? []).join("\n"),
+					responsibilities: (job.responsibilities ?? []).join("\n"),
 					companyId: job.company._id,
 					startDate: job.startDate?.slice(0, 10) ?? "",
 					endDate: job.endDate?.slice(0, 10) ?? "",
@@ -109,11 +215,22 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 			} else {
 				form.reset({
 					name: "",
+					category: "",
+					specialization: "",
 					skills: [],
 					location: "",
-					salary: 0,
+					salaryNegotiable: false,
+					salaryMin: undefined,
+					salaryMax: undefined,
 					quantity: 1,
 					level: "",
+					jobType: "Full-time",
+					workMode: "Onsite",
+					yoeMin: undefined,
+					yoeMax: undefined,
+					benefits: "",
+					requirements: "",
+					responsibilities: "",
 					companyId: !isAdmin ? (currentUser?.company?._id ?? "") : "",
 					startDate: "",
 					endDate: "",
@@ -131,13 +248,43 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 		const company = companies.find((c) => c._id === values.companyId);
 		if (!company) return;
 
-		const payload = {
+		const salary: CreateJobDto["salary"] = {
+			isNegotiable: values.salaryNegotiable,
+			...(values.salaryNegotiable
+				? {}
+				: {
+						min:
+							typeof values.salaryMin === "number"
+								? values.salaryMin
+								: undefined,
+						max:
+							typeof values.salaryMax === "number"
+								? values.salaryMax
+								: undefined,
+					}),
+		};
+
+		const yoeMin = typeof values.yoeMin === "number" ? values.yoeMin : undefined;
+		const yoeMax = typeof values.yoeMax === "number" ? values.yoeMax : undefined;
+
+		const payload: CreateJobDto = {
 			name: values.name,
+			category: values.category,
+			specialization: values.specialization,
 			skills: values.skills,
 			location: values.location,
-			salary: values.salary,
+			salary,
 			quantity: values.quantity,
 			level: values.level,
+			jobType: values.jobType,
+			workMode: values.workMode,
+			yearsOfExperience:
+				yoeMin !== undefined || yoeMax !== undefined
+					? { min: yoeMin, max: yoeMax }
+					: undefined,
+			benefits: linesToList(values.benefits),
+			requirements: linesToList(values.requirements),
+			responsibilities: linesToList(values.responsibilities),
 			company: {
 				_id: company._id,
 				name: company.name,
@@ -200,6 +347,94 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							)}
 						/>
 
+						{/* Category + Specialization */}
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+							<FormField
+								control={form.control}
+								name="category"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Nghề <span className="text-destructive">*</span>
+										</FormLabel>
+										<Select
+											value={field.value}
+											onValueChange={(v) => {
+												field.onChange(v);
+												// Reset specialization when category changes
+												form.setValue("specialization", "");
+											}}
+										>
+											<FormControl>
+												<SelectTrigger className="cursor-pointer">
+													<SelectValue placeholder="Chọn nghề" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{categories.map((cat) => (
+													<SelectItem
+														key={cat}
+														value={cat}
+														className="cursor-pointer"
+													>
+														{cat}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="specialization"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Vị trí chuyên môn{" "}
+											<span className="text-destructive">*</span>
+										</FormLabel>
+										<Select
+											value={field.value}
+											onValueChange={field.onChange}
+											disabled={!watchedCategory}
+										>
+											<FormControl>
+												<SelectTrigger
+													className={
+														watchedCategory
+															? "cursor-pointer"
+															: "cursor-not-allowed opacity-70"
+													}
+												>
+													<SelectValue
+														placeholder={
+															watchedCategory
+																? "Chọn vị trí chuyên môn"
+																: "Chọn nghề trước"
+														}
+													/>
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{specializations.map((s) => (
+													<SelectItem
+														key={s}
+														value={s}
+														className="cursor-pointer"
+													>
+														{s}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
 						{/* Skills */}
 						<FormField
 							control={form.control}
@@ -207,7 +442,8 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
-										Kỹ năng yêu cầu <span className="text-destructive">*</span>
+										Kỹ năng yêu cầu{" "}
+										<span className="text-destructive">*</span>
 									</FormLabel>
 									<FormControl>
 										<Input
@@ -275,16 +511,16 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>
-											Level <span className="text-destructive">*</span>
+											Cấp bậc <span className="text-destructive">*</span>
 										</FormLabel>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<FormControl>
 												<SelectTrigger className="cursor-pointer">
-													<SelectValue placeholder="Chọn level" />
+													<SelectValue placeholder="Chọn cấp bậc" />
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
-												{LEVEL_LIST.map((lv) => (
+												{levels.map((lv) => (
 													<SelectItem
 														key={lv}
 														value={lv}
@@ -301,18 +537,165 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							/>
 						</div>
 
-						{/* Salary + Quantity */}
+						{/* JobType + WorkMode */}
 						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<FormField
 								control={form.control}
-								name="salary"
+								name="jobType"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Mức lương (VNĐ)</FormLabel>
+										<FormLabel>
+											Loại hình <span className="text-destructive">*</span>
+										</FormLabel>
+										<Select value={field.value} onValueChange={field.onChange}>
+											<FormControl>
+												<SelectTrigger className="cursor-pointer">
+													<SelectValue placeholder="Loại hình" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{jobTypes.map((jt) => (
+													<SelectItem
+														key={jt}
+														value={jt}
+														className="cursor-pointer"
+													>
+														{jt}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="workMode"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Hình thức làm việc{" "}
+											<span className="text-destructive">*</span>
+										</FormLabel>
+										<Select value={field.value} onValueChange={field.onChange}>
+											<FormControl>
+												<SelectTrigger className="cursor-pointer">
+													<SelectValue placeholder="Onsite/Remote/Hybrid" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent>
+												{workModes.map((wm) => (
+													<SelectItem
+														key={wm}
+														value={wm}
+														className="cursor-pointer"
+													>
+														{wm}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+
+						{/* Salary block */}
+						<div className="rounded-md border border-slate-200 p-3 space-y-3">
+							<div className="flex items-center justify-between">
+								<FormLabel className="text-sm font-medium">Mức lương</FormLabel>
+								<FormField
+									control={form.control}
+									name="salaryNegotiable"
+									render={({ field }) => (
+										<label className="flex cursor-pointer items-center gap-2 text-sm">
+											<Checkbox
+												checked={!!field.value}
+												onCheckedChange={(v) => field.onChange(!!v)}
+											/>
+											<span>Thỏa thuận</span>
+										</label>
+									)}
+								/>
+							</div>
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								<FormField
+									control={form.control}
+									name="salaryMin"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className="text-xs text-muted-foreground">
+												Tối thiểu (VND)
+											</FormLabel>
+											<FormControl>
+												<Input
+													type="number"
+													min={0}
+													disabled={watchedNegotiable}
+													value={
+														typeof field.value === "number" ? field.value : ""
+													}
+													onChange={(e) =>
+														field.onChange(
+															e.target.value === ""
+																? undefined
+																: e.target.valueAsNumber,
+														)
+													}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="salaryMax"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel className="text-xs text-muted-foreground">
+												Tối đa (VND)
+											</FormLabel>
+											<FormControl>
+												<Input
+													type="number"
+													min={0}
+													disabled={watchedNegotiable}
+													value={
+														typeof field.value === "number" ? field.value : ""
+													}
+													onChange={(e) =>
+														field.onChange(
+															e.target.value === ""
+																? undefined
+																: e.target.valueAsNumber,
+														)
+													}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</div>
+						</div>
+
+						{/* Quantity + Years of experience */}
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+							<FormField
+								control={form.control}
+								name="quantity"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Số lượng <span className="text-destructive">*</span>
+										</FormLabel>
 										<FormControl>
 											<Input
 												type="number"
-												min={0}
+												min={1}
 												{...field}
 												onChange={(e) => field.onChange(e.target.valueAsNumber)}
 											/>
@@ -323,16 +706,50 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							/>
 							<FormField
 								control={form.control}
-								name="quantity"
+								name="yoeMin"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Số lượng</FormLabel>
+										<FormLabel>KN tối thiểu (năm)</FormLabel>
 										<FormControl>
 											<Input
 												type="number"
-												min={1}
-												{...field}
-												onChange={(e) => field.onChange(e.target.valueAsNumber)}
+												min={0}
+												value={
+													typeof field.value === "number" ? field.value : ""
+												}
+												onChange={(e) =>
+													field.onChange(
+														e.target.value === ""
+															? undefined
+															: e.target.valueAsNumber,
+													)
+												}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="yoeMax"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>KN tối đa (năm)</FormLabel>
+										<FormControl>
+											<Input
+												type="number"
+												min={0}
+												value={
+													typeof field.value === "number" ? field.value : ""
+												}
+												onChange={(e) =>
+													field.onChange(
+														e.target.value === ""
+															? undefined
+															: e.target.valueAsNumber,
+													)
+												}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -448,12 +865,81 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 							name="description"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Mô tả công việc</FormLabel>
+									<FormLabel>
+										Mô tả công việc{" "}
+										<span className="text-destructive">*</span>
+									</FormLabel>
 									<RichTextEditor
 										value={field.value}
 										onChange={field.onChange}
 										placeholder="Nhập mô tả công việc..."
 									/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						{/* Responsibilities */}
+						<FormField
+							control={form.control}
+							name="responsibilities"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Trách nhiệm chính</FormLabel>
+									<FormControl>
+										<Textarea
+											rows={4}
+											placeholder="Mỗi dòng là 1 trách nhiệm"
+											{...field}
+										/>
+									</FormControl>
+									<p className="text-xs text-muted-foreground">
+										Mỗi dòng một mục, tối đa 50 mục.
+									</p>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						{/* Requirements */}
+						<FormField
+							control={form.control}
+							name="requirements"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Yêu cầu công việc</FormLabel>
+									<FormControl>
+										<Textarea
+											rows={4}
+											placeholder="Mỗi dòng là 1 yêu cầu"
+											{...field}
+										/>
+									</FormControl>
+									<p className="text-xs text-muted-foreground">
+										Mỗi dòng một mục, tối đa 50 mục.
+									</p>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						{/* Benefits */}
+						<FormField
+							control={form.control}
+							name="benefits"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Quyền lợi</FormLabel>
+									<FormControl>
+										<Textarea
+											rows={4}
+											placeholder="Mỗi dòng là 1 quyền lợi"
+											{...field}
+										/>
+									</FormControl>
+									<p className="text-xs text-muted-foreground">
+										Mỗi dòng một mục, tối đa 30 mục.
+									</p>
 									<FormMessage />
 								</FormItem>
 							)}

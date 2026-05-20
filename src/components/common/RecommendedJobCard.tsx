@@ -5,7 +5,7 @@ import { Banknote, Briefcase, Building2, CalendarX2, Clock, MapPin } from "lucid
 
 import { Badge } from "@/components/ui/badge";
 import { JobBookmarkButton } from "@/components/common/JobBookmarkButton";
-import { companyLogoUrl, formatSalaryCompact } from "@/lib/format";
+import { companyLogoUrl, formatJobSalary } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { RecommendedJobItem } from "@/types/cv-recommendation";
 
@@ -38,9 +38,6 @@ function getScoreBadge(score: number) {
 	};
 }
 
-function salaryLabel(salary: number) {
-	return salary > 0 ? formatSalaryCompact(salary) : "Thỏa thuận";
-}
 
 export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 	const { job, score, matchedSkills } = item;
@@ -76,7 +73,7 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 
 				<div className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-blue-600">
 					<Banknote className="h-3.5 w-3.5" />
-					<span>{salaryLabel(job.salary)}</span>
+					<span>{formatJobSalary(job.salary)}</span>
 				</div>
 
 				<div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2 text-xs text-slate-400">

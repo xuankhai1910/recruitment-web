@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { companyLogoUrl, formatSalaryFull } from "@/lib/format";
+import { companyLogoUrl, formatJobSalary } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Job } from "@/types/job";
 
@@ -40,8 +40,7 @@ export function JobDetailTooltip({
 	children,
 	side = "right",
 }: JobDetailTooltipProps) {
-	const salaryLabel =
-		job.salary > 0 ? formatSalaryFull(job.salary) : "Thỏa thuận";
+	const salaryLabel = formatJobSalary(job.salary);
 	const deadlineFormatted = format(new Date(job.endDate), "dd/MM/yyyy");
 
 	return (

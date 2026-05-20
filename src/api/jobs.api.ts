@@ -4,13 +4,19 @@ import type {
   PaginatedResponse,
   PaginationParams,
 } from "@/types/api";
-import type { Job, CreateJobDto } from "@/types/job";
+import type { Job, CreateJobDto, JobTaxonomy } from "@/types/job";
 
 export interface JobQueryParams extends PaginationParams {
   name?: string;
   location?: string;
-  "salary[$gte]"?: number;
-  "salary[$lte]"?: number;
+  category?: string;
+  specialization?: string;
+  jobType?: string;
+  workMode?: string;
+  "salary.min[$gte]"?: number;
+  "salary.max[$lte]"?: number;
+  "yearsOfExperience.min[$gte]"?: number;
+  "yearsOfExperience.max[$lte]"?: number;
   level?: string;
   skills?: string;
   isActive?: boolean;
@@ -32,6 +38,8 @@ export const jobsApi = {
 
   getSimilar: (id: string) =>
     api.get<ApiResponse<Job[]>>(`/jobs/${id}/similar`),
+
+  getTaxonomy: () => api.get<ApiResponse<JobTaxonomy>>("/jobs/taxonomy"),
 
   create: (data: CreateJobDto) => api.post<ApiResponse<Job>>("/jobs", data),
 

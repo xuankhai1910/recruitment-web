@@ -16,7 +16,8 @@ import { JobModal } from "@/components/admin/job/JobModal";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
-import { formatSalary, formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
@@ -59,7 +60,9 @@ export default function JobPage() {
 		return "Nhấn để hủy sắp xếp";
 	};
 
-	const sortParam = sortField ? (sortDir === "asc" ? sortField : `-${sortField}`) : undefined;
+	// `salary` is a nested doc — sorting on it must target a scalar.
+	const sortKey = sortField === "salary" ? "salary.min" : sortField;
+	const sortParam = sortKey ? (sortDir === "asc" ? sortKey : `-${sortKey}`) : undefined;
 
 	const salaryRange = SALARY_RANGES.find((r) => r.key === salaryKey);
 
@@ -69,8 +72,8 @@ export default function JobPage() {
 		sort: sortParam,
 		name: toSearchRegex(search),
 		level: levels.length > 0 ? levels.join(",") : undefined,
-		"salary[$gte]": salaryRange?.min,
-		"salary[$lte]": salaryRange?.max,
+		"salary.min[$gte]": salaryRange?.min,
+		"salary.max[$lte]": salaryRange?.max,
 	});
 	const deleteJob = useDeleteJob();
 
@@ -127,7 +130,7 @@ export default function JobPage() {
 					<SortIcon field="salary" />
 				</button>
 			),
-			render: (row) => formatSalary(row.salary),
+			render: (row) => formatJobSalary(row.salary),
 		},
 		{
 			key: "level",

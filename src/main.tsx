@@ -26,7 +26,6 @@ createRoot(document.getElementById("root")!).render(
 		<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 			<BrowserRouter>
 				<App />
-				x``{" "}
 			</BrowserRouter>
 			<ReactQueryDevtools initialIsOpen={false} />
 		</ThemeProvider>

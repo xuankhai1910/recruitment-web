@@ -35,6 +35,19 @@ export function useJob(id: string) {
   });
 }
 
+/**
+ * Job taxonomy (categories + specializations + level/jobType/workMode enums).
+ * Static on the server — cached forever client-side; only refetched on hard reload.
+ */
+export function useJobTaxonomy() {
+  return useQuery({
+    queryKey: ["jobs", "taxonomy"],
+    queryFn: () => jobsApi.getTaxonomy().then((r) => r.data.data),
+    staleTime: Number.POSITIVE_INFINITY,
+    gcTime: Number.POSITIVE_INFINITY,
+  });
+}
+
 export function useSimilarJobs(id: string) {
   return useQuery({
     queryKey: ["jobs", id, "similar"],
