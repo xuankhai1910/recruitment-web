@@ -325,7 +325,7 @@ export function JobsPage() {
 		SORT_OPTIONS.find((option) => option.value === sort)?.label ?? "Mới nhất";
 
 	return (
-		<div className="min-h-[calc(100vh-3.5rem)] bg-white text-slate-900">
+		<div className="min-h-[calc(100vh-6rem)] bg-white text-slate-900">
 			<form
 				onSubmit={(event) => {
 					event.preventDefault();

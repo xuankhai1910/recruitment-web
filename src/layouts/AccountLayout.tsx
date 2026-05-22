@@ -60,10 +60,10 @@ export function AccountLayout() {
 	const allItems = NAV_SECTIONS.flatMap((s) => s.items);
 
 	return (
-		<div className="min-h-[calc(100vh-3.5rem)] bg-slate-50/50">
+		<div className="min-h-[calc(100vh-6rem)] bg-slate-50/50">
 			<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:gap-8 lg:px-8">
 				{/* Mobile horizontal nav */}
-				<nav className="sticky top-14 z-30 -mx-4 flex gap-1 overflow-x-auto border-b border-slate-200/70 bg-white/80 px-4 py-2.5 backdrop-blur lg:hidden">
+				<nav className="sticky top-24 z-30 -mx-4 flex gap-1 overflow-x-auto border-b border-slate-200/70 bg-white/80 px-4 py-2.5 backdrop-blur lg:hidden">
 					{allItems.map((item) => (
 						<NavLink
 							key={item.to}

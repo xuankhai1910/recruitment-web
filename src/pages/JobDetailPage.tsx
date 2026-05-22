@@ -98,6 +98,23 @@ export function JobDetailPage() {
 		);
 	}
 
+	const detailSections: Array<{ title: string; items: string[] }> = [];
+	if (job.responsibilities?.length) {
+		detailSections.push({
+			title: "Trách nhiệm chính",
+			items: job.responsibilities,
+		});
+	}
+	if (job.requirements?.length) {
+		detailSections.push({
+			title: "Yêu cầu công việc",
+			items: job.requirements,
+		});
+	}
+	if (job.benefits?.length) {
+		detailSections.push({ title: "Quyền lợi", items: job.benefits });
+	}
+
 	return (
 		<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 			{/* Back link */}
@@ -214,60 +231,31 @@ export function JobDetailPage() {
 						</CardContent>
 					</Card>
 
-					{/* Description */}
-					<Card className="rounded-xl border-slate-200">
-						<CardContent className="p-5 sm:p-6">
-							<h2 className="text-base font-semibold text-slate-900">
-								Mô tả công việc
-							</h2>
-							<div
-								className="prose prose-sm mt-3 max-w-none text-slate-700 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900 prose-ul:my-2 prose-ol:my-2"
-								dangerouslySetInnerHTML={{ __html: job.description }}
-							/>
-						</CardContent>
-					</Card>
-
-					{job.responsibilities && job.responsibilities.length > 0 && (
+					{detailSections.length > 0 && (
 						<Card className="rounded-xl border-slate-200">
 							<CardContent className="p-5 sm:p-6">
 								<h2 className="text-base font-semibold text-slate-900">
-									Trách nhiệm chính
+									Mô tả công việc
 								</h2>
-								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
-									{job.responsibilities.map((item) => (
-										<li key={item}>{item}</li>
+								<div className="mt-4">
+									{detailSections.map((section, idx) => (
+										<section
+											key={section.title}
+											className={
+												idx > 0 ? "mt-5 border-t border-slate-200 pt-5" : ""
+											}
+										>
+											<h3 className="text-sm font-semibold text-slate-900">
+												{section.title}
+											</h3>
+											<ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+												{section.items.map((item) => (
+													<li key={item}>{item}</li>
+												))}
+											</ul>
+										</section>
 									))}
-								</ul>
-							</CardContent>
-						</Card>
-					)}
-
-					{job.requirements && job.requirements.length > 0 && (
-						<Card className="rounded-xl border-slate-200">
-							<CardContent className="p-5 sm:p-6">
-								<h2 className="text-base font-semibold text-slate-900">
-									Yêu cầu công việc
-								</h2>
-								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
-									{job.requirements.map((item) => (
-										<li key={item}>{item}</li>
-									))}
-								</ul>
-							</CardContent>
-						</Card>
-					)}
-
-					{job.benefits && job.benefits.length > 0 && (
-						<Card className="rounded-xl border-slate-200">
-							<CardContent className="p-5 sm:p-6">
-								<h2 className="text-base font-semibold text-slate-900">
-									Quyền lợi
-								</h2>
-								<ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
-									{job.benefits.map((item) => (
-										<li key={item}>{item}</li>
-									))}
-								</ul>
+								</div>
 							</CardContent>
 						</Card>
 					)}
@@ -303,7 +291,7 @@ export function JobDetailPage() {
 				</div>
 
 				{/* Sidebar */}
-				<aside className="space-y-4 lg:sticky lg:top-16 lg:self-start">
+				<aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
 					<Card className="rounded-xl border-slate-200">
 						<CardContent className="p-5">
 							<h3 className="text-sm font-semibold text-slate-900">

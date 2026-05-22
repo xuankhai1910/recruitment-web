@@ -521,7 +521,7 @@ export function ProfilePage() {
 				</div>
 
 				{/* Sidebar */}
-				<aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+				<aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
 					<Card>
 						<CardContent className="p-5">
 							<h3 className="font-heading text-sm font-semibold text-foreground mb-3">

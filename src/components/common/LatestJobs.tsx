@@ -46,12 +46,12 @@ export function LatestJobs() {
 	}, [page, meta, prefetchJobs]);
 
 	return (
-		<section className="px-4 py-12">
-			<div className="mx-auto max-w-7xl">
+		<section className="px-4 py-4 sm:px-6 lg:px-8">
+			<div>
 				{/* Section header */}
 				<div className="mb-6 flex items-end justify-between">
 					<div>
-						<h2 className="text-lg font-bold uppercase tracking-wide text-slate-900">
+						<h2 className="text-2xl font-bold text-slate-900">
 							Việc làm mới nhất
 						</h2>
 						<p className="mt-1 text-sm text-slate-500">
@@ -59,14 +59,14 @@ export function LatestJobs() {
 						</p>
 					</div>
 					{meta && meta.pages > 1 && (
-						<div className="flex items-center gap-1.5">
+						<div className="flex items-center gap-2">
 							<span className="mr-1 text-sm font-medium text-muted-foreground">
 								{page}/{meta.pages}
 							</span>
 							<Button
 								variant="outline"
 								size="icon"
-								className="h-9 w-9 cursor-pointer transition-colors duration-150"
+								className="h-9 w-9 cursor-pointer rounded-full transition-colors duration-150"
 								disabled={page <= 1 || isFetching}
 								onClick={() => {
 									setPage((p) => p - 1);
@@ -77,7 +77,7 @@ export function LatestJobs() {
 							<Button
 								variant="outline"
 								size="icon"
-								className="h-9 w-9 cursor-pointer transition-colors duration-150"
+								className="h-9 w-9 cursor-pointer rounded-full transition-colors duration-150"
 								disabled={page >= meta.pages || isFetching}
 								onClick={() => {
 									setPage((p) => p + 1);

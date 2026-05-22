@@ -132,7 +132,7 @@ function ContactRow({
 
 function ProfileUnavailable() {
 	return (
-		<div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-3xl flex-col items-center justify-center px-4 py-12 text-center">
+		<div className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-3xl flex-col items-center justify-center px-4 py-12 text-center">
 			<div className="flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
 				<AlertCircle className="h-8 w-8" />
 			</div>
@@ -523,7 +523,7 @@ export function PublicProfilePage() {
 					)}
 				</main>
 
-				<aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+				<aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
 					<Card>
 						<CardContent className="p-5">
 							<h2 className="font-heading text-sm font-semibold text-foreground">
