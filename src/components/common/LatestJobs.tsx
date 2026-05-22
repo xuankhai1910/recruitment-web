@@ -115,7 +115,7 @@ export function LatestJobs() {
 					>
 						{jobs.map((job) => (
 							<JobDetailTooltip key={job._id} job={job}>
-								<div>
+								<div className="h-full">
 									<JobCard job={job} variant="card" />
 								</div>
 							</JobDetailTooltip>
