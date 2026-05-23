@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, RefreshCcw, Sparkles, UserCog } from "lucide-react";
+import { ArrowRight, Loader2, RefreshCcw, Sparkles, UserCog } from "lucide-react";
 import { AxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
@@ -86,13 +86,10 @@ export function ProfileRecommendedJobs() {
 	const { data, isLoading, isFetching, refetch, error } =
 		useProfileJobRecommendations(HOME_LIMIT, isAuthenticated);
 
-	// Guests: hide entirely.
 	if (!isAuthenticated) return null;
 
-	const sectionWrap = "px-4 py-8";
-	const inner = "mx-auto max-w-7xl";
+	const sectionWrap = "px-4 py-4 sm:px-6 lg:px-8";
 
-	// Header rendered above any state so the section identity is stable.
 	const header = (
 		<div className="mb-5 flex flex-wrap items-end justify-between gap-3">
 			<div className="min-w-0">
@@ -141,23 +138,19 @@ export function ProfileRecommendedJobs() {
 		</div>
 	);
 
-	// Loading state.
 	if (isLoading) {
 		return (
 			<section className={sectionWrap}>
-				<div className={inner}>
-					{header}
-					<div className="grid gap-4 sm:grid-cols-2">
-						{SKELETON_KEYS.map((key) => (
-							<Skeleton key={key} className="h-36 rounded-lg" />
-						))}
-					</div>
+				{header}
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					{SKELETON_KEYS.map((key) => (
+						<Skeleton key={key} className="h-36 rounded-xl" />
+					))}
 				</div>
 			</section>
 		);
 	}
 
-	// Error states: profile missing (404) or incomplete (400).
 	if (error) {
 		const axiosErr = error as AxiosError<{ message?: string }>;
 		const status = axiosErr.response?.status;
@@ -165,16 +158,14 @@ export function ProfileRecommendedJobs() {
 		if (status === 404) {
 			return (
 				<section className={sectionWrap}>
-					<div className={inner}>
-						{header}
-						<ProfileRecBanner
-							icon={<UserCog className="h-5 w-5" />}
-							title="Tạo hồ sơ để nhận gợi ý cá nhân hóa"
-							description="Cập nhật kỹ năng, kinh nghiệm và mục tiêu nghề nghiệp. AI sẽ phân tích hồ sơ và tự động khớp với các vị trí phù hợp nhất."
-							ctaLabel="Tạo hồ sơ ngay"
-							onCta={() => navigate("/account/cv-builder")}
-						/>
-					</div>
+					{header}
+					<ProfileRecBanner
+						icon={<UserCog className="h-5 w-5" />}
+						title="Tạo hồ sơ để nhận gợi ý cá nhân hóa"
+						description="Cập nhật kỹ năng, kinh nghiệm và mục tiêu nghề nghiệp. AI sẽ phân tích hồ sơ và tự động khớp với các vị trí phù hợp nhất."
+						ctaLabel="Tạo hồ sơ ngay"
+						onCta={() => navigate("/account/cv-builder")}
+					/>
 				</section>
 			);
 		}
@@ -182,21 +173,18 @@ export function ProfileRecommendedJobs() {
 		if (status === 400) {
 			return (
 				<section className={sectionWrap}>
-					<div className={inner}>
-						{header}
-						<ProfileRecBanner
-							icon={<UserCog className="h-5 w-5" />}
-							title="Hồ sơ của bạn còn thiếu thông tin"
-							description="Hãy bổ sung kỹ năng, kinh nghiệm và học vấn để hệ thống AI gợi ý chính xác hơn."
-							ctaLabel="Hoàn thiện hồ sơ"
-							onCta={() => navigate("/account/cv-builder")}
-						/>
-					</div>
+					{header}
+					<ProfileRecBanner
+						icon={<UserCog className="h-5 w-5" />}
+						title="Hồ sơ của bạn còn thiếu thông tin"
+						description="Hãy bổ sung kỹ năng, kinh nghiệm và học vấn để hệ thống AI gợi ý chính xác hơn."
+						ctaLabel="Hoàn thiện hồ sơ"
+						onCta={() => navigate("/account/cv-builder")}
+					/>
 				</section>
 			);
 		}
 
-		// Unknown error — render nothing rather than a noisy fallback.
 		return null;
 	}
 
@@ -204,31 +192,43 @@ export function ProfileRecommendedJobs() {
 
 	return (
 		<section className={sectionWrap}>
-			<div className={inner}>
-				{header}
+			{header}
 
-				{items.length === 0 ? (
-					<div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 py-12 text-center">
-						<Sparkles className="h-10 w-10 text-slate-300" />
-						<p className="text-sm text-slate-500">
-							Hiện chưa có việc làm nào phù hợp với hồ sơ của bạn.
-						</p>
-						<Button
-							variant="outline"
-							onClick={() => navigate("/account/cv-builder")}
-							className="cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50"
-						>
-							Cập nhật hồ sơ
-						</Button>
-					</div>
-				) : (
-					<div className="grid gap-4 sm:grid-cols-2">
+			{items.length === 0 ? (
+				<div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 py-12 text-center">
+					<Sparkles className="h-10 w-10 text-slate-300" />
+					<p className="text-sm text-slate-500">
+						Hiện chưa có việc làm nào phù hợp với hồ sơ của bạn.
+					</p>
+					<Button
+						variant="outline"
+						onClick={() => navigate("/account/cv-builder")}
+						className="cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50"
+					>
+						Cập nhật hồ sơ
+					</Button>
+				</div>
+			) : (
+				<div className="relative">
+					<div
+						className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 transition-opacity ${
+							isFetching ? "opacity-60" : ""
+						}`}
+					>
 						{items.map((rec) => (
 							<RecommendedJobCard key={rec._id} item={toCardItem(rec)} />
 						))}
 					</div>
-				)}
-			</div>
+					{isFetching && (
+						<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+							<div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm backdrop-blur">
+								<Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
+								Đang cập nhật gợi ý...
+							</div>
+						</div>
+					)}
+				</div>
+			)}
 		</section>
 	);
 }

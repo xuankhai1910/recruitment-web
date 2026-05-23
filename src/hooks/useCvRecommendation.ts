@@ -55,7 +55,7 @@ export function useRecommendedJobs(limit = 10, enabled = true) {
       cvRecommendationApi.recommendJobs(limit).then((r) => r.data.data),
     enabled: isAuthenticated && enabled,
     retry: false,
-    refetchOnWindowFocus: true,
-    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    staleTime: 30 * 60_000,
   });
 }
