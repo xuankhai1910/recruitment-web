@@ -231,30 +231,41 @@ export function JobDetailPage() {
 						</CardContent>
 					</Card>
 
-					{detailSections.length > 0 && (
+					{(job.description || detailSections.length > 0) && (
 						<Card className="rounded-xl border-slate-200">
 							<CardContent className="p-5 sm:p-6">
 								<h2 className="text-base font-semibold text-slate-900">
 									Mô tả công việc
 								</h2>
-								<div className="mt-4">
-									{detailSections.map((section, idx) => (
+								<div className="mt-4 space-y-5">
+									{job.description && (
 										<section
-											key={section.title}
-											className={
-												idx > 0 ? "mt-5 border-t border-slate-200 pt-5" : ""
-											}
-										>
-											<h3 className="text-sm font-semibold text-slate-900">
-												{section.title}
-											</h3>
-											<ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
-												{section.items.map((item) => (
-													<li key={item}>{item}</li>
-												))}
-											</ul>
-										</section>
-									))}
+											className="prose prose-sm max-w-none text-sm leading-relaxed text-slate-700 prose-headings:text-slate-900 prose-strong:text-slate-900 prose-a:text-blue-600"
+											dangerouslySetInnerHTML={{ __html: job.description }}
+										/>
+									)}
+									{detailSections.map((section, idx) => {
+										const isFirstAfterDesc = idx === 0 && !job.description;
+										return (
+											<section
+												key={section.title}
+												className={
+													isFirstAfterDesc
+														? ""
+														: "border-t border-slate-200 pt-5"
+												}
+											>
+												<h3 className="text-sm font-semibold text-slate-900">
+													{section.title}
+												</h3>
+												<ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+													{section.items.map((item) => (
+														<li key={item}>{item}</li>
+													))}
+												</ul>
+											</section>
+										);
+									})}
 								</div>
 							</CardContent>
 						</Card>

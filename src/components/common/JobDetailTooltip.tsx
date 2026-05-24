@@ -174,7 +174,6 @@ export function JobDetailTooltip({
 										<section>
 											<div
 												className="text-xs leading-relaxed text-slate-600 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mt-1"
-												// eslint-disable-next-line react/no-danger -- admin-authored HTML from RichTextEditor; same pattern as CompanyDetailPage
 												dangerouslySetInnerHTML={{
 													__html: job.description,
 												}}
