@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -136,6 +136,7 @@ export function JobsPage() {
 	const jobTypeParam = searchParams.get("jobType") || "";
 	const workModeParam = searchParams.get("workMode") || "";
 	const [specModalOpen, setSpecModalOpen] = useState(false);
+	const listScrollRef = useRef<HTMLElement>(null);
 
 	const [keywordDraft, setKeywordDraft] = useState({
 		source: keywordParam,
@@ -204,10 +205,14 @@ export function JobsPage() {
 	if (jobTypeParam) queryParams.jobType = jobTypeParam;
 	if (workModeParam) queryParams.workMode = workModeParam;
 
-	const range = SALARY_RANGES.find((item) => item.key === salaryParam);
 	// Salary is now an object {min,max,isNegotiable,currency} so use dot-path filters.
-	if (range?.min !== undefined) queryParams["salary.min[$gte]"] = range.min;
-	if (range?.max !== undefined) queryParams["salary.max[$lte]"] = range.max;
+	if (salaryParam === "negotiable") {
+		queryParams["salary.isNegotiable"] = true;
+	} else {
+		const range = SALARY_RANGES.find((item) => item.key === salaryParam);
+		if (range?.min !== undefined) queryParams["salary.min[$gte]"] = range.min;
+		if (range?.max !== undefined) queryParams["salary.max[$lte]"] = range.max;
+	}
 
 	const { data, isLoading } = useJobs(queryParams);
 	const meta = data?.meta;
@@ -292,6 +297,10 @@ export function JobsPage() {
 		setParams((params) => {
 			params.set("current", String(next));
 		});
+		// Without this the user lands mid-list on the new page (the section is
+		// the scroll container on lg, the window on smaller breakpoints).
+		listScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
 	const changeSort = (value: string) => {
@@ -574,7 +583,10 @@ export function JobsPage() {
 			</div>
 
 			<div className="mx-auto grid max-w-7xl grid-cols-1 lg:h-[calc(100vh-14rem)] lg:grid-cols-[420px_1fr] lg:overflow-hidden">
-				<section className="border-slate-200/60 lg:border-r lg:overflow-y-auto">
+				<section
+					ref={listScrollRef}
+					className="border-slate-200/60 lg:border-r lg:overflow-y-auto"
+				>
 					<div className="flex items-center justify-between border-b border-slate-200/60 px-4 py-2">
 						<p className="text-sm text-slate-500">
 							{meta ? `${meta.total} việc làm` : "Đang tải..."}
@@ -816,56 +828,59 @@ export function JobsPage() {
 
 							<div className="my-6 h-px bg-slate-200" />
 
-							<section>
-								<h2 className="text-base font-bold text-slate-900">
-									Mô tả công việc
-								</h2>
-								<div
-									className="prose prose-sm mt-3 max-w-none text-slate-700 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900 prose-ul:my-2 prose-ol:my-2"
-									dangerouslySetInnerHTML={{ __html: selectedJob.description }}
-								/>
-							</section>
-
-							{selectedJob.responsibilities &&
-								selectedJob.responsibilities.length > 0 && (
-									<section className="mt-5">
+							{(() => {
+								const detailSections: Array<{
+									title: string;
+									items: string[];
+								}> = [];
+								if (selectedJob.responsibilities?.length) {
+									detailSections.push({
+										title: "Trách nhiệm chính",
+										items: selectedJob.responsibilities,
+									});
+								}
+								if (selectedJob.requirements?.length) {
+									detailSections.push({
+										title: "Yêu cầu công việc",
+										items: selectedJob.requirements,
+									});
+								}
+								if (selectedJob.benefits?.length) {
+									detailSections.push({
+										title: "Quyền lợi",
+										items: selectedJob.benefits,
+									});
+								}
+								if (detailSections.length === 0) return null;
+								return (
+									<section>
 										<h2 className="text-base font-bold text-slate-900">
-											Trách nhiệm chính
+											Mô tả công việc
 										</h2>
-										<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-											{selectedJob.responsibilities.map((item) => (
-												<li key={item}>{item}</li>
+										<div className="mt-3">
+											{detailSections.map((section, idx) => (
+												<section
+													key={section.title}
+													className={
+														idx > 0
+															? "mt-5 border-t border-slate-200 pt-5"
+															: ""
+													}
+												>
+													<h3 className="text-sm font-semibold text-slate-900">
+														{section.title}
+													</h3>
+													<ul className="mt-2 list-disc space-y-1.5 pl-5 text-sm text-slate-700">
+														{section.items.map((item) => (
+															<li key={item}>{item}</li>
+														))}
+													</ul>
+												</section>
 											))}
-										</ul>
+										</div>
 									</section>
-								)}
-
-							{selectedJob.requirements &&
-								selectedJob.requirements.length > 0 && (
-									<section className="mt-5">
-										<h2 className="text-base font-bold text-slate-900">
-											Yêu cầu công việc
-										</h2>
-										<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-											{selectedJob.requirements.map((item) => (
-												<li key={item}>{item}</li>
-											))}
-										</ul>
-									</section>
-								)}
-
-							{selectedJob.benefits && selectedJob.benefits.length > 0 && (
-								<section className="mt-5">
-									<h2 className="text-base font-bold text-slate-900">
-										Quyền lợi
-									</h2>
-									<ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-										{selectedJob.benefits.map((item) => (
-											<li key={item}>{item}</li>
-										))}
-									</ul>
-								</section>
-							)}
+								);
+							})()}
 
 							<div className="mt-6 grid gap-3 border-t border-slate-200 pt-4 text-sm text-slate-600 sm:grid-cols-3">
 								<div>

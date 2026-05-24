@@ -9,6 +9,7 @@ export const LEVEL_LIST = [
 
 export const SALARY_RANGES = [
   { key: "all", label: "Tất cả", min: undefined, max: undefined },
+  { key: "negotiable", label: "Thỏa thuận", min: undefined, max: undefined },
   { key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000 },
   { key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000 },
   { key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000 },
