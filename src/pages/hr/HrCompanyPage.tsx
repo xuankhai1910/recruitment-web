@@ -27,8 +27,8 @@ import { useUploadFile } from "@/hooks/useFiles";
 const schema = z.object({
 	name: z.string().min(1, "Tên công ty không được để trống"),
 	address: z.string().min(1, "Địa chỉ không được để trống"),
-	logo: z.string().min(1, "Vui lòng upload logo"),
-	description: z.string().min(1, "Mô tả không được để trống"),
+	logo: z.string().optional().or(z.literal("")),
+	description: z.string().optional().or(z.literal("")),
 	email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
 	phone: z
 		.string()
@@ -170,9 +170,7 @@ export function HrCompanyPage() {
 										name="logo"
 										render={() => (
 											<FormItem>
-												<FormLabel>
-													Logo <span className="text-destructive">*</span>
-												</FormLabel>
+												<FormLabel>Logo</FormLabel>
 												<div className="flex items-start gap-3">
 													{logoSrc ? (
 														<div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-border">
@@ -226,8 +224,8 @@ export function HrCompanyPage() {
 										render={({ field }) => (
 											<FormItem className="flex flex-col">
 												<FormLabel>
-													Địa chỉ <span className="text-destructive">*</span>
-												</FormLabel>
+												Địa chỉ <span className="text-destructive">*</span>
+											</FormLabel>
 												<FormControl>
 													<Input placeholder="Nhập địa chỉ" {...field} />
 												</FormControl>
@@ -285,12 +283,9 @@ export function HrCompanyPage() {
 									name="description"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>
-												Mô tả công ty{" "}
-												<span className="text-destructive">*</span>
-											</FormLabel>
+											<FormLabel>Mô tả công ty</FormLabel>
 											<RichTextEditor
-												value={field.value}
+												value={field.value ?? ""}
 												onChange={field.onChange}
 												placeholder="Giới thiệu về công ty, văn hoá, sản phẩm..."
 											/>

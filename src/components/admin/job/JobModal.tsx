@@ -34,6 +34,7 @@ import {
 import { RichTextEditor } from "@/components/common/RichTextEditor";
 import {
 	useCreateJob,
+	useJob,
 	useJobTaxonomy,
 	useUpdateJob,
 } from "@/hooks/useJobs";
@@ -139,6 +140,9 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 	const updateJob = useUpdateJob();
 	const { data: companiesData } = useCompaniesDropdown(open);
 	const { data: taxonomy } = useJobTaxonomy();
+	// List endpoint strips benefits/requirements/responsibilities to keep payload
+	// small; refetch the full job by id so the edit form can hydrate them.
+	const { data: fullJob } = useJob(open && job?._id ? job._id : "");
 
 	const companies = useMemo(() => companiesData?.result ?? [], [companiesData]);
 	const categories = taxonomy?.categories ?? [];
@@ -187,31 +191,34 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 	useEffect(() => {
 		if (open) {
 			if (job) {
+				// Prefer full-detail fetch (has benefits/requirements/responsibilities);
+				// fall back to row data while the request is in flight.
+				const source = fullJob ?? job;
 				form.reset({
-					name: job.name,
-					category: job.category ?? "",
-					specialization: job.specialization ?? "",
-					skills: job.skills,
-					location: job.location,
-					salaryNegotiable: !!job.salary?.isNegotiable,
-					salaryMin: job.salary?.min,
-					salaryMax: job.salary?.max,
-					quantity: job.quantity,
-					level: job.level,
-					jobType: job.jobType || "Full-time",
-					workMode: job.workMode || "Onsite",
-					yoeMin: job.yearsOfExperience?.min,
-					yoeMax: job.yearsOfExperience?.max,
-					benefits: (job.benefits ?? []).join("\n"),
-					requirements: (job.requirements ?? []).join("\n"),
-					responsibilities: (job.responsibilities ?? []).join("\n"),
-					companyId: job.company._id,
-					startDate: job.startDate?.slice(0, 10) ?? "",
-					endDate: job.endDate?.slice(0, 10) ?? "",
-					isActive: job.isActive,
-					description: job.description,
+					name: source.name,
+					category: source.category ?? "",
+					specialization: source.specialization ?? "",
+					skills: source.skills,
+					location: source.location,
+					salaryNegotiable: !!source.salary?.isNegotiable,
+					salaryMin: source.salary?.min,
+					salaryMax: source.salary?.max,
+					quantity: source.quantity,
+					level: source.level,
+					jobType: source.jobType || "Full-time",
+					workMode: source.workMode || "Onsite",
+					yoeMin: source.yearsOfExperience?.min,
+					yoeMax: source.yearsOfExperience?.max,
+					benefits: (source.benefits ?? []).join("\n"),
+					requirements: (source.requirements ?? []).join("\n"),
+					responsibilities: (source.responsibilities ?? []).join("\n"),
+					companyId: source.company._id,
+					startDate: source.startDate?.slice(0, 10) ?? "",
+					endDate: source.endDate?.slice(0, 10) ?? "",
+					isActive: source.isActive,
+					description: source.description,
 				});
-				setSkillsInput(job.skills.join(", "));
+				setSkillsInput(source.skills.join(", "));
 			} else {
 				form.reset({
 					name: "",
@@ -240,7 +247,7 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 				setSkillsInput("");
 			}
 		}
-	}, [open, job, form, isAdmin, currentUser?.company?._id]);
+	}, [open, job, fullJob, form, isAdmin, currentUser?.company?._id]);
 
 	const submitting = createJob.isPending || updateJob.isPending;
 

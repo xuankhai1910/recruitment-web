@@ -28,18 +28,11 @@ import { useCreateCompany, useUpdateCompany } from "@/hooks/useCompanies";
 import { useUploadFile } from "@/hooks/useFiles";
 import type { Company } from "@/types/company";
 
-const companySchemaBase = z.object({
+const companySchema = z.object({
 	name: z.string().min(1, "Tên công ty không được để trống"),
 	address: z.string().min(1, "Địa chỉ không được để trống"),
-	logo: z.string().min(1, "Vui lòng upload logo"),
-	description: z.string().min(1, "Mô tả không được để trống"),
-	email: z.string().email("Email không hợp lệ"),
-	phone: z
-		.string()
-		.regex(/^(0|\+84)[3|5|7|8|9][0-9]{8}$/, "Số điện thoại không hợp lệ"),
-});
-
-const companyUpdateSchema = companySchemaBase.extend({
+	logo: z.string().optional().or(z.literal("")),
+	description: z.string().optional().or(z.literal("")),
 	email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
 	phone: z
 		.string()
@@ -48,9 +41,7 @@ const companyUpdateSchema = companySchemaBase.extend({
 		.or(z.literal("")),
 });
 
-const companySchema = companySchemaBase;
-
-type CompanyFormValues = z.infer<typeof companySchemaBase>;
+type CompanyFormValues = z.infer<typeof companySchema>;
 
 interface CompanyModalProps {
 	open: boolean;
@@ -73,9 +64,7 @@ export function CompanyModal({
 	const isSubmitting = createCompany.isPending || updateCompany.isPending;
 
 	const form = useForm<CompanyFormValues>({
-		resolver: zodResolver(
-			isEdit ? companyUpdateSchema : companySchema,
-		) as Resolver<CompanyFormValues>,
+		resolver: zodResolver(companySchema) as Resolver<CompanyFormValues>,
 		defaultValues: {
 			name: "",
 			address: "",
@@ -183,9 +172,7 @@ export function CompanyModal({
 								name="logo"
 								render={() => (
 									<FormItem>
-										<FormLabel>
-											Ảnh Logo <span className="text-destructive">*</span>
-										</FormLabel>
+										<FormLabel>Ảnh Logo</FormLabel>
 										<div className="flex items-start gap-3">
 											{logoSrc ? (
 												<div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-border">
@@ -260,10 +247,7 @@ export function CompanyModal({
 								name="email"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>
-											Email liên hệ
-											{!isEdit && <span className="text-destructive"> *</span>}
-										</FormLabel>
+										<FormLabel>Email liên hệ</FormLabel>
 										<FormControl>
 											<div className="relative">
 												<Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -283,10 +267,7 @@ export function CompanyModal({
 								name="phone"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>
-											Số điện thoại liên hệ
-											{!isEdit && <span className="text-destructive"> *</span>}
-										</FormLabel>
+										<FormLabel>Số điện thoại liên hệ</FormLabel>
 										<FormControl>
 											<div className="relative">
 												<Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -311,7 +292,7 @@ export function CompanyModal({
 								<FormItem>
 									<FormLabel>Miêu tả</FormLabel>
 									<RichTextEditor
-										value={field.value}
+										value={field.value ?? ""}
 										onChange={field.onChange}
 										placeholder="Nhập mô tả công ty..."
 									/>
