@@ -61,8 +61,8 @@ const WORK_MODES = ["Onsite", "Remote", "Hybrid"] as const;
 const PAGE_SIZE = 10;
 const SORT_OPTIONS = [
 	{ value: "-createdAt", label: "Mới nhất" },
-	{ value: "-salary", label: "Lương cao - thấp" },
-	{ value: "salary", label: "Lương thấp - cao" },
+	{ value: "-salary.min", label: "Lương cao - thấp" },
+	{ value: "salary.min", label: "Lương thấp - cao" },
 ];
 const SKELETON_ROWS = ["a", "b", "c", "d", "e", "f"];
 
@@ -171,10 +171,16 @@ export function JobsPage() {
 	);
 	const filterResetKey = `${keywordParam}|${locationParam}|${levelParam}|${salaryParam}|${specializationParam}|${jobTypeParam}|${workModeParam}`;
 
+	// `salary` is a sub-document — Mongo can't sort by the object. Rewrite the
+	// legacy `-salary`/`salary` sort param (older bookmarks / older builds) to
+	// the scalar `salary.min` path that the BE index actually covers.
+	const sortForApi =
+		sort === "-salary" ? "-salary.min" : sort === "salary" ? "salary.min" : sort;
+
 	const queryParams: Record<string, unknown> = {
 		current: page,
 		pageSize: PAGE_SIZE,
-		sort,
+		sort: sortForApi,
 		isActive: true,
 	};
 

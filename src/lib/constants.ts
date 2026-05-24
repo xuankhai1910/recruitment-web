@@ -2,8 +2,9 @@ export const LEVEL_LIST = [
   "INTERN",
   "FRESHER",
   "JUNIOR",
-  "MIDDLE",
+  "MID",
   "SENIOR",
+  "LEAD",
 ] as const;
 
 export const SALARY_RANGES = [
