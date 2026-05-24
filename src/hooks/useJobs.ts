@@ -65,16 +65,24 @@ export function useJob(id: string) {
     queryKey: ["jobs", id],
     queryFn: () => jobsApi.getById(id).then((r) => r.data.data),
     enabled: !!id,
+    // Override the global `keepPreviousData` default — when the edit modal
+    // switches from job A → job B, we don't want React Query to hand back
+    // job A as placeholder; the JobModal would briefly hydrate the form
+    // with the wrong job before the new fetch resolves.
+    placeholderData: undefined,
   });
 }
 
 /**
  * Job taxonomy (categories + specializations + level/jobType/workMode enums).
  * Static on the server — cached forever client-side; only refetched on hard reload.
+ *
+ * Key is intentionally NOT under the `["jobs"]` prefix so job CRUD mutations
+ * (which call `invalidateQueries({ queryKey: ["jobs"] })`) do not bust it.
  */
 export function useJobTaxonomy() {
   return useQuery({
-    queryKey: ["jobs", "taxonomy"],
+    queryKey: ["jobs-taxonomy"],
     queryFn: () => jobsApi.getTaxonomy().then((r) => r.data.data),
     staleTime: Number.POSITIVE_INFINITY,
     gcTime: Number.POSITIVE_INFINITY,

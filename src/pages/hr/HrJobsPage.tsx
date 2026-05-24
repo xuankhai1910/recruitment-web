@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
 	Plus,
 	Pencil,
@@ -21,18 +21,19 @@ import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { JobModal } from "@/components/admin/job/JobModal";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
-import { formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { LEVEL_LIST } from "@/lib/constants";
 import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
 const SALARY_RANGES = [
-	{ key: "all", label: "Tất cả", min: undefined, max: undefined },
-	{ key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000 },
-	{ key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000 },
-	{ key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000 },
-	{ key: "30-50", label: "30 - 50 triệu", min: 30_000_000, max: 50_000_000 },
-	{ key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined },
+	{ key: "all", label: "Tất cả", min: undefined, max: undefined, negotiable: undefined },
+	{ key: "negotiable", label: "Thỏa thuận", min: undefined, max: undefined, negotiable: true },
+	{ key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000, negotiable: undefined },
+	{ key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000, negotiable: undefined },
+	{ key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000, negotiable: undefined },
+	{ key: "30-50", label: "30 - 50 triệu", min: 30_000_000, max: 50_000_000, negotiable: undefined },
+	{ key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined, negotiable: undefined },
 ] as const;
 
 /**
@@ -49,6 +50,17 @@ export function HrJobsPage() {
 	const [editingJob, setEditingJob] = useState<Job | null>(null);
 	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+	// Mounting the heavy JobModal (form + Tiptap) blocks the click handler for
+	// 200-400ms. Marking the open as a transition lets React keep the UI
+	// responsive while the modal mounts off the main render path.
+	const [, startTransition] = useTransition();
+
+	const openModal = (job: Job | null) => {
+		startTransition(() => {
+			setEditingJob(job);
+			setModalOpen(true);
+		});
+	};
 
 	const handleSort = (field: "name" | "salary") => {
 		if (sortField !== field) {
@@ -80,6 +92,7 @@ export function HrJobsPage() {
 		level: levels.length > 0 ? levels.join(",") : undefined,
 		"salary.min[$gte]": salaryRange?.min,
 		"salary.max[$lte]": salaryRange?.max,
+		"salary.isNegotiable": salaryRange?.negotiable,
 	});
 	const deleteJob = useDeleteJob();
 
@@ -102,7 +115,7 @@ export function HrJobsPage() {
 		{
 			key: "name",
 			label: "Tên công việc",
-			className: "w-[30%]",
+			className: "w-[26%]",
 			labelNode: (
 				<button
 					type="button"
@@ -118,9 +131,17 @@ export function HrJobsPage() {
 			),
 		},
 		{
+			key: "company",
+			label: "Công ty",
+			className: "w-[22%]",
+			render: (row) => (
+				<span className="block truncate">{row.company.name}</span>
+			),
+		},
+		{
 			key: "salary",
 			label: "Mức lương",
-			className: "w-[16%]",
+			className: "w-[14%]",
 			labelNode: (
 				<button
 					type="button"
@@ -136,7 +157,7 @@ export function HrJobsPage() {
 		{
 			key: "level",
 			label: "Level",
-			className: "w-[12%]",
+			className: "w-[10%]",
 			render: (row) => (
 				<Badge variant="outline" className="font-normal">
 					{row.level}
@@ -146,7 +167,7 @@ export function HrJobsPage() {
 		{
 			key: "status",
 			label: "Trạng thái",
-			className: "w-[12%]",
+			className: "w-[14%]",
 			render: (row) => (
 				<Badge
 					className={
@@ -161,25 +182,16 @@ export function HrJobsPage() {
 			),
 		},
 		{
-			key: "createdAt",
-			label: "Ngày tạo",
-			className: "w-[18%]",
-			render: (row) => formatDateTime(row.createdAt),
-		},
-		{
 			key: "actions",
 			label: "Thao tác",
-			className: "w-[12%] text-center",
+			className: "w-[14%] text-center",
 			render: (row) => (
 				<div className="flex items-center justify-center gap-1">
 					<Button
 						variant="ghost"
 						size="icon"
 						className="h-8 w-8 cursor-pointer text-sky-700 hover:bg-sky-50 hover:text-sky-700"
-						onClick={() => {
-							setEditingJob(row);
-							setModalOpen(true);
-						}}
+						onClick={() => openModal(row)}
 					>
 						<Pencil className="h-4 w-4" />
 					</Button>
@@ -202,10 +214,7 @@ export function HrJobsPage() {
 				</div>
 				<Button
 					className="cursor-pointer gap-2"
-					onClick={() => {
-						setEditingJob(null);
-						setModalOpen(true);
-					}}
+					onClick={() => openModal(null)}
 				>
 					<Plus className="h-4 w-4" />
 					Đăng tin mới

@@ -15,6 +15,7 @@ export interface JobQueryParams extends PaginationParams {
   workMode?: string;
   "salary.min[$gte]"?: number;
   "salary.max[$lte]"?: number;
+  "salary.isNegotiable"?: boolean;
   "yearsOfExperience.min[$gte]"?: number;
   "yearsOfExperience.max[$lte]"?: number;
   level?: string;

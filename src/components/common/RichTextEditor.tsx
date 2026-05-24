@@ -25,7 +25,11 @@ export function RichTextEditor({
 	onChange,
 	placeholder,
 }: RichTextEditorProps) {
+	// `immediatelyRender: false` defers ProseMirror init to a microtask so the
+	// host (e.g. JobModal dialog) can paint before Tiptap does its heavy mount
+	// work — kills the visible lag when opening modals that contain this editor.
 	const editor = useEditor({
+		immediatelyRender: false,
 		extensions: [StarterKit, Underline, Link.configure({ openOnClick: false })],
 		content: value,
 		onUpdate: ({ editor: e }) => {
@@ -46,7 +50,16 @@ export function RichTextEditor({
 		}
 	}, [value, editor]);
 
-	if (!editor) return null;
+	// Stable placeholder while editor is initializing — avoids layout shift
+	// from the previous `return null` flash.
+	if (!editor) {
+		return (
+			<div className="rounded-lg border border-input overflow-hidden">
+				<div className="h-9 border-b border-border bg-muted/30" />
+				<div className="min-h-[220px] bg-background" />
+			</div>
+		);
+	}
 
 	return (
 		<div className="rounded-lg border border-input overflow-hidden">

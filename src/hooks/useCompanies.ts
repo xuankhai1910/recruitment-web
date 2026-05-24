@@ -54,13 +54,19 @@ export function useDeleteCompany() {
   });
 }
 
+/**
+ * Slim list for company-picker selects (max 100). Key sits outside the
+ * `["companies"]` prefix so list mutations don't invalidate it. Companies
+ * change rarely, so a longer staleTime keeps the modal open instant.
+ */
 export function useCompaniesDropdown(enabled = true) {
   return useQuery({
-    queryKey: ["companies", "dropdown"],
+    queryKey: ["companies-dropdown"],
     queryFn: () =>
       companiesApi
         .getList({ current: 1, pageSize: 100 })
         .then((r) => r.data.data),
     enabled,
+    staleTime: 10 * 60 * 1000,
   });
 }

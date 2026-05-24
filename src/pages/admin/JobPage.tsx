@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Plus, Pencil, RotateCcw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,22 +12,25 @@ import {
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
+import { CompanyCombobox } from "@/components/admin/CompanyCombobox";
 import { JobModal } from "@/components/admin/job/JobModal";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
-import { formatDateTime, LEVEL_LIST } from "@/lib/constants";
+import { useCompaniesDropdown } from "@/hooks/useCompanies";
+import { LEVEL_LIST } from "@/lib/constants";
 import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
 import type { Job } from "@/types/job";
 
 const SALARY_RANGES = [
-	{ key: "all", label: "Tất cả", min: undefined, max: undefined },
-	{ key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000 },
-	{ key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000 },
-	{ key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000 },
-	{ key: "30-50", label: "30 - 50 triệu", min: 30_000_000, max: 50_000_000 },
-	{ key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined },
+	{ key: "all", label: "Tất cả", min: undefined, max: undefined, negotiable: undefined },
+	{ key: "negotiable", label: "Thỏa thuận", min: undefined, max: undefined, negotiable: true },
+	{ key: "under-10", label: "Dưới 10 triệu", min: undefined, max: 10_000_000, negotiable: undefined },
+	{ key: "10-20", label: "10 - 20 triệu", min: 10_000_000, max: 20_000_000, negotiable: undefined },
+	{ key: "20-30", label: "20 - 30 triệu", min: 20_000_000, max: 30_000_000, negotiable: undefined },
+	{ key: "30-50", label: "30 - 50 triệu", min: 30_000_000, max: 50_000_000, negotiable: undefined },
+	{ key: "over-50", label: "Trên 50 triệu", min: 50_000_000, max: undefined, negotiable: undefined },
 ] as const;
 
 export default function JobPage() {
@@ -36,10 +39,22 @@ export default function JobPage() {
 	const [search, setSearch] = useState("");
 	const [levels, setLevels] = useState<string[]>([]);
 	const [salaryKey, setSalaryKey] = useState("all");
+	const [companyId, setCompanyId] = useState<string | undefined>(undefined);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editingJob, setEditingJob] = useState<Job | null>(null);
 	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+	// Mounting the heavy JobModal (form + Tiptap) blocks the click handler for
+	// 200-400ms. Marking the open as a transition lets React keep the UI
+	// responsive while the modal mounts off the main render path.
+	const [, startTransition] = useTransition();
+
+	const openModal = (job: Job | null) => {
+		startTransition(() => {
+			setEditingJob(job);
+			setModalOpen(true);
+		});
+	};
 
 	const handleSort = (field: "name" | "salary") => {
 		if (sortField !== field) {
@@ -74,8 +89,13 @@ export default function JobPage() {
 		level: levels.length > 0 ? levels.join(",") : undefined,
 		"salary.min[$gte]": salaryRange?.min,
 		"salary.max[$lte]": salaryRange?.max,
+		"salary.isNegotiable": salaryRange?.negotiable,
+		"company._id": companyId,
 	});
 	const deleteJob = useDeleteJob();
+	// Pulls from the cache warmed by JobModal — same query key, no extra fetch.
+	const { data: companiesData } = useCompaniesDropdown(true);
+	const companies = companiesData?.result ?? [];
 
 	const displayData = data?.result ?? [];
 	const displayMeta = data?.meta;
@@ -83,10 +103,12 @@ export default function JobPage() {
 	const resetFilters = () => {
 		setLevels([]);
 		setSalaryKey("all");
+		setCompanyId(undefined);
 		setPage(1);
 	};
 
-	const hasFilter = levels.length > 0 || salaryKey !== "all";
+	const hasFilter =
+		levels.length > 0 || salaryKey !== "all" || companyId !== undefined;
 
 	const SortIcon = ({ field }: { field: "name" | "salary" }) => {
 		if (sortField !== field) return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/50" />;
@@ -99,7 +121,7 @@ export default function JobPage() {
 		{
 			key: "name",
 			label: "Tên công việc",
-			className: "w-[28%]",
+			className: "w-[24%]",
 			labelNode: (
 				<button
 					type="button"
@@ -116,9 +138,17 @@ export default function JobPage() {
 			),
 		},
 		{
+			key: "company",
+			label: "Công ty",
+			className: "w-[22%]",
+			render: (row) => (
+				<span className="block truncate">{row.company.name}</span>
+			),
+		},
+		{
 			key: "salary",
 			label: "Mức lương",
-			className: "w-[16%]",
+			className: "w-[14%]",
 			labelNode: (
 				<button
 					type="button"
@@ -135,7 +165,7 @@ export default function JobPage() {
 		{
 			key: "level",
 			label: "Level",
-			className: "w-[12%]",
+			className: "w-[10%]",
 			render: (row) => (
 				<Badge variant="outline" className="font-normal">
 					{row.level}
@@ -145,7 +175,7 @@ export default function JobPage() {
 		{
 			key: "status",
 			label: "Trạng thái",
-			className: "w-[12%]",
+			className: "w-[14%]",
 			render: (row) => (
 				<Badge
 					className={
@@ -160,12 +190,6 @@ export default function JobPage() {
 			),
 		},
 		{
-			key: "createdAt",
-			label: "Ngày tạo",
-			className: "w-[20%]",
-			render: (row) => formatDateTime(row.createdAt),
-		},
-		{
 			key: "actions",
 			label: "Thao tác",
 			className: "w-[12%] text-center",
@@ -176,10 +200,7 @@ export default function JobPage() {
 							variant="ghost"
 							size="icon"
 							className="h-8 w-8 cursor-pointer text-sky-700 hover:bg-sky-50 hover:text-sky-700"
-							onClick={() => {
-								setEditingJob(row);
-								setModalOpen(true);
-							}}
+							onClick={() => openModal(row)}
 						>
 							<Pencil className="h-4 w-4" />
 						</Button>
@@ -225,6 +246,21 @@ export default function JobPage() {
 								}}
 							/>
 							<div className="flex items-center gap-2">
+								<span className="text-sm text-muted-foreground">Công ty:</span>
+								<div className="w-56">
+									<CompanyCombobox
+										companies={companies}
+										value={companyId}
+										onChange={(id) => {
+											setCompanyId(id);
+											setPage(1);
+										}}
+										allowClear
+										placeholder="Tất cả công ty"
+									/>
+								</div>
+							</div>
+							<div className="flex items-center gap-2">
 								<span className="text-sm text-muted-foreground">
 									Mức lương:
 								</span>
@@ -268,10 +304,7 @@ export default function JobPage() {
 						<Access permission={ALL_PERMISSIONS.JOBS.CREATE} hideChildren>
 							<Button
 								className="cursor-pointer bg-primary hover:bg-primary/90 transition-colors duration-150"
-								onClick={() => {
-									setEditingJob(null);
-									setModalOpen(true);
-								}}
+								onClick={() => openModal(null)}
 							>
 								<Plus className="mr-1.5 h-4 w-4" />
 								Thêm mới

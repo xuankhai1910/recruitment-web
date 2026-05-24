@@ -32,13 +32,14 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { RichTextEditor } from "@/components/common/RichTextEditor";
+import { CompanyCombobox } from "@/components/admin/CompanyCombobox";
 import {
 	useCreateJob,
 	useJob,
 	useJobTaxonomy,
 	useUpdateJob,
 } from "@/hooks/useJobs";
-import { useCompaniesDropdown } from "@/hooks/useCompanies";
+import { useCompaniesDropdown, useCompany } from "@/hooks/useCompanies";
 import { LOCATIONS } from "@/lib/locations";
 import { useCurrentUser } from "@/stores/auth.store";
 import type { CreateJobDto, Job } from "@/types/job";
@@ -136,15 +137,24 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 	const isEdit = !!job;
 	const currentUser = useCurrentUser();
 	const isAdmin = currentUser?.role.name === "SUPER_ADMIN";
+	const hrCompanyId = !isAdmin ? (currentUser?.company?._id ?? "") : "";
 	const createJob = useCreateJob();
 	const updateJob = useUpdateJob();
-	const { data: companiesData } = useCompaniesDropdown(open);
+	// Admin sees full picker → fetch the dropdown. HR's company is locked, so
+	// we only need their one company record (logo/email/phone) for the payload.
+	// Both queries are mounted on JobModal mount (which happens on page mount),
+	// so the cache is warm by the time the user clicks Edit/Create.
+	const { data: companiesData } = useCompaniesDropdown(isAdmin);
+	const { data: hrCompany } = useCompany(hrCompanyId);
 	const { data: taxonomy } = useJobTaxonomy();
 	// List endpoint strips benefits/requirements/responsibilities to keep payload
 	// small; refetch the full job by id so the edit form can hydrate them.
 	const { data: fullJob } = useJob(open && job?._id ? job._id : "");
 
-	const companies = useMemo(() => companiesData?.result ?? [], [companiesData]);
+	const companies = useMemo(() => {
+		if (isAdmin) return companiesData?.result ?? [];
+		return hrCompany ? [hrCompany] : [];
+	}, [isAdmin, companiesData, hrCompany]);
 	const categories = taxonomy?.categories ?? [];
 	const specMap = taxonomy?.specializationsByCategory ?? {};
 	const levels = taxonomy?.levels ?? [];
@@ -192,8 +202,11 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 		if (open) {
 			if (job) {
 				// Prefer full-detail fetch (has benefits/requirements/responsibilities);
-				// fall back to row data while the request is in flight.
-				const source = fullJob ?? job;
+				// fall back to row data while the request is in flight. Verify
+				// `fullJob._id === job._id` to defend against stale cache: when
+				// switching from edit(A) → close → edit(B), React Query can briefly
+				// hand back job A's data and flash it into the form.
+				const source = fullJob?._id === job._id ? fullJob : job;
 				form.reset({
 					name: source.name,
 					category: source.category ?? "",
@@ -774,34 +787,15 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
 									<FormLabel>
 										Thuộc công ty <span className="text-destructive">*</span>
 									</FormLabel>
-									<Select
-										value={field.value}
-										onValueChange={field.onChange}
-										disabled={!isAdmin}
-									>
-										<FormControl>
-											<SelectTrigger
-												className={
-													isAdmin
-														? "cursor-pointer"
-														: "cursor-not-allowed opacity-70"
-												}
-											>
-												<SelectValue placeholder="Chọn công ty" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{companies.map((c) => (
-												<SelectItem
-													key={c._id}
-													value={c._id}
-													className="cursor-pointer"
-												>
-													{c.name}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+									<FormControl>
+										<CompanyCombobox
+											companies={companies}
+											value={field.value || undefined}
+											onChange={(id) => field.onChange(id ?? "")}
+											disabled={!isAdmin}
+											placeholder="Chọn công ty"
+										/>
+									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
