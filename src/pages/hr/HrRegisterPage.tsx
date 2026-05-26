@@ -256,7 +256,7 @@ export function HrRegisterPage() {
 									required
 									min={16}
 									max={65}
-									className="h-10"
+									className="h-11"
 								/>
 							</div>
 							<div className="space-y-1.5">
