@@ -8,7 +8,8 @@ export const filesApi = {
     return api.post<ApiResponse<{ fileName: string }>>('/files/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        folder_type: folderType ?? 'default',
+        // Hyphenated header — nginx by default strips headers with underscores.
+        'x-folder-type': folderType ?? 'default',
       },
     });
   },
