@@ -11,8 +11,8 @@ import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AuthenticatedRoute } from "@/components/guards/AuthenticatedRoute";
 import { HrRoute } from "@/components/guards/HrRoute";
 import { HomePage } from "@/pages/HomePage";
-import { ProfilePage } from "@/pages/ProfilePage";
-import { PublicProfilePage } from "@/pages/PublicProfilePage";
+import { ProfilePage } from "@/pages/profile/ProfilePage";
+import { PublicProfilePage } from "@/pages/profile/PublicProfilePage";
 import {
 	CvBuilderPage,
 	RecommendationCvPage,
@@ -21,13 +21,13 @@ import {
 	SubscriberPage,
 	SettingsPage,
 } from "@/pages/account";
-import { JobsPage } from "@/pages/JobsPage";
-import { JobDetailPage } from "@/pages/JobDetailPage";
-import { RecommendedJobsPage } from "@/pages/RecommendedJobsPage";
-import { CompaniesPage } from "@/pages/CompaniesPage";
-import { CompanyDetailPage } from "@/pages/CompanyDetailPage";
-import { LoginPage } from "@/pages/LoginPage";
-import { RegisterPage } from "@/pages/RegisterPage";
+import { JobsPage } from "@/pages/job/JobsPage";
+import { JobDetailPage } from "@/pages/job/JobDetailPage";
+import { RecommendedJobsPage } from "@/pages/job/RecommendedJobsPage";
+import { CompaniesPage } from "@/pages/company/CompaniesPage";
+import { CompanyDetailPage } from "@/pages/company/CompanyDetailPage";
+import { LoginPage } from "@/pages/auth/LoginPage";
+import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
