@@ -34,7 +34,6 @@ import {
 const NAV_LINKS = [
 	{ to: "/jobs", label: "Việc làm", matchPath: "/jobs" },
 	{ to: "/companies", label: "Công ty", matchPath: "/companies" },
-	{ to: "/tools/salary-calculator", label: "Lương", matchPath: "/tools" },
 ] as const;
 
 export function Header() {
@@ -62,7 +61,8 @@ export function Header() {
 			: pathname.startsWith(matchPath);
 
 	return (
-		<header className="fixed inset-x-4 top-4 z-50 mx-auto max-w-7xl rounded-2xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-900/10 backdrop-blur-md supports-backdrop-filter:bg-white/80 sm:inset-x-6 lg:inset-x-8 dark:border-slate-800 dark:bg-slate-950/90 dark:supports-backdrop-filter:bg-slate-950/80">
+		<header className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8 pointer-events-none">
+			<div className="pointer-events-auto mx-auto max-w-7xl rounded-2xl border border-slate-200 bg-white/90 shadow-lg shadow-slate-900/10 backdrop-blur-md supports-backdrop-filter:bg-white/80 dark:border-slate-800 dark:bg-slate-950/90 dark:supports-backdrop-filter:bg-slate-950/80">
 			<div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
 				{/* Left: Logo + Nav */}
 				<div className="flex items-center gap-8">
@@ -265,6 +265,7 @@ export function Header() {
 						</SheetContent>
 					</Sheet>
 				</div>
+			</div>
 			</div>
 		</header>
 	);

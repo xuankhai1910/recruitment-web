@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import {
 	Select,
 	SelectContent,
@@ -31,7 +30,7 @@ import {
 import { RecommendedJobCard } from "@/components/common/RecommendedJobCard";
 import { extractOriginalFileName } from "@/lib/format";
 
-const LIMIT_OPTIONS = [10, 20, 30, 50];
+const RECOMMEND_LIMIT = 20;
 
 export function RecommendedJobsPage() {
 	const navigate = useNavigate();
@@ -40,11 +39,10 @@ export function RecommendedJobsPage() {
 	const { data: cvData, isLoading: cvLoading } = useRecommendationCv();
 	const hasCv = !!cvData?.recommendationCv;
 
-	const [limit, setLimit] = useState<number>(20);
 	const [minScore, setMinScore] = useState<string>("0");
 
 	const { data, isLoading, isFetching, refetch, dataUpdatedAt, error } =
-		useRecommendedJobs(limit, isAuthenticated && hasCv);
+		useRecommendedJobs(RECOMMEND_LIMIT, isAuthenticated && hasCv);
 
 	// Auto-refetch when tab regains focus (catch newly posted jobs)
 	useEffect(() => {
@@ -237,31 +235,6 @@ export function RecommendedJobsPage() {
 											<SelectItem value="40">≥ 40%</SelectItem>
 											<SelectItem value="60">≥ 60%</SelectItem>
 											<SelectItem value="80">≥ 80%</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
-
-								<Separator orientation="vertical" className="h-5" />
-
-								<div className="flex items-center gap-2">
-									<span className="text-xs font-medium text-muted-foreground">
-										Hiển thị
-									</span>
-									<Select
-										value={String(limit)}
-										onValueChange={(v) => {
-											setLimit(Number(v));
-										}}
-									>
-										<SelectTrigger className="h-8 w-[80px]">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											{LIMIT_OPTIONS.map((n) => (
-												<SelectItem key={n} value={String(n)}>
-													{n}
-												</SelectItem>
-											))}
 										</SelectContent>
 									</Select>
 								</div>

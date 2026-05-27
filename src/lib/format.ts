@@ -87,13 +87,14 @@ export function resumeFileUrl(file: string): string {
 }
 
 /**
- * Backend stores uploaded files as `{unixTimestamp}_{originalFilename}`.
- * This helper strips the numeric timestamp prefix to recover the original name.
+ * Backend stores uploaded files with generated suffixes for de-dupe safety.
+ * Strip those technical parts for display only.
  */
 export function extractOriginalFileName(storedName: string): string {
   if (!storedName) return "";
-  // Drop any path segments just in case
   const base = storedName.split(/[\\/]/).pop() ?? storedName;
-  // Remove leading "<digits>_" prefix (e.g. "1729500000_cv.pdf" -> "cv.pdf")
-  return base.replace(/^\d+_/, "");
+  return base
+    .replace(/^\d+_/, "")
+    .replace(/-[a-f0-9]{12}-[a-f0-9]{8}(?=\.[^.]+$)/i, "")
+    .replace(/-\d{10,}(?=\.[^.]+$)/, "");
 }

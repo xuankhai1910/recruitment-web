@@ -5,7 +5,6 @@ import { JobCard } from "@/components/common/JobCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	ArrowLeft,
 	Briefcase,
@@ -108,49 +107,18 @@ export function CompanyDetailPage() {
 				</CardContent>
 			</Card>
 
-			{/* Tabs */}
-			<Tabs defaultValue="jobs" className="mt-6">
-				<TabsList>
-					<TabsTrigger value="jobs" className="cursor-pointer">
-						Việc làm ({companyJobs.length})
-					</TabsTrigger>
-					<TabsTrigger value="about" className="cursor-pointer">
-						Giới thiệu
-					</TabsTrigger>
-				</TabsList>
-
-				<TabsContent value="jobs" className="mt-4">
-					{jobsLoading ? (
-						<div className="space-y-3">
-							{Array.from({ length: 3 }).map((_, i) => (
-								<Skeleton key={i} className="h-24 rounded-lg" />
-							))}
-						</div>
-					) : companyJobs.length === 0 ? (
-						<div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card py-16">
-							<Briefcase className="h-10 w-10 text-muted-foreground/40" />
-							<p className="text-muted-foreground">
-								Công ty chưa có tin tuyển dụng nào
-							</p>
-						</div>
-					) : (
-						<div className="flex flex-col gap-3">
-							{companyJobs.map((job) => (
-								<JobCard key={job._id} job={job} />
-							))}
-						</div>
-					)}
-				</TabsContent>
-
-				<TabsContent value="about" className="mt-4 space-y-4">
+			{/* Two-column layout */}
+			<div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.5fr]">
+				{/* Cột trái — Giới thiệu + Liên hệ */}
+				<div className="space-y-4">
+					<h2 className="font-heading text-base font-semibold text-foreground">
+						Giới thiệu công ty
+					</h2>
 					{company.description ? (
 						<Card>
 							<CardContent className="p-5 sm:p-6">
-								<h2 className="font-heading text-base font-semibold text-foreground">
-									Giới thiệu công ty
-								</h2>
 								<div
-									className="prose prose-sm mt-3 max-w-none text-foreground/90 prose-headings:font-heading prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground"
+									className="prose prose-sm max-w-none text-foreground/90 prose-headings:font-heading prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground"
 									dangerouslySetInnerHTML={{ __html: company.description }}
 								/>
 							</CardContent>
@@ -192,8 +160,35 @@ export function CompanyDetailPage() {
 							</CardContent>
 						</Card>
 					)}
-				</TabsContent>
-			</Tabs>
+				</div>
+
+				{/* Cột phải — Việc làm */}
+				<div>
+					<h2 className="mb-4 font-heading text-base font-semibold text-foreground">
+						Việc làm đang tuyển ({companyJobs.length})
+					</h2>
+					{jobsLoading ? (
+						<div className="space-y-3">
+							{Array.from({ length: 3 }).map((_, i) => (
+								<Skeleton key={i} className="h-24 rounded-lg" />
+							))}
+						</div>
+					) : companyJobs.length === 0 ? (
+						<div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card py-16">
+							<Briefcase className="h-10 w-10 text-muted-foreground/40" />
+							<p className="text-muted-foreground">
+								Công ty chưa có tin tuyển dụng nào
+							</p>
+						</div>
+					) : (
+						<div className="flex flex-col gap-3">
+							{companyJobs.map((job) => (
+								<JobCard key={job._id} job={job} />
+							))}
+						</div>
+					)}
+				</div>
+			</div>
 		</div>
 	);
 }

@@ -9,7 +9,6 @@ import {
 	Building2,
 	ChevronLeft,
 	ChevronRight,
-	MapPin,
 	Search,
 } from "lucide-react";
 import { companyLogoUrl } from "@/lib/format";
@@ -78,9 +77,9 @@ export function CompaniesPage() {
 
 			{/* Grid */}
 			{isLoading ? (
-				<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{Array.from({ length: PAGE_SIZE }).map((_, i) => (
-						<Skeleton key={i} className="h-44 rounded-lg" />
+						<Skeleton key={i} className="h-56 rounded-lg" />
 					))}
 				</div>
 			) : companies.length === 0 ? (
@@ -91,33 +90,41 @@ export function CompaniesPage() {
 					</p>
 				</div>
 			) : (
-				<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{companies.map((c) => (
-						<Link key={c._id} to={`/companies/${c._id}`}>
-							<Card className="group h-full cursor-pointer transition-colors duration-150 hover:border-primary/50">
-								<CardContent className="flex flex-col items-center p-5 text-center">
-									{c.logo ? (
-										<img
-											src={companyLogoUrl(c.logo)}
-											alt={c.name}
-											className="mb-3 h-16 w-16 rounded-md border border-border bg-white object-contain p-1"
-										/>
-									) : (
-										<div className="mb-3 flex h-16 w-16 items-center justify-center rounded-md border border-border bg-muted">
-											<Building2 className="h-8 w-8 text-muted-foreground" />
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					{companies.map((c) => {
+						const plainDesc = c.description
+							? c.description.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim()
+							: "";
+						return (
+							<Link key={c._id} to={`/companies/${c._id}`} className="mt-10">
+								<Card className="group h-full cursor-pointer overflow-visible transition-colors duration-150 hover:border-primary/50">
+									<CardContent className="px-5 pb-5 pt-0">
+										<div className="-mt-10 mb-3">
+											{c.logo ? (
+												<img
+													src={companyLogoUrl(c.logo)}
+													alt={c.name}
+													className="h-16 w-16 rounded-xl border border-border bg-white object-contain p-1.5 shadow-md"
+												/>
+											) : (
+												<div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-slate-50 shadow-md">
+													<Building2 className="h-7 w-7 text-muted-foreground" />
+												</div>
+											)}
 										</div>
-									)}
-									<h3 className="line-clamp-1 font-heading text-base font-semibold text-foreground transition-colors duration-150 group-hover:text-primary">
-										{c.name}
-									</h3>
-									<p className="mt-1.5 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-										<MapPin className="h-3 w-3 shrink-0" />
-										<span className="line-clamp-1">{c.address}</span>
-									</p>
-								</CardContent>
-							</Card>
-						</Link>
-					))}
+										<h3 className="line-clamp-2 font-heading text-base font-bold text-foreground transition-colors duration-150 group-hover:text-primary">
+											{c.name}
+										</h3>
+										{plainDesc && (
+											<p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+												{plainDesc}
+											</p>
+										)}
+									</CardContent>
+								</Card>
+							</Link>
+						);
+					})}
 				</div>
 			)}
 

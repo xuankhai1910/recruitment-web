@@ -6,114 +6,118 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: 'Inter Variable', system-ui, sans-serif;
-    --font-sans: 'Inter Variable', system-ui, sans-serif;
-    --color-chart-5: var(--chart-5);
-    --color-chart-4: var(--chart-4);
-    --color-chart-3: var(--chart-3);
-    --color-chart-2: var(--chart-2);
-    --color-chart-1: var(--chart-1);
-    --color-ring: var(--ring);
-    --color-input: var(--input);
-    --color-border: var(--border);
-    --color-destructive: var(--destructive);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-accent: var(--accent);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-muted: var(--muted);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-secondary: var(--secondary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-primary: var(--primary);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-popover: var(--popover);
-    --color-card-foreground: var(--card-foreground);
-    --color-card: var(--card);
-    --color-foreground: var(--foreground);
-    --color-background: var(--background);
-    --radius-sm: calc(var(--radius) * 0.6);
-    --radius-md: calc(var(--radius) * 0.8);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) * 1.4);
-    --radius-2xl: calc(var(--radius) * 1.8);
-    --radius-3xl: calc(var(--radius) * 2.2);
-    --radius-4xl: calc(var(--radius) * 2.6);
+  --font-heading: "Inter Variable", system-ui, sans-serif;
+  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 :root {
-    /* Design system: Soft Blue Minimal (TopDev-inspired, lighter primary)
+  /* Design system: Soft Blue Minimal (TopDev-inspired, lighter primary)
      * Primary blue dropped one step (blue-500) for a softer feel; blue-600
      * reserved for hover/active. Rose accent (#EC4899) is used for "Thỏa thuận"
      * and other secondary highlight states (parallel to TopDev's magenta tag). */
-    --background: #FFFFFF;
-    --foreground: #0F172A;
-    --card: #FFFFFF;
-    --card-foreground: #0F172A;
-    --popover: #FFFFFF;
-    --popover-foreground: #0F172A;
-    --primary: #3B82F6;             /* blue-500 (was #2563EB) */
-    --primary-foreground: #FFFFFF;
-    --primary-hover: #2563EB;       /* blue-600 — only for hover/pressed */
-    --primary-soft: #EFF6FF;        /* blue-50 — filter band / banner surface */
-    --primary-soft-active: #DBEAFE; /* blue-100 — active chip background */
-    --secondary: #EFF6FF;
-    --secondary-foreground: #1E3A8A;
-    --muted: #F8FAFC;
-    --muted-foreground: #475569;    /* slate-600 — better contrast than 64748B */
-    --accent: #EFF6FF;
-    --accent-foreground: #1E40AF;
-    --accent-rose: #EC4899;         /* pink-500 — magenta touch for Negotiable */
-    --accent-rose-soft: #FCE7F3;    /* pink-100 */
-    --destructive: #EF4444;
-    --border: #E2E8F0;
-    --input: #E2E8F0;
-    --ring: #3B82F6;
-    --chart-1: #3B82F6;
-    --chart-2: #60A5FA;
-    --chart-3: #14B8A6;
-    --chart-4: #F59E0B;
-    --chart-5: #6366F1;
-    --radius: 0.5rem;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #3b82f6; /* blue-500 (was #2563EB) */
+  --primary-foreground: #ffffff;
+  --primary-hover: #2563eb; /* blue-600 — only for hover/pressed */
+  --primary-soft: #eff6ff; /* blue-50 — filter band / banner surface */
+  --primary-soft-active: #dbeafe; /* blue-100 — active chip background */
+  --secondary: #eff6ff;
+  --secondary-foreground: #1e3a8a;
+  --muted: #f8fafc;
+  --muted-foreground: #475569; /* slate-600 — better contrast than 64748B */
+  --accent: #eff6ff;
+  --accent-foreground: #1e40af;
+  --accent-rose: #ec4899; /* pink-500 — magenta touch for Negotiable */
+  --accent-rose-soft: #fce7f3; /* pink-100 */
+  --destructive: #ef4444;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b82f6;
+  --chart-1: #3b82f6;
+  --chart-2: #60a5fa;
+  --chart-3: #14b8a6;
+  --chart-4: #f59e0b;
+  --chart-5: #6366f1;
+  --radius: 0.5rem;
 }
 
 .dark {
-    --background: #0F172A;
-    --foreground: #F8FAFC;
-    --card: #1E293B;
-    --card-foreground: #F8FAFC;
-    --popover: #1E293B;
-    --popover-foreground: #F8FAFC;
-    --primary: #3B82F6;
-    --primary-foreground: #FFFFFF;
-    --secondary: #1E3A5F;
-    --secondary-foreground: #F8FAFC;
-    --muted: #1E293B;
-    --muted-foreground: #94A3B8;
-    --accent: #1E3A5F;
-    --accent-foreground: #DBEAFE;
-    --destructive: #EF4444;
-    --border: #334155;
-    --input: #334155;
-    --ring: #3B82F6;
-    --chart-1: #3B82F6;
-    --chart-2: #60A5FA;
-    --chart-3: #14B8A6;
-    --chart-4: #F59E0B;
-    --chart-5: #8B5CF6;
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #1e3a5f;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e3a5f;
+  --accent-foreground: #dbeafe;
+  --destructive: #ef4444;
+  --border: #334155;
+  --input: #334155;
+  --ring: #3b82f6;
+  --chart-1: #3b82f6;
+  --chart-2: #60a5fa;
+  --chart-3: #14b8a6;
+  --chart-4: #f59e0b;
+  --chart-5: #8b5cf6;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
-  h1, h2, h3, h4, h5, h6 {
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-heading);
-    }
+  }
 }
-

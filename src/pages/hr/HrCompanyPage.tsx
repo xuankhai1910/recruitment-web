@@ -208,7 +208,7 @@ export function HrCompanyPage() {
 													<input
 														ref={fileInputRef}
 														type="file"
-														accept="image/jpeg,image/png"
+														accept="image/jpeg,image/png,.jfif"
 														className="hidden"
 														onChange={handleFileChange}
 													/>
