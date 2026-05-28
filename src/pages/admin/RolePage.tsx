@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { rolesApi } from "@/api/roles.api";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { formatDateTime } from "@/lib/constants";
 import { RoleModal } from "@/components/admin/role/RoleModal";
 import type { Role } from "@/types/role";
@@ -17,6 +19,7 @@ export default function RolePage() {
 	const qc = useQueryClient();
 	const [page, setPage] = useState(1);
 	const [pageSize, setPageSize] = useState(10);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
 	const { data, isLoading } = useQuery({
 		queryKey: ["roles", page, pageSize],
@@ -31,6 +34,11 @@ export default function RolePage() {
 			qc.invalidateQueries({ queryKey: ["roles"] });
 			toast.success("Đã xóa vai trò");
 		},
+	});
+	const bulkDelete = useBulkDelete({
+		queryKey: ["roles"],
+		deleteFn: (id) => rolesApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} vai trò`,
 	});
 
 	const [modalOpen, setModalOpen] = useState(false);
@@ -106,13 +114,30 @@ export default function RolePage() {
 					data={data?.result ?? []}
 					meta={data?.meta}
 					loading={isLoading}
-					onPageChange={setPage}
+					onPageChange={(p) => {
+						setSelectedIds([]);
+						setPage(p);
+					}}
 					onPageSizeChange={(s) => {
+						setSelectedIds([]);
 						setPageSize(s);
 						setPage(1);
 					}}
 					rowKey={(row) => row._id}
+					selectedRowKeys={selectedIds}
+					onSelectedRowKeysChange={setSelectedIds}
 					toolbar={
+						<>
+							<Access permission={ALL_PERMISSIONS.ROLES.DELETE} hideChildren>
+								<BulkDeleteButton
+									selectedCount={selectedIds.length}
+									itemLabel="vai trò"
+									onConfirm={async () => {
+										await bulkDelete.mutateAsync(selectedIds);
+										setSelectedIds([]);
+									}}
+								/>
+							</Access>
 						<Access permission={ALL_PERMISSIONS.ROLES.CREATE} hideChildren>
 							<Button
 								className="cursor-pointer bg-sky-700 hover:bg-sky-800 transition-colors duration-150"
@@ -125,6 +150,7 @@ export default function RolePage() {
 								Thêm mới
 							</Button>
 						</Access>
+						</>
 					}
 				/>
 				<RoleModal

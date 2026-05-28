@@ -11,13 +11,16 @@ import {
 } from "@/components/ui/select";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { CompanyCombobox } from "@/components/admin/CompanyCombobox";
 import { JobModal } from "@/components/admin/job/JobModal";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { useCompaniesDropdown } from "@/hooks/useCompanies";
+import { jobsApi } from "@/api/jobs.api";
 import { LEVEL_LIST } from "@/lib/constants";
 import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
@@ -42,6 +45,7 @@ export default function JobPage() {
 	const [companyId, setCompanyId] = useState<string | undefined>(undefined);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editingJob, setEditingJob] = useState<Job | null>(null);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 	// Mounting the heavy JobModal (form + Tiptap) blocks the click handler for
@@ -93,6 +97,11 @@ export default function JobPage() {
 		"company._id": companyId,
 	});
 	const deleteJob = useDeleteJob();
+	const bulkDelete = useBulkDelete({
+		queryKeys: [["jobs"], ["jobs-admin"]],
+		deleteFn: (id) => jobsApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} tin tuyển dụng`,
+	});
 	// Pulls from the cache warmed by JobModal — same query key, no extra fetch.
 	const { data: companiesData } = useCompaniesDropdown(true);
 	const companies = companiesData?.result ?? [];
@@ -104,6 +113,7 @@ export default function JobPage() {
 		setLevels([]);
 		setSalaryKey("all");
 		setCompanyId(undefined);
+		setSelectedIds([]);
 		setPage(1);
 	};
 
@@ -226,14 +236,21 @@ export default function JobPage() {
 					searchValue={search}
 					onSearchChange={(v) => {
 						setSearch(v);
+						setSelectedIds([]);
 						setPage(1);
 					}}
-					onPageChange={setPage}
+					onPageChange={(p) => {
+						setSelectedIds([]);
+						setPage(p);
+					}}
 					onPageSizeChange={(s) => {
+						setSelectedIds([]);
 						setPageSize(s);
 						setPage(1);
 					}}
 					rowKey={(row) => row._id}
+					selectedRowKeys={selectedIds}
+					onSelectedRowKeysChange={setSelectedIds}
 					filters={
 						<>
 							<MultiSelectFilter
@@ -242,6 +259,7 @@ export default function JobPage() {
 								value={levels}
 								onChange={(v) => {
 									setLevels(v);
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							/>
@@ -253,6 +271,7 @@ export default function JobPage() {
 										value={companyId}
 										onChange={(id) => {
 											setCompanyId(id);
+											setSelectedIds([]);
 											setPage(1);
 										}}
 										allowClear
@@ -268,6 +287,7 @@ export default function JobPage() {
 									value={salaryKey}
 									onValueChange={(v) => {
 										setSalaryKey(v);
+										setSelectedIds([]);
 										setPage(1);
 									}}
 								>
@@ -301,6 +321,17 @@ export default function JobPage() {
 						</>
 					}
 					toolbar={
+						<>
+							<Access permission={ALL_PERMISSIONS.JOBS.DELETE} hideChildren>
+								<BulkDeleteButton
+									selectedCount={selectedIds.length}
+									itemLabel="tin tuyển dụng"
+									onConfirm={async () => {
+										await bulkDelete.mutateAsync(selectedIds);
+										setSelectedIds([]);
+									}}
+								/>
+							</Access>
 						<Access permission={ALL_PERMISSIONS.JOBS.CREATE} hideChildren>
 							<Button
 								className="cursor-pointer bg-primary hover:bg-primary/90 transition-colors duration-150"
@@ -310,6 +341,7 @@ export default function JobPage() {
 								Thêm mới
 							</Button>
 						</Access>
+						</>
 					}
 				/>
 

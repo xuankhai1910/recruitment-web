@@ -17,6 +17,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { PaginationMeta } from "@/types/api";
 import { ChevronLeft, ChevronRight, Inbox, Search } from "lucide-react";
 
@@ -41,6 +42,9 @@ interface DataTableProps<T> {
 	toolbar?: ReactNode;
 	filters?: ReactNode;
 	rowKey: (row: T) => string;
+	selectedRowKeys?: string[];
+	onSelectedRowKeysChange?: (keys: string[]) => void;
+	getRowCanSelect?: (row: T) => boolean;
 }
 
 export function DataTable<T>({
@@ -56,7 +60,50 @@ export function DataTable<T>({
 	toolbar,
 	filters,
 	rowKey,
+	selectedRowKeys,
+	onSelectedRowKeysChange,
+	getRowCanSelect,
 }: DataTableProps<T>) {
+	const selectionEnabled =
+		selectedRowKeys !== undefined && onSelectedRowKeysChange !== undefined;
+	const selectedSet = new Set(selectedRowKeys ?? []);
+	const selectableRows = selectionEnabled
+		? data.filter((row) => getRowCanSelect?.(row) ?? true)
+		: [];
+	const selectableKeys = selectableRows.map(rowKey);
+	const selectedVisibleCount = selectableKeys.filter((key) =>
+		selectedSet.has(key),
+	).length;
+	const allVisibleSelected =
+		selectableKeys.length > 0 && selectedVisibleCount === selectableKeys.length;
+	const someVisibleSelected =
+		selectedVisibleCount > 0 && selectedVisibleCount < selectableKeys.length;
+	const columnCount = columns.length + (selectionEnabled ? 1 : 0);
+
+	const setVisibleRowsSelected = (checked: boolean) => {
+		if (!selectionEnabled) return;
+		const next = new Set(selectedRowKeys);
+		for (const key of selectableKeys) {
+			if (checked) {
+				next.add(key);
+			} else {
+				next.delete(key);
+			}
+		}
+		onSelectedRowKeysChange(Array.from(next));
+	};
+
+	const setRowSelected = (key: string, checked: boolean) => {
+		if (!selectionEnabled) return;
+		const next = new Set(selectedRowKeys);
+		if (checked) {
+			next.add(key);
+		} else {
+			next.delete(key);
+		}
+		onSelectedRowKeysChange(Array.from(next));
+	};
+
 	return (
 		<div className="space-y-4">
 			{/* Toolbar: search + actions */}
@@ -91,6 +138,24 @@ export function DataTable<T>({
 				<Table className="table-fixed min-w-[900px]">
 					<TableHeader>
 						<TableRow className="bg-muted/50 hover:bg-muted/50">
+							{selectionEnabled && (
+								<TableHead className="w-[44px] text-center">
+									<Checkbox
+										aria-label="Chọn tất cả dòng đang hiển thị"
+										checked={
+											allVisibleSelected
+												? true
+												: someVisibleSelected
+													? "indeterminate"
+													: false
+										}
+										disabled={loading || selectableKeys.length === 0}
+										onCheckedChange={(checked) => {
+											setVisibleRowsSelected(checked === true);
+										}}
+									/>
+								</TableHead>
+							)}
 							{columns.map((col) => (
 								<TableHead key={col.key} className={col.className}>
 								{col.labelNode ?? col.label}
@@ -102,6 +167,11 @@ export function DataTable<T>({
 						{loading ? (
 							Array.from({ length: 5 }).map((_, i) => (
 								<TableRow key={`skeleton-${i.toString()}`}>
+									{selectionEnabled && (
+										<TableCell>
+											<Skeleton className="h-4 w-4 rounded-[4px]" />
+										</TableCell>
+									)}
 									{columns.map((col) => (
 										<TableCell key={col.key}>
 											<Skeleton className="h-5 w-full" />
@@ -111,7 +181,7 @@ export function DataTable<T>({
 							))
 						) : data.length === 0 ? (
 							<TableRow>
-								<TableCell colSpan={columns.length}>
+								<TableCell colSpan={columnCount}>
 									<div className="flex flex-col items-center gap-2 py-12">
 										<Inbox className="h-10 w-10 text-muted-foreground/40" />
 										<p className="text-sm text-muted-foreground">
@@ -121,18 +191,37 @@ export function DataTable<T>({
 								</TableCell>
 							</TableRow>
 						) : (
-							data.map((row, idx) => (
-								<TableRow
-									key={rowKey(row)}
-									className="cursor-default transition-colors duration-100 hover:bg-accent/40"
-								>
-									{columns.map((col) => (
-										<TableCell key={col.key} className={col.className}>
-											{col.render(row, idx)}
-										</TableCell>
-									))}
-								</TableRow>
-							))
+							data.map((row, idx) => {
+								const key = rowKey(row);
+								const canSelect = getRowCanSelect?.(row) ?? true;
+								const isSelected = selectedSet.has(key);
+
+								return (
+									<TableRow
+										key={key}
+										data-state={isSelected ? "selected" : undefined}
+										className="cursor-default transition-colors duration-100 hover:bg-accent/40 data-[state=selected]:bg-accent/40"
+									>
+										{selectionEnabled && (
+											<TableCell className="text-center">
+												<Checkbox
+													aria-label="Chọn dòng"
+													checked={isSelected}
+													disabled={!canSelect}
+													onCheckedChange={(checked) => {
+														setRowSelected(key, checked === true);
+													}}
+												/>
+											</TableCell>
+										)}
+										{columns.map((col) => (
+											<TableCell key={col.key} className={col.className}>
+												{col.render(row, idx)}
+											</TableCell>
+										))}
+									</TableRow>
+								);
+							})
 						)}
 					</TableBody>
 				</Table>

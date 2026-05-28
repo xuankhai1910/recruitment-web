@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -6,14 +7,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Loader2, Trash2 } from "lucide-react";
-import { useState } from "react";
 
 interface ConfirmDeleteProps {
   onConfirm: () => unknown | Promise<unknown>;
   children?: ReactNode;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
 }
 
-export function ConfirmDelete({ onConfirm, children }: ConfirmDeleteProps) {
+export function ConfirmDelete({
+  onConfirm,
+  children,
+  title = "Xác nhận xóa?",
+  description = "Hành động này không thể hoàn tác.",
+  confirmLabel = "Xóa",
+}: ConfirmDeleteProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -41,16 +50,16 @@ export function ConfirmDelete({ onConfirm, children }: ConfirmDeleteProps) {
         )}
       </PopoverTrigger>
       <PopoverContent className="w-56">
-        <p className="text-sm font-medium">Xác nhận xóa?</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Hành động này không thể hoàn tác.
-        </p>
+        <p className="text-sm font-medium">{title}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
         <div className="mt-3 flex justify-end gap-2">
           <Button
             variant="outline"
             size="sm"
             className="cursor-pointer"
-            onClick={() => { setOpen(false); }}
+            onClick={() => {
+              setOpen(false);
+            }}
           >
             Hủy
           </Button>
@@ -62,7 +71,7 @@ export function ConfirmDelete({ onConfirm, children }: ConfirmDeleteProps) {
             onClick={handleConfirm}
           >
             {loading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-            Xóa
+            {confirmLabel}
           </Button>
         </div>
       </PopoverContent>

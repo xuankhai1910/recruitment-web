@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { UserModal } from "@/components/admin/user/UserModal";
 import { UserDetail } from "@/components/admin/user/UserDetail";
 import { useUsers, useDeleteUser } from "@/hooks/useUsers";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { rolesApi } from "@/api/roles.api";
+import { usersApi } from "@/api/users.api";
 import { formatDateTime } from "@/lib/constants";
 import { toSearchRegex } from "@/lib/vietnamese";
 import type { User } from "@/types/user";
@@ -22,6 +25,7 @@ export default function UserPage() {
 	const [openModal, setOpenModal] = useState(false);
 	const [editingUser, setEditingUser] = useState<User | null>(null);
 	const [viewUser, setViewUser] = useState<User | null>(null);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -78,6 +82,11 @@ export default function UserPage() {
 	const displayMeta = data?.meta;
 
 	const deleteMutation = useDeleteUser();
+	const bulkDelete = useBulkDelete({
+		queryKey: ["users"],
+		deleteFn: (id) => usersApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} người dùng`,
+	});
 
 	const handleEdit = (user: User) => {
 		setEditingUser(user);
@@ -198,14 +207,21 @@ export default function UserPage() {
 				searchValue={search}
 				onSearchChange={(v) => {
 					setSearch(v);
+					setSelectedIds([]);
 					setPage(1);
 				}}
-				onPageChange={setPage}
+				onPageChange={(p) => {
+					setSelectedIds([]);
+					setPage(p);
+				}}
 				onPageSizeChange={(s) => {
+					setSelectedIds([]);
 					setPageSize(s);
 					setPage(1);
 				}}
 				rowKey={(row) => row._id}
+				selectedRowKeys={selectedIds}
+				onSelectedRowKeysChange={setSelectedIds}
 				filters={
 					<>
 						<MultiSelectFilter
@@ -217,6 +233,7 @@ export default function UserPage() {
 									.filter((r) => names.includes(r.name))
 									.map((r) => r._id);
 								setRoleIds(ids);
+								setSelectedIds([]);
 								setPage(1);
 							}}
 						/>
@@ -227,6 +244,7 @@ export default function UserPage() {
 								className="h-9 cursor-pointer text-muted-foreground hover:text-foreground"
 								onClick={() => {
 									setRoleIds([]);
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							>
@@ -237,6 +255,15 @@ export default function UserPage() {
 					</>
 				}
 				toolbar={
+					<>
+						<BulkDeleteButton
+							selectedCount={selectedIds.length}
+							itemLabel="người dùng"
+							onConfirm={async () => {
+								await bulkDelete.mutateAsync(selectedIds);
+								setSelectedIds([]);
+							}}
+						/>
 					<Button
 						className="cursor-pointer bg-primary hover:bg-primary/90"
 						onClick={handleCreate}
@@ -244,6 +271,7 @@ export default function UserPage() {
 						<Plus className="mr-1.5 h-4 w-4" />
 						Thêm mới
 					</Button>
+					</>
 				}
 			/>
 

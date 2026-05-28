@@ -3,9 +3,12 @@ import { Pencil, Plus, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { Access } from "@/components/guards/Access";
 import { CompanyModal } from "@/components/admin/company/CompanyModal";
 import { useCompanies, useDeleteCompany } from "@/hooks/useCompanies";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
+import { companiesApi } from "@/api/companies.api";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { formatDateTime } from "@/lib/constants";
 import { toSearchRegex } from "@/lib/vietnamese";
@@ -19,6 +22,7 @@ export default function CompanyPage() {
 	const [search, setSearch] = useState("");
 	const [openModal, setOpenModal] = useState(false);
 	const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -61,6 +65,11 @@ export default function CompanyPage() {
 	const displayMeta = data?.meta;
 
 	const { mutateAsync: deleteCompany } = useDeleteCompany();
+	const bulkDelete = useBulkDelete({
+		queryKey: ["companies"],
+		deleteFn: (id) => companiesApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} công ty`,
+	});
 
 	const columns = useMemo<Column<Company>[]>(
 		() => [
@@ -143,15 +152,33 @@ export default function CompanyPage() {
 				searchValue={search}
 				onSearchChange={(v) => {
 					setSearch(v);
+					setSelectedIds([]);
 					setPage(1);
 				}}
-				onPageChange={setPage}
+				onPageChange={(p) => {
+					setSelectedIds([]);
+					setPage(p);
+				}}
 				onPageSizeChange={(s) => {
+					setSelectedIds([]);
 					setPageSize(s);
 					setPage(1);
 				}}
 				rowKey={(row) => row._id}
+				selectedRowKeys={selectedIds}
+				onSelectedRowKeysChange={setSelectedIds}
 				toolbar={
+					<>
+						<Access permission={COMPANIES.DELETE} hideChildren>
+							<BulkDeleteButton
+								selectedCount={selectedIds.length}
+								itemLabel="công ty"
+								onConfirm={async () => {
+									await bulkDelete.mutateAsync(selectedIds);
+									setSelectedIds([]);
+								}}
+							/>
+						</Access>
 					<Access permission={COMPANIES.CREATE} hideChildren>
 						<Button
 							className="cursor-pointer bg-[#0369A1] hover:bg-[#0369A1]/90 transition-colors duration-150"
@@ -164,6 +191,7 @@ export default function CompanyPage() {
 							Thêm mới
 						</Button>
 					</Access>
+					</>
 				}
 			/>
 

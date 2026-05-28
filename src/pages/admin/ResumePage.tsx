@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useResumes, useDeleteResume } from "@/hooks/useResumes";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
+import { resumesApi } from "@/api/resumes.api";
 import { formatDateTime, STATUS_LIST } from "@/lib/constants";
 import { toSearchRegex } from "@/lib/vietnamese";
 import { ResumeDetail } from "@/components/admin/resume/ResumeDetail";
@@ -27,6 +30,7 @@ export default function ResumePage() {
 	const [pageSize, setPageSize] = useState(10);
 	const [statuses, setStatuses] = useState<string[]>([]);
 	const [search, setSearch] = useState("");
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"email" | "userId.name" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -98,6 +102,11 @@ export default function ResumePage() {
 			: {}),
 	} as Record<string, unknown>);
 	const deleteResume = useDeleteResume();
+	const bulkDelete = useBulkDelete({
+		queryKey: ["resumes"],
+		deleteFn: (id) => resumesApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} hồ sơ`,
+	});
 
 	const [selected, setSelected] = useState<Resume | null>(null);
 	const [sheetOpen, setSheetOpen] = useState(false);
@@ -307,14 +316,33 @@ export default function ResumePage() {
 					searchValue={search}
 					onSearchChange={(v) => {
 						setSearch(v);
+						setSelectedIds([]);
 						setPage(1);
 					}}
-					onPageChange={setPage}
+					onPageChange={(p) => {
+						setSelectedIds([]);
+						setPage(p);
+					}}
 					onPageSizeChange={(s) => {
+						setSelectedIds([]);
 						setPageSize(s);
 						setPage(1);
 					}}
 					rowKey={(row) => row._id}
+					selectedRowKeys={selectedIds}
+					onSelectedRowKeysChange={setSelectedIds}
+					toolbar={
+						<Access permission={ALL_PERMISSIONS.RESUMES.DELETE} hideChildren>
+							<BulkDeleteButton
+								selectedCount={selectedIds.length}
+								itemLabel="hồ sơ"
+								onConfirm={async () => {
+									await bulkDelete.mutateAsync(selectedIds);
+									setSelectedIds([]);
+								}}
+							/>
+						</Access>
+					}
 					filters={
 						<>
 							<MultiSelectFilter
@@ -323,6 +351,7 @@ export default function ResumePage() {
 								value={statuses}
 								onChange={(v) => {
 									setStatuses(v);
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							/>
@@ -333,6 +362,7 @@ export default function ResumePage() {
 									className="h-9 cursor-pointer text-muted-foreground hover:text-foreground"
 									onClick={() => {
 										setStatuses([]);
+										setSelectedIds([]);
 										setPage(1);
 									}}
 								>

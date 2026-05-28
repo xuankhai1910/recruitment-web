@@ -18,9 +18,12 @@ import {
 } from "@/components/ui/select";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { JobModal } from "@/components/admin/job/JobModal";
 import { useJobsByAdmin, useDeleteJob } from "@/hooks/useJobs";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
+import { jobsApi } from "@/api/jobs.api";
 import { LEVEL_LIST } from "@/lib/constants";
 import { formatJobSalary } from "@/lib/format";
 import { toSearchRegex } from "@/lib/vietnamese";
@@ -48,6 +51,7 @@ export function HrJobsPage() {
 	const [salaryKey, setSalaryKey] = useState("all");
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editingJob, setEditingJob] = useState<Job | null>(null);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 	// Mounting the heavy JobModal (form + Tiptap) blocks the click handler for
@@ -95,6 +99,11 @@ export function HrJobsPage() {
 		"salary.isNegotiable": salaryRange?.negotiable,
 	});
 	const deleteJob = useDeleteJob();
+	const bulkDelete = useBulkDelete({
+		queryKeys: [["jobs"], ["jobs-admin"]],
+		deleteFn: (id) => jobsApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} tin tuyển dụng`,
+	});
 
 	const displayData = data?.result ?? [];
 	const displayMeta = data?.meta;
@@ -230,14 +239,31 @@ export function HrJobsPage() {
 				searchValue={search}
 				onSearchChange={(v) => {
 					setSearch(v);
+					setSelectedIds([]);
 					setPage(1);
 				}}
-				onPageChange={setPage}
+				onPageChange={(p) => {
+					setSelectedIds([]);
+					setPage(p);
+				}}
 				onPageSizeChange={(s) => {
+					setSelectedIds([]);
 					setPageSize(s);
 					setPage(1);
 				}}
 				rowKey={(row) => row._id}
+				selectedRowKeys={selectedIds}
+				onSelectedRowKeysChange={setSelectedIds}
+				toolbar={
+					<BulkDeleteButton
+						selectedCount={selectedIds.length}
+						itemLabel="tin tuyển dụng"
+						onConfirm={async () => {
+							await bulkDelete.mutateAsync(selectedIds);
+							setSelectedIds([]);
+						}}
+					/>
+				}
 				filters={
 					<>
 						<MultiSelectFilter
@@ -246,6 +272,7 @@ export function HrJobsPage() {
 							value={levels}
 							onChange={(v) => {
 								setLevels(v);
+								setSelectedIds([]);
 								setPage(1);
 							}}
 						/>
@@ -253,6 +280,7 @@ export function HrJobsPage() {
 							value={salaryKey}
 							onValueChange={(v) => {
 								setSalaryKey(v);
+								setSelectedIds([]);
 								setPage(1);
 							}}
 						>
@@ -275,6 +303,7 @@ export function HrJobsPage() {
 								onClick={() => {
 									setLevels([]);
 									setSalaryKey("all");
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							>

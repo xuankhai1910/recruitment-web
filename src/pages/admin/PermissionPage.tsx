@@ -14,10 +14,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { ConfirmDelete } from "@/components/admin/ConfirmDelete";
+import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS, ALL_MODULES } from "@/lib/permissions";
 import { permissionsApi } from "@/api/permissions.api";
+import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { formatDateTime, colorMethodBg } from "@/lib/constants";
 import { toSearchRegex } from "@/lib/vietnamese";
 import { PermissionModal } from "@/components/admin/permission/PermissionModal";
@@ -33,6 +35,7 @@ export default function PermissionPage() {
 	const [search, setSearch] = useState("");
 	const [methods, setMethods] = useState<string[]>([]);
 	const [modules, setModules] = useState<string[]>([]);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | "apiPath" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
@@ -103,6 +106,7 @@ export default function PermissionPage() {
 	const resetFilters = () => {
 		setMethods([]);
 		setModules([]);
+		setSelectedIds([]);
 		setPage(1);
 	};
 
@@ -112,6 +116,11 @@ export default function PermissionPage() {
 			qc.invalidateQueries({ queryKey: ["permissions"] });
 			toast.success("Đã xóa permission");
 		},
+	});
+	const bulkDelete = useBulkDelete({
+		queryKey: ["permissions"],
+		deleteFn: (id) => permissionsApi.delete(id),
+		successMessage: (count) => `Đã xóa ${count} quyền hạn`,
 	});
 
 	const [modalOpen, setModalOpen] = useState(false);
@@ -242,14 +251,21 @@ export default function PermissionPage() {
 					searchValue={search}
 					onSearchChange={(v) => {
 						setSearch(v);
+						setSelectedIds([]);
 						setPage(1);
 					}}
-					onPageChange={setPage}
+					onPageChange={(p) => {
+						setSelectedIds([]);
+						setPage(p);
+					}}
 					onPageSizeChange={(s) => {
+						setSelectedIds([]);
 						setPageSize(s);
 						setPage(1);
 					}}
 					rowKey={(row) => row._id}
+					selectedRowKeys={selectedIds}
+					onSelectedRowKeysChange={setSelectedIds}
 					filters={
 						<>
 							<MultiSelectFilter
@@ -258,6 +274,7 @@ export default function PermissionPage() {
 								value={methods}
 								onChange={(v) => {
 									setMethods(v);
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							/>
@@ -267,6 +284,7 @@ export default function PermissionPage() {
 								value={modules}
 								onChange={(v) => {
 									setModules(v);
+									setSelectedIds([]);
 									setPage(1);
 								}}
 							/>
@@ -284,6 +302,17 @@ export default function PermissionPage() {
 						</>
 					}
 					toolbar={
+						<>
+							<Access permission={ALL_PERMISSIONS.PERMISSIONS.DELETE} hideChildren>
+								<BulkDeleteButton
+									selectedCount={selectedIds.length}
+									itemLabel="quyền hạn"
+									onConfirm={async () => {
+										await bulkDelete.mutateAsync(selectedIds);
+										setSelectedIds([]);
+									}}
+								/>
+							</Access>
 						<Access
 							permission={ALL_PERMISSIONS.PERMISSIONS.CREATE}
 							hideChildren
@@ -299,6 +328,7 @@ export default function PermissionPage() {
 								Thêm mới
 							</Button>
 						</Access>
+						</>
 					}
 				/>
 				<PermissionModal
