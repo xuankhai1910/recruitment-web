@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -38,6 +39,21 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* JobFinder (candidate-side) design tokens — Wellfound vibe.
+   Built on Tailwind's teal/rose/amber/emerald/violet palettes; only the
+   bespoke ink/cream/line + display font are registered here. These do NOT
+   touch shadcn's --primary, so the HR/admin portals stay blue. */
+@theme {
+  --font-display: "Space Grotesk", "Inter Variable", system-ui, sans-serif;
+  --font-mono-jb: "JetBrains Mono", ui-monospace, monospace;
+  --color-ink: #0a0f1a;
+  --color-ink-soft: #1f2937;
+  --color-cream: #fafaf7;
+  --color-cream-2: #f4f4ef;
+  --color-line: #e5e5df;
+  --color-line-soft: #efefe9;
 }
 
 :root {

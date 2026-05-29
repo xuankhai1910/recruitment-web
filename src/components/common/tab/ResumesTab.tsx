@@ -12,68 +12,57 @@ import {
 	XCircle,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMyResumes } from "@/hooks/useResumes";
 import { resumeFileUrl } from "@/lib/format";
+import { brandColor, brandShort } from "@/lib/brand";
 import { ResumeTimelineDialog } from "@/components/common/ResumeTimelineDialog";
+import { ui } from "@/lib/ui";
 import { cn } from "@/lib/utils";
 import type { Resume } from "@/types/resume";
 
-const RESUME_STATUS_STYLE: Record<string, string> = {
-	PENDING: "bg-amber-50 text-amber-700 border-amber-200",
-	REVIEWING: "bg-blue-50 text-blue-700 border-blue-200",
-	APPROVED: "bg-emerald-50 text-emerald-700 border-emerald-200",
-	REJECTED: "bg-rose-50 text-rose-700 border-rose-200",
+const STATUS: Record<string, { cls: string; label: string }> = {
+	PENDING: { cls: "bg-amber-100 text-amber-800", label: "Chờ xử lý" },
+	REVIEWING: { cls: "bg-teal-50 text-teal-700", label: "Đang xem xét" },
+	APPROVED: { cls: "bg-emerald-50 text-emerald-700", label: "Được duyệt" },
+	REJECTED: { cls: "bg-rose-50 text-rose-800", label: "Đã từ chối" },
 };
 
-const RESUME_STATUS_LABEL: Record<string, string> = {
-	PENDING: "Chờ xử lý",
-	REVIEWING: "Đang xem xét",
-	APPROVED: "Được duyệt",
-	REJECTED: "Đã từ chối",
-};
+const FILTERS = [
+	{ key: "ALL", label: "Tất cả" },
+	{ key: "PENDING", label: "Chờ xử lý" },
+	{ key: "REVIEWING", label: "Đang xem xét" },
+	{ key: "APPROVED", label: "Được duyệt" },
+	{ key: "REJECTED", label: "Đã từ chối" },
+];
 
-interface StatCardProps {
-	label: string;
-	value: number;
+function StatTile({
+	icon: Icon,
+	tone,
+	value,
+	label,
+}: {
 	icon: React.ComponentType<{ className?: string }>;
-	tone: "slate" | "amber" | "blue" | "emerald" | "rose";
-}
-
-const TONE_BG: Record<StatCardProps["tone"], string> = {
-	slate: "bg-slate-50 text-slate-600",
-	amber: "bg-amber-50 text-amber-600",
-	blue: "bg-blue-50 text-blue-600",
-	emerald: "bg-emerald-50 text-emerald-600",
-	rose: "bg-rose-50 text-rose-600",
-};
-
-function StatCard({ label, value, icon: Icon, tone }: StatCardProps) {
+	tone: string;
+	value: number;
+	label: string;
+}) {
 	return (
-		<div className="flex items-center gap-3 rounded-xl border border-slate-200/70 bg-white p-3.5">
-			<div
-				className={cn(
-					"grid h-10 w-10 shrink-0 place-items-center rounded-lg",
-					TONE_BG[tone],
-				)}
-			>
-				<Icon className="h-5 w-5" />
+		<div className="rounded-xl border border-line bg-white p-5">
+			<div className={cn("mb-3 grid h-9 w-9 place-items-center rounded-lg", tone)}>
+				<Icon className="h-[18px] w-[18px]" />
 			</div>
-			<div className="min-w-0">
-				<p className="text-xs text-slate-500">{label}</p>
-				<p className="font-heading text-xl font-bold leading-tight text-slate-900">
-					{value}
-				</p>
+			<div className="font-display text-[32px] font-bold leading-none tracking-tight text-ink">
+				{value}
 			</div>
+			<div className="mt-2 text-xs text-slate-600">{label}</div>
 		</div>
 	);
 }
 
 export function ResumesTab() {
 	const { data, isLoading } = useMyResumes();
-	const resumes = data ?? [];
+	const resumes = useMemo(() => data ?? [], [data]);
 	const [selected, setSelected] = useState<Resume | null>(null);
 	const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
@@ -92,15 +81,15 @@ export function ResumesTab() {
 
 	if (isLoading) {
 		return (
-			<div className="space-y-4">
+			<div className="space-y-5">
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					{["a", "b", "c", "d"].map((k) => (
-						<Skeleton key={`stat-sk-${k}`} className="h-16 rounded-xl" />
+						<Skeleton key={k} className="h-24 rounded-xl" />
 					))}
 				</div>
-				<div className="space-y-3">
+				<div className="space-y-2.5">
 					{["a", "b", "c"].map((k) => (
-						<Skeleton key={`resume-sk-${k}`} className="h-20 rounded-xl" />
+						<Skeleton key={k} className="h-20 rounded-xl" />
 					))}
 				</div>
 			</div>
@@ -109,178 +98,133 @@ export function ResumesTab() {
 
 	if (resumes.length === 0) {
 		return (
-			<div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-slate-200 bg-white py-16 px-6 text-center">
-				<div className="grid h-16 w-16 place-items-center rounded-full bg-blue-50">
-					<FileText className="h-8 w-8 text-blue-500" />
+			<div className={ui.empty}>
+				<div className={ui.emptyIcon}>
+					<FileText className="h-7 w-7" />
 				</div>
-				<div className="space-y-1">
-					<p className="font-heading text-base font-semibold text-slate-900">
-						Bạn chưa nộp CV nào
-					</p>
-					<p className="max-w-sm text-sm text-slate-500">
-						Khám phá việc làm phù hợp và nộp CV để bắt đầu hành trình của bạn.
-					</p>
-				</div>
-				<Button
-					asChild
-					className="mt-2 cursor-pointer bg-blue-500 text-white shadow-sm shadow-blue-500/20 hover:bg-blue-600"
-				>
-					<Link to="/jobs">
-						<Search className="mr-2 h-4 w-4" />
-						Tìm việc ngay
-					</Link>
-				</Button>
+				<h3 className="mb-2 text-xl font-semibold text-ink">
+					Bạn chưa nộp đơn ứng tuyển nào
+				</h3>
+				<p className="max-w-[380px] text-sm text-slate-600">
+					Khám phá việc làm phù hợp và nộp CV để bắt đầu hành trình của bạn.
+				</p>
+				<Link to="/jobs" className={cn(ui.btnPrimary, "mt-5")}>
+					<Search className="h-4 w-4" />
+					Tìm việc ngay
+				</Link>
 			</div>
 		);
 	}
 
 	return (
-		<div className="space-y-5">
-			{/* Stats row */}
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<StatCard
-					label="Tổng số"
-					value={stats.total}
-					icon={FileText}
-					tone="slate"
-				/>
-				<StatCard
-					label="Chờ xử lý"
-					value={stats.PENDING + stats.REVIEWING}
+		<div>
+			<div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+				<StatTile icon={FileText} tone="bg-teal-50 text-teal-700" value={stats.total} label="Tổng số đơn" />
+				<StatTile
 					icon={Hourglass}
-					tone="amber"
+					tone="bg-amber-100 text-amber-800"
+					value={stats.PENDING + stats.REVIEWING}
+					label="Đang chờ"
 				/>
-				<StatCard
-					label="Được duyệt"
-					value={stats.APPROVED}
-					icon={CheckCircle2}
-					tone="emerald"
-				/>
-				<StatCard
-					label="Đã từ chối"
-					value={stats.REJECTED}
-					icon={XCircle}
-					tone="rose"
-				/>
+				<StatTile icon={CheckCircle2} tone="bg-emerald-50 text-emerald-700" value={stats.APPROVED} label="Được duyệt" />
+				<StatTile icon={XCircle} tone="bg-rose-50 text-rose-800" value={stats.REJECTED} label="Đã từ chối" />
 			</div>
 
-			{/* Status filter pills */}
-			<div className="flex flex-wrap gap-2">
-				{[
-					{ key: "ALL", label: "Tất cả" },
-					{ key: "PENDING", label: "Chờ xử lý" },
-					{ key: "REVIEWING", label: "Đang xem xét" },
-					{ key: "APPROVED", label: "Được duyệt" },
-					{ key: "REJECTED", label: "Đã từ chối" },
-				].map((opt) => {
-					const active = statusFilter === opt.key;
-					return (
-						<button
-							key={opt.key}
-							type="button"
-							onClick={() => setStatusFilter(opt.key)}
-							className={cn(
-								"inline-flex h-8 cursor-pointer items-center rounded-full border px-3 text-xs font-medium transition-all duration-150",
-								active
-									? "border-blue-300 bg-blue-50 text-blue-600 shadow-sm shadow-blue-100"
-									: "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-500",
-							)}
-						>
-							{opt.label}
-						</button>
-					);
-				})}
+			<div className="mb-5 flex flex-wrap gap-2">
+				{FILTERS.map((opt) => (
+					<button
+						key={opt.key}
+						onClick={() => setStatusFilter(opt.key)}
+						className={cn(
+							"inline-flex items-center rounded-full border px-4 py-2 text-[13px] font-medium transition-colors",
+							statusFilter === opt.key
+								? "border-ink bg-ink text-white"
+								: "border-line bg-white text-slate-700 hover:border-ink",
+						)}
+					>
+						{opt.label}
+					</button>
+				))}
 			</div>
 
-			{/* Resume cards */}
 			{filteredResumes.length === 0 ? (
-				<div className="rounded-2xl border border-dashed border-slate-200 bg-white py-10 text-center text-sm text-slate-500">
-					Không có CV nào ở trạng thái này
+				<div className={ui.empty + " py-10"}>
+					<div className={ui.emptyIcon}>
+						<FileText className="h-7 w-7" />
+					</div>
+					<h3 className="mb-2 text-xl font-semibold text-ink">
+						Không có đơn nào ở trạng thái này
+					</h3>
+					<p className="max-w-[380px] text-sm text-slate-600">Thử chọn bộ lọc khác.</p>
 				</div>
 			) : (
 				<div className="space-y-2.5">
 					{filteredResumes.map((r) => {
-						// jobId/companyId can be: populated object | id string | null (deleted).
-						// `typeof null === "object"` so guard with truthy check too.
 						const jobRef = r.jobId;
 						const companyRef = r.companyId;
 						const job =
 							jobRef && typeof jobRef === "object"
 								? jobRef
-								: {
-										_id: typeof jobRef === "string" ? jobRef : "",
-										name: "Việc làm đã bị xóa",
-									};
+								: { _id: "", name: "Việc làm đã bị xóa" };
 						const company =
 							companyRef && typeof companyRef === "object"
 								? companyRef
-								: {
-										_id: typeof companyRef === "string" ? companyRef : "",
-										name: "—",
-									};
+								: { _id: "", name: "—" };
+						const st = STATUS[r.status] ?? { cls: "bg-amber-100 text-amber-800", label: r.status };
 						return (
 							<div
 								key={r._id}
-								className="group flex flex-col gap-3 rounded-xl border border-slate-200/70 bg-white p-4 transition-all hover:border-blue-200 hover:shadow-sm sm:flex-row sm:items-center"
+								onClick={() => setSelected(r)}
+								className="flex cursor-pointer flex-col gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-ink sm:flex-row sm:items-center"
 							>
-								<button
-									type="button"
-									onClick={() => setSelected(r)}
-									className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left"
-								>
-									<div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-500">
-										<FileText className="h-5 w-5" />
+								<div className="flex min-w-0 flex-1 items-center gap-3">
+									<div
+										className="grid h-11 w-11 shrink-0 place-items-center rounded-lg font-display text-[13px] font-bold text-white"
+										style={{ background: brandColor(company.name) }}
+									>
+										{brandShort(company.name)}
 									</div>
-									<div className="min-w-0 flex-1">
-										<p className="line-clamp-1 text-sm font-semibold text-slate-900 transition-colors group-hover:text-blue-600">
+									<div className="min-w-0">
+										<div className="font-display text-[15px] font-semibold text-ink">
 											{job.name}
-										</p>
-										<div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
+										</div>
+										<div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-slate-600">
 											<span className="inline-flex items-center gap-1">
-												<Briefcase className="h-3 w-3" />
+												<Briefcase className="h-[11px] w-[11px]" />
 												{company.name}
 											</span>
-											<span className="text-slate-300">•</span>
-											<span>
-												Nộp {format(new Date(r.createdAt), "dd/MM/yyyy")}
-											</span>
+											<span>·</span>
+											<span>Nộp {format(new Date(r.createdAt), "dd/MM/yyyy")}</span>
 										</div>
 									</div>
-								</button>
-
+								</div>
 								<div className="flex items-center gap-2 sm:shrink-0">
-									<Badge
-										variant="outline"
+									<span
 										className={cn(
-											"font-medium",
-											RESUME_STATUS_STYLE[r.status] ?? "",
+											"inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:content-['']",
+											st.cls,
 										)}
 									>
-										{RESUME_STATUS_LABEL[r.status] ?? r.status}
-									</Badge>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-8 w-8 cursor-pointer text-slate-500 hover:bg-slate-100 hover:text-blue-600"
-										onClick={() => setSelected(r)}
-										title="Xem tiến trình"
-									>
-										<History className="h-4 w-4" />
-									</Button>
-									<a
-										href={resumeFileUrl(r.url)}
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<Button
-											variant="ghost"
-											size="icon"
-											className="h-8 w-8 cursor-pointer text-slate-500 hover:bg-slate-100 hover:text-blue-600"
+										{st.label}
+									</span>
+									<div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+										<button
+											className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-slate-600 hover:border-ink hover:text-ink"
+											title="Xem tiến trình"
+											onClick={() => setSelected(r)}
+										>
+											<History className="h-4 w-4" />
+										</button>
+										<a
+											href={resumeFileUrl(r.url)}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-slate-600 hover:border-ink hover:text-ink"
 											title="Mở file CV"
 										>
 											<ExternalLink className="h-4 w-4" />
-										</Button>
-									</a>
+										</a>
+									</div>
 								</div>
 							</div>
 						);

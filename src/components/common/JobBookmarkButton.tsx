@@ -1,4 +1,4 @@
-import { Bookmark, BookmarkCheck } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCheckSaved, useToggleSaveJob } from "@/hooks/useSavedJobs";
@@ -7,11 +7,15 @@ import { cn } from "@/lib/utils";
 
 interface JobBookmarkButtonProps {
 	jobId: string;
+	variant?: "light" | "dark";
+	size?: "sm" | "md";
 	className?: string;
 }
 
 export function JobBookmarkButton({
 	jobId,
+	variant = "light",
+	size = "md",
 	className,
 }: JobBookmarkButtonProps) {
 	const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -36,16 +40,21 @@ export function JobBookmarkButton({
 			disabled={toggle.isPending}
 			aria-label={saved ? "Bỏ lưu" : "Lưu việc làm"}
 			className={cn(
-				"inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border border-border bg-card/80 text-muted-foreground backdrop-blur transition-colors hover:border-blue-400 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-70",
+				"inline-flex shrink-0 items-center justify-center rounded-lg border transition-colors disabled:opacity-50",
+				size === "md" ? "h-9 w-9" : "h-7 w-7",
+				variant === "light"
+					? saved
+						? "border-ink bg-ink text-teal-400"
+						: "border-line bg-transparent text-slate-400 hover:border-ink hover:text-ink"
+					: saved
+						? "border-teal-500 bg-teal-500 text-ink"
+						: "border-white/15 bg-white/5 text-white/70 hover:border-teal-500 hover:bg-teal-500 hover:text-ink",
 				className,
-				saved && "border-blue-400 bg-blue-50 text-blue-600",
 			)}
 		>
-			{saved ? (
-				<BookmarkCheck className="h-4 w-4" />
-			) : (
-				<Bookmark className="h-4 w-4" />
-			)}
+			<Bookmark
+				className={cn(size === "md" ? "h-4 w-4" : "h-3.5 w-3.5", saved && "fill-current")}
+			/>
 		</button>
 	);
 }

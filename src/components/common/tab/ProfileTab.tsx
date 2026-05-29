@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -122,16 +121,17 @@ export function ProfileTab() {
 			</div>
 
 			<div className="flex justify-end pt-2">
-				<Button
+				<button
+					type="button"
 					onClick={handleSave}
 					disabled={update.isPending}
-					className="cursor-pointer bg-blue-500 px-5 text-white shadow-sm shadow-blue-500/20 transition-colors duration-150 hover:bg-blue-600"
+					className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-teal-500 px-[18px] text-sm font-semibold text-white transition-colors hover:bg-teal-600 disabled:pointer-events-none disabled:opacity-50"
 				>
 					{update.isPending && (
 						<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 					)}
 					{update.isPending ? "Đang lưu..." : "Lưu thay đổi"}
-				</Button>
+				</button>
 			</div>
 		</div>
 	);

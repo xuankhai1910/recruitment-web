@@ -132,7 +132,7 @@ export function SubscriberTab() {
 					"rounded-2xl border p-4",
 					hasSavedPreferences
 						? "border-emerald-200/70 bg-emerald-50/60"
-						: "border-blue-200/70 bg-blue-50/60",
+						: "border-teal-200/70 bg-teal-50/60",
 				)}
 			>
 				<div className="flex items-start gap-3">
@@ -141,7 +141,7 @@ export function SubscriberTab() {
 							"grid h-10 w-10 shrink-0 place-items-center rounded-xl",
 							hasSavedPreferences
 								? "bg-emerald-500/10 text-emerald-600"
-								: "bg-blue-500/10 text-blue-500",
+								: "bg-teal-500/10 text-teal-500",
 						)}
 					>
 						{hasSavedPreferences ? (
@@ -154,7 +154,7 @@ export function SubscriberTab() {
 						<p
 							className={cn(
 								"font-heading text-sm font-semibold",
-								hasSavedPreferences ? "text-emerald-700" : "text-blue-700",
+								hasSavedPreferences ? "text-emerald-700" : "text-teal-700",
 							)}
 						>
 							{hasSavedPreferences
@@ -185,17 +185,17 @@ export function SubscriberTab() {
 					</p>
 				</div>
 
-				<div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-500/20">
+				<div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-slate-200 bg-white p-2 focus-within:border-teal-300 focus-within:ring-2 focus-within:ring-teal-500/20">
 					{skills.map((skill) => (
 						<span
 							key={skill}
-							className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50/60 px-2.5 py-0.5 text-xs font-medium text-blue-600"
+							className="inline-flex items-center gap-1 rounded-full border border-teal-100 bg-teal-50/60 px-2.5 py-0.5 text-xs font-medium text-teal-600"
 						>
 							{skill}
 							<button
 								type="button"
 								onClick={() => removeSkill(skill)}
-								className="-mr-1 cursor-pointer rounded-full p-0.5 text-blue-400 transition-colors hover:bg-blue-100 hover:text-blue-700"
+								className="-mr-1 cursor-pointer rounded-full p-0.5 text-teal-400 transition-colors hover:bg-teal-100 hover:text-teal-700"
 								aria-label={`Xóa ${skill}`}
 							>
 								<X className="h-3 w-3" />
@@ -224,7 +224,7 @@ export function SubscriberTab() {
 									key={s}
 									type="button"
 									onClick={() => addSkill(s)}
-									className="cursor-pointer rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs text-slate-600 transition-all hover:border-blue-300 hover:text-blue-500"
+									className="cursor-pointer rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs text-slate-600 transition-all hover:border-teal-300 hover:text-teal-500"
 								>
 									+ {s}
 								</button>
@@ -238,7 +238,7 @@ export function SubscriberTab() {
 				<Button
 					onClick={handleSave}
 					disabled={isSaving || isTriggering || !hasSelectedSkills}
-					className="cursor-pointer bg-blue-500 text-white shadow-sm shadow-blue-500/20 transition-colors duration-150 hover:bg-blue-600"
+					className="cursor-pointer bg-teal-500 text-white shadow-sm shadow-teal-500/20 transition-colors duration-150 hover:bg-teal-600"
 				>
 					{isSaving
 						? "Đang lưu..."
@@ -262,7 +262,7 @@ export function SubscriberTab() {
 						onClick={handleStartNotifications}
 						disabled={isSaving || isTriggering || !hasSelectedSkills}
 						variant="outline"
-						className="cursor-pointer border-blue-200 bg-white text-blue-600 transition-colors duration-150 hover:border-blue-300 hover:bg-blue-50"
+						className="cursor-pointer border-teal-200 bg-white text-teal-600 transition-colors duration-150 hover:border-teal-300 hover:bg-teal-50"
 					>
 						<Mail className="mr-2 h-4 w-4" />
 						{isTriggering ? "Đang gửi email..." : subscribeLabel}

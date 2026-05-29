@@ -1,10 +1,11 @@
 import { useJobs, usePrefetchJobs } from "@/hooks/useJobs";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { JobCard } from "@/components/common/JobCard";
 import { JobDetailTooltip } from "@/components/common/JobDetailTooltip";
+import { ui } from "@/lib/ui";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 8;
 
@@ -18,22 +19,12 @@ export function LatestJobs() {
 	});
 	const prefetchJobs = usePrefetchJobs();
 
-	// `placeholderData` only fills `data` while the query is pending. If a
-	// fetch ends in error (common on Atlas free tier at high skip offsets),
-	// `data` drops to `undefined` and the grid would flash to skeleton. We
-	// cache the last successful payload here so the previous page stays
-	// rendered even through error states.
 	const [lastGood, setLastGood] = useState<typeof data>();
-	useEffect(() => {
-		if (data) setLastGood(data);
-	}, [data]);
+	if (data && data !== lastGood) setLastGood(data);
 	const display = data ?? lastGood;
 	const meta = display?.meta;
 	const jobs = display?.result ?? [];
 
-	// Prefetch adjacent pages so paginating feels instant. Skips when the
-	// neighbour is out of range. The same staleTime as useJobs is set inside
-	// usePrefetchJobs, so cache hits skip refetch on click.
 	useEffect(() => {
 		if (!meta) return;
 		const base = {
@@ -46,77 +37,73 @@ export function LatestJobs() {
 	}, [page, meta, prefetchJobs]);
 
 	return (
-		<section className="px-4 py-4 sm:px-6 lg:px-8">
-			<div>
-				{/* Section header */}
-				<div className="mb-6 flex items-end justify-between">
+		<section className="pb-14">
+			<div className={ui.wrap}>
+				<div className="mb-8 flex flex-wrap items-end justify-between gap-6">
 					<div>
-						<h2 className="text-2xl font-bold text-slate-900">
-							Việc làm mới nhất
-						</h2>
-						<p className="mt-1 text-sm text-slate-500">
-							Cập nhật liên tục các cơ hội việc làm hấp dẫn
-						</p>
+						<div className={cn(ui.eyebrow, "mb-3")}>Tất cả việc làm</div>
+						<h2 className={ui.h2}>Việc làm mới nhất</h2>
+						<p className={ui.sub}>Cập nhật liên tục các cơ hội việc làm hấp dẫn.</p>
 					</div>
 					{meta && meta.pages > 1 && (
 						<div className="flex items-center gap-2">
-							<span className="mr-1 text-sm font-medium text-muted-foreground">
+							<span className="mr-1 font-mono-jb text-[13px] text-slate-600">
 								{page}/{meta.pages}
 							</span>
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-9 w-9 cursor-pointer rounded-full transition-colors duration-150"
+							<button
+								className={ui.iconBtn}
+								aria-label="Trang trước"
 								disabled={page <= 1 || isFetching}
-								onClick={() => {
-									setPage((p) => p - 1);
-								}}
+								onClick={() => setPage((p) => p - 1)}
 							>
 								<ChevronLeft className="h-4 w-4" />
-							</Button>
-							<Button
-								variant="outline"
-								size="icon"
-								className="h-9 w-9 cursor-pointer rounded-full transition-colors duration-150"
+							</button>
+							<button
+								className={ui.iconBtn}
+								aria-label="Trang sau"
 								disabled={page >= meta.pages || isFetching}
-								onClick={() => {
-									setPage((p) => p + 1);
-								}}
+								onClick={() => setPage((p) => p + 1)}
 							>
 								<ChevronRight className="h-4 w-4" />
-							</Button>
+							</button>
 						</div>
 					)}
 				</div>
 
-				{/* Job grid.
-				    Skeleton only when nothing has ever loaded. After the
-				    first success, `display` falls back to the last good
-				    payload, so transient errors don't blank the grid. */}
 				{!display ? (
-					<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-						{Array.from(
-							{ length: PAGE_SIZE },
-							(_, index) => `latest-job-skeleton-${index}`,
-						).map((skeletonId) => (
-							<Skeleton key={skeletonId} className="h-52 rounded-xl" />
-						))}
+					<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{Array.from({ length: PAGE_SIZE }, (_, i) => `lj-sk-${i}`).map(
+							(id) => (
+								<Skeleton key={id} className="h-60 rounded-xl" />
+							),
+						)}
 					</div>
 				) : jobs.length === 0 ? (
-					<div className="flex flex-col items-center gap-3 py-16">
-						<Briefcase className="h-12 w-12 text-muted-foreground/40" />
-						<p className="text-muted-foreground">Chưa có việc làm nào</p>
+					<div className={ui.empty}>
+						<div className={ui.emptyIcon}>
+							<Briefcase className="h-7 w-7" />
+						</div>
+						<h3 className="mb-2 text-xl font-semibold text-ink">
+							Chưa có việc làm nào
+						</h3>
+						<p className="max-w-[380px] text-sm text-slate-600">
+							Hãy quay lại sau để khám phá các cơ hội mới.
+						</p>
 					</div>
 				) : (
 					<div
-						className={`grid grid-cols-1 gap-4 transition-opacity duration-150 sm:grid-cols-2 lg:grid-cols-4 ${
-							isFetching ? "opacity-60" : ""
-						}`}
+						className={cn(
+							"grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+							isFetching && "opacity-60",
+						)}
 					>
-						{jobs.map((job) => (
+						{jobs.map((job, index) => (
 							<JobDetailTooltip key={job._id} job={job}>
-								<div className="h-full">
-									<JobCard job={job} variant="card" />
+								<div>
+									<JobCard
+										job={job}
+										variant={page === 1 && index === 0 ? "dark" : "default"}
+									/>
 								</div>
 							</JobDetailTooltip>
 						))}

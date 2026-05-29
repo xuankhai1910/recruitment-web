@@ -1,17 +1,11 @@
 import { useMemo, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCompanies } from "@/hooks/useCompanies";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { CompanyCard } from "@/components/common/CompanyCard";
+import { JfPager } from "@/components/common/JfPager";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	Building2,
-	ChevronLeft,
-	ChevronRight,
-	Search,
-} from "lucide-react";
-import { companyLogoUrl } from "@/lib/format";
+import { Building2, ChevronRight, Search } from "lucide-react";
+import { ui } from "@/lib/ui";
 
 const PAGE_SIZE = 12;
 
@@ -51,113 +45,75 @@ export function CompaniesPage() {
 	};
 
 	return (
-		<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-			{/* Page header */}
-			<div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+		<div className="mx-auto max-w-[1280px] px-7 pb-16 pt-8">
+			<div className="mb-5 flex items-center gap-2 text-[13px] text-slate-400">
+				<Link to="/" className="text-slate-600 hover:text-ink">
+					Trang chủ
+				</Link>
+				<ChevronRight className="h-3 w-3" />
+				<span>Công ty</span>
+			</div>
+
+			<div className="mb-6 flex flex-wrap items-end justify-between gap-6">
 				<div>
-					<h1 className="font-heading text-2xl font-bold text-foreground sm:text-3xl">
-						Các công ty
-					</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
-						{meta ? `${meta.total} công ty đang tuyển dụng` : "Đang tải..."}
+					<h1 className={ui.h1}>Khám phá công ty</h1>
+					<p className="mt-3 text-[15px] text-slate-600">
+						{meta ? (
+							<>
+								<b className="font-display font-bold text-ink">{meta.total}</b>{" "}
+								công ty đang tuyển dụng trên JobFinder
+							</>
+						) : (
+							"Đang tải..."
+						)}
 					</p>
 				</div>
-				<form onSubmit={handleSearch} className="relative w-full sm:w-80">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
-						placeholder="Tìm công ty..."
+				<form
+					onSubmit={handleSearch}
+					className="flex h-11 w-80 items-center gap-2.5 rounded-lg border-[1.5px] border-line bg-white px-3.5 focus-within:border-ink"
+				>
+					<Search className="h-4 w-4 shrink-0 text-slate-400" />
+					<input
+						type="text"
+						placeholder="Tìm theo tên công ty"
 						value={keyword}
-						onChange={(e) => {
-							setKeyword(e.target.value);
-						}}
-						className="pl-9"
+						onChange={(e) => setKeyword(e.target.value)}
+						className="min-w-0 flex-1 border-0 bg-transparent text-sm text-ink outline-none placeholder:text-slate-400"
 					/>
 				</form>
 			</div>
 
-			{/* Grid */}
 			{isLoading ? (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 					{Array.from({ length: PAGE_SIZE }).map((_, i) => (
-						<Skeleton key={i} className="h-56 rounded-lg" />
+						<Skeleton key={i} className="h-40 rounded-xl" />
 					))}
 				</div>
 			) : companies.length === 0 ? (
-				<div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card py-20">
-					<Building2 className="h-12 w-12 text-muted-foreground/40" />
-					<p className="font-heading font-semibold text-foreground">
-						Không tìm thấy công ty phù hợp
+				<div className={ui.empty}>
+					<div className={ui.emptyIcon}>
+						<Building2 className="h-7 w-7" />
+					</div>
+					<h3 className="mb-2 text-xl font-semibold text-ink">
+						Không tìm thấy công ty nào
+					</h3>
+					<p className="max-w-[380px] text-sm text-slate-600">
+						Thử tìm với từ khóa khác.
 					</p>
 				</div>
 			) : (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{companies.map((c) => {
-						const plainDesc = c.description
-							? c.description.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim()
-							: "";
-						return (
-							<Link key={c._id} to={`/companies/${c._id}`} className="mt-10">
-								<Card className="group h-full cursor-pointer overflow-visible transition-colors duration-150 hover:border-primary/50">
-									<CardContent className="px-5 pb-5 pt-0">
-										<div className="-mt-10 mb-3">
-											{c.logo ? (
-												<img
-													src={companyLogoUrl(c.logo)}
-													alt={c.name}
-													className="h-16 w-16 rounded-xl border border-border bg-white object-contain p-1.5 shadow-md"
-												/>
-											) : (
-												<div className="flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-slate-50 shadow-md">
-													<Building2 className="h-7 w-7 text-muted-foreground" />
-												</div>
-											)}
-										</div>
-										<h3 className="line-clamp-2 font-heading text-base font-bold text-foreground transition-colors duration-150 group-hover:text-primary">
-											{c.name}
-										</h3>
-										{plainDesc && (
-											<p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-												{plainDesc}
-											</p>
-										)}
-									</CardContent>
-								</Card>
-							</Link>
-						);
-					})}
+				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+					{companies.map((c) => (
+						<CompanyCard key={c._id} company={c} />
+					))}
 				</div>
 			)}
 
-			{/* Pagination */}
-			{meta && meta.pages > 1 && (
-				<div className="mt-8 flex items-center justify-center gap-2">
-					<Button
-						variant="outline"
-						size="icon"
-						className="h-9 w-9 cursor-pointer"
-						disabled={page <= 1}
-						onClick={() => {
-							changePage(page - 1);
-						}}
-					>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<span className="px-3 text-sm font-medium text-foreground">
-						Trang {page} / {meta.pages}
-					</span>
-					<Button
-						variant="outline"
-						size="icon"
-						className="h-9 w-9 cursor-pointer"
-						disabled={page >= meta.pages}
-						onClick={() => {
-							changePage(page + 1);
-						}}
-					>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
-			)}
+			<JfPager
+				page={page}
+				totalPages={meta?.pages ?? 1}
+				onChange={changePage}
+			/>
 		</div>
 	);
 }

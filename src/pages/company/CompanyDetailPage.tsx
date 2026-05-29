@@ -2,18 +2,18 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useCompany } from "@/hooks/useCompanies";
 import { useJobs } from "@/hooks/useJobs";
 import { JobCard } from "@/components/common/JobCard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-	ArrowLeft,
 	Briefcase,
 	Building2,
+	ChevronRight,
 	Mail,
 	MapPin,
 	Phone,
 } from "lucide-react";
 import { companyLogoUrl } from "@/lib/format";
+import { brandColor, brandShort } from "@/lib/brand";
+import { ui } from "@/lib/ui";
 
 export function CompanyDetailPage() {
 	const { id = "" } = useParams<{ id: string }>();
@@ -31,12 +31,11 @@ export function CompanyDetailPage() {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-				<Skeleton className="h-40 rounded-lg" />
-				<div className="mt-6 space-y-3">
-					{Array.from({ length: 3 }).map((_, i) => (
-						<Skeleton key={i} className="h-24 rounded-lg" />
-					))}
+			<div className="mx-auto max-w-[1280px] px-7 py-12">
+				<Skeleton className="h-48 rounded-xl" />
+				<div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
+					<Skeleton className="h-64 rounded-xl" />
+					<Skeleton className="h-48 rounded-xl" />
 				</div>
 			</div>
 		);
@@ -44,151 +43,175 @@ export function CompanyDetailPage() {
 
 	if (!company) {
 		return (
-			<div className="mx-auto max-w-3xl px-4 py-20 text-center">
-				<Building2 className="mx-auto h-12 w-12 text-muted-foreground/40" />
-				<h2 className="mt-4 font-heading text-xl font-semibold text-foreground">
-					Không tìm thấy công ty
-				</h2>
-				<Button
-					onClick={() => {
-						navigate("/companies");
-					}}
-					className="mt-4 cursor-pointer"
-				>
-					Xem công ty khác
-				</Button>
+			<div className="mx-auto max-w-[1280px] px-7 py-8">
+				<div className={ui.empty}>
+					<div className={ui.emptyIcon}>
+						<Building2 className="h-7 w-7" />
+					</div>
+					<h3 className="mb-2 text-xl font-semibold text-ink">
+						Không tìm thấy công ty
+					</h3>
+					<p className="max-w-[380px] text-sm text-slate-600">
+						Công ty có thể đã bị gỡ hoặc không tồn tại.
+					</p>
+					<button
+						className={ui.btnPrimary + " mt-5"}
+						onClick={() => navigate("/companies")}
+					>
+						Xem công ty khác
+					</button>
+				</div>
 			</div>
 		);
 	}
 
-	return (
-		<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-			<Link
-				to="/companies"
-				className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-primary"
-			>
-				<ArrowLeft className="h-4 w-4" />
-				Quay lại danh sách
-			</Link>
+	const logo = companyLogoUrl(company.logo);
 
-			{/* Hero banner */}
-			<Card>
-				<CardContent className="p-5 sm:p-6">
-					<div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-						{company.logo ? (
-							<img
-								src={companyLogoUrl(company.logo)}
-								alt={company.name}
-								className="h-20 w-20 shrink-0 rounded-md border border-border bg-white object-contain p-1.5"
-							/>
+	return (
+		<>
+			<div className="relative overflow-hidden bg-ink text-white">
+				<div className="mx-auto max-w-[1280px] px-7 py-12">
+					<div className="mb-5 flex items-center gap-2 text-[13px] text-white/50">
+						<Link to="/companies" className="text-white/70 hover:text-white">
+							Công ty
+						</Link>
+						<ChevronRight className="h-3 w-3" />
+						<span>{company.name}</span>
+					</div>
+					<div className="flex flex-wrap items-start gap-7">
+						{logo ? (
+							<div className="grid h-30 w-30 shrink-0 place-items-center overflow-hidden rounded-xl border border-white/10">
+								<img src={logo} alt={company.name} className="h-full w-full bg-white object-contain" />
+							</div>
 						) : (
-							<div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-md border border-border bg-muted">
-								<Building2 className="h-10 w-10 text-muted-foreground" />
+							<div
+								className="grid h-30 w-30 shrink-0 place-items-center rounded-xl border border-white/10 font-display text-4xl font-bold text-white"
+								style={{ background: brandColor(company.name) }}
+							>
+								{brandShort(company.name)}
 							</div>
 						)}
-						<div className="min-w-0 flex-1">
-							<h1 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
+						<div className="min-w-[280px] flex-1">
+							<h1 className="mb-4 font-display text-[clamp(32px,5vw,56px)] font-bold leading-[1.05] tracking-[-0.03em] text-white">
 								{company.name}
 							</h1>
-							<div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-								<span className="inline-flex items-center gap-1.5">
-									<MapPin className="h-3.5 w-3.5 shrink-0" />
-									{company.address}
-								</span>
-								<span className="inline-flex items-center gap-1.5 text-primary">
-									<Briefcase className="h-3.5 w-3.5" />
-									<span className="font-medium">
-										{companyJobs.length} việc làm đang tuyển
+							<div className="flex flex-wrap gap-x-6 gap-y-2.5 text-sm text-white/75">
+								{company.address && (
+									<span className="inline-flex items-center gap-2">
+										<MapPin className="h-3.5 w-3.5 text-teal-400" />
+										{company.address}
 									</span>
+								)}
+								<span className="inline-flex items-center gap-2">
+									<Briefcase className="h-3.5 w-3.5 text-teal-400" />
+									{companyJobs.length} việc đang tuyển
 								</span>
+								{company.email && (
+									<span className="inline-flex items-center gap-2">
+										<Mail className="h-3.5 w-3.5 text-teal-400" />
+										{company.email}
+									</span>
+								)}
+								{company.phone && (
+									<span className="inline-flex items-center gap-2">
+										<Phone className="h-3.5 w-3.5 text-teal-400" />
+										{company.phone}
+									</span>
+								)}
 							</div>
 						</div>
 					</div>
-				</CardContent>
-			</Card>
-
-			{/* Two-column layout */}
-			<div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_1.5fr]">
-				{/* Cột trái — Giới thiệu + Liên hệ */}
-				<div className="space-y-4">
-					<h2 className="font-heading text-base font-semibold text-foreground">
-						Giới thiệu công ty
-					</h2>
-					{company.description ? (
-						<Card>
-							<CardContent className="p-5 sm:p-6">
-								<div
-									className="prose prose-sm max-w-none text-foreground/90 prose-headings:font-heading prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground"
-									dangerouslySetInnerHTML={{ __html: company.description }}
-								/>
-							</CardContent>
-						</Card>
-					) : (
-						<Card>
-							<CardContent className="p-5 text-sm text-muted-foreground">
-								Công ty chưa có thông tin giới thiệu.
-							</CardContent>
-						</Card>
-					)}
-
-					{(company.email || company.phone) && (
-						<Card>
-							<CardContent className="p-5 sm:p-6">
-								<h2 className="mb-3 font-heading text-base font-semibold text-foreground">
-									Thông tin liên hệ
-								</h2>
-								<div className="space-y-2">
-									{company.email && (
-										<a
-											href={`mailto:${company.email}`}
-											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
-										>
-											<Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
-											{company.email}
-										</a>
-									)}
-									{company.phone && (
-										<a
-											href={`tel:${company.phone}`}
-											className="flex items-center gap-2 text-sm text-foreground/80 transition-colors duration-150 hover:text-primary"
-										>
-											<Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
-											{company.phone}
-										</a>
-									)}
-								</div>
-							</CardContent>
-						</Card>
-					)}
-				</div>
-
-				{/* Cột phải — Việc làm */}
-				<div>
-					<h2 className="mb-4 font-heading text-base font-semibold text-foreground">
-						Việc làm đang tuyển ({companyJobs.length})
-					</h2>
-					{jobsLoading ? (
-						<div className="space-y-3">
-							{Array.from({ length: 3 }).map((_, i) => (
-								<Skeleton key={i} className="h-24 rounded-lg" />
-							))}
-						</div>
-					) : companyJobs.length === 0 ? (
-						<div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-card py-16">
-							<Briefcase className="h-10 w-10 text-muted-foreground/40" />
-							<p className="text-muted-foreground">
-								Công ty chưa có tin tuyển dụng nào
-							</p>
-						</div>
-					) : (
-						<div className="flex flex-col gap-3">
-							{companyJobs.map((job) => (
-								<JobCard key={job._id} job={job} />
-							))}
-						</div>
-					)}
 				</div>
 			</div>
-		</div>
+
+			<div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-7 py-14 lg:grid-cols-[1fr_360px]">
+				<div>
+					<section className="mb-5 rounded-xl border border-line bg-white p-8">
+						<h3 className="mb-4 font-display text-[22px] font-bold tracking-tight text-ink">
+							Giới thiệu công ty
+						</h3>
+						{company.description ? (
+							<div
+								className={ui.richtext}
+								dangerouslySetInnerHTML={{ __html: company.description }}
+							/>
+						) : (
+							<p className="text-[15px] leading-7 text-slate-700">
+								Công ty chưa có thông tin giới thiệu.
+							</p>
+						)}
+					</section>
+
+					<section className="rounded-xl border border-line bg-white p-8">
+						<h3 className="mb-4 font-display text-[22px] font-bold tracking-tight text-ink">
+							Việc đang tuyển ({companyJobs.length})
+						</h3>
+						{jobsLoading ? (
+							<div className="flex flex-col gap-3">
+								{Array.from({ length: 3 }).map((_, i) => (
+									<Skeleton key={i} className="h-24 rounded-xl" />
+								))}
+							</div>
+						) : companyJobs.length === 0 ? (
+							<div className={ui.empty + " py-10"}>
+								<div className={ui.emptyIcon}>
+									<Briefcase className="h-7 w-7" />
+								</div>
+								<h3 className="mb-2 text-xl font-semibold text-ink">
+									Chưa có tin tuyển dụng
+								</h3>
+								<p className="max-w-[380px] text-sm text-slate-600">
+									Công ty chưa đăng tin tuyển dụng nào.
+								</p>
+							</div>
+						) : (
+							<div className="flex flex-col gap-3">
+								{companyJobs.map((job) => (
+									<JobCard key={job._id} job={job} variant="row" />
+								))}
+							</div>
+						)}
+					</section>
+				</div>
+
+				<aside className="flex flex-col gap-5">
+					<div className="rounded-xl border border-line bg-white p-6">
+						<h4 className="mb-4 font-mono-jb text-[11px] font-bold uppercase tracking-[0.12em] text-slate-600">
+							Thông tin
+						</h4>
+						<dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
+							{company.address && (
+								<>
+									<dt className="text-slate-400">Trụ sở</dt>
+									<dd className="text-right font-medium text-ink">
+										{company.address}
+									</dd>
+								</>
+							)}
+							<dt className="text-slate-400">Việc đang tuyển</dt>
+							<dd className="text-right font-medium text-ink">
+								{companyJobs.length}
+							</dd>
+							{company.email && (
+								<>
+									<dt className="text-slate-400">Email</dt>
+									<dd className="break-all text-right font-medium text-ink">
+										{company.email}
+									</dd>
+								</>
+							)}
+							{company.phone && (
+								<>
+									<dt className="text-slate-400">Điện thoại</dt>
+									<dd className="text-right font-medium text-ink">
+										{company.phone}
+									</dd>
+								</>
+							)}
+						</dl>
+					</div>
+				</aside>
+			</div>
+		</>
 	);
 }

@@ -7,8 +7,8 @@ export function ResumesPage() {
 		<div className="space-y-6">
 			<PageHeader
 				icon={FileText}
-				title="CV đã nộp"
-				description="Theo dõi trạng thái các hồ sơ bạn đã ứng tuyển"
+				title="Đơn ứng tuyển"
+				description="Theo dõi trạng thái các vị trí bạn đã ứng tuyển"
 				tone="blue"
 			/>
 			<ResumesTab />

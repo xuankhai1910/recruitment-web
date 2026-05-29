@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { LocationMultiSelect } from "@/components/common/LocationMultiSelect";
 import { CategorySpecializationModal } from "@/components/common/CategorySpecializationModal";
 import {
@@ -11,9 +10,6 @@ import { ChevronDown, Layers, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const POPULAR_KEYWORDS = ["React", "Java", "Python", "Marketing", "Design"];
-
-const HERO_IMAGE_URL =
-	"https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1600&q=80&auto=format&fit=crop";
 
 export function HeroSearch() {
 	const navigate = useNavigate();
@@ -42,102 +38,100 @@ export function HeroSearch() {
 	};
 
 	return (
-		<section className="px-4 pt-4 sm:px-6 lg:px-8">
-			<div className="relative">
-				{/* Background layer (clipped) — gradient + image stay inside rounded corners */}
-				<div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl bg-linear-to-r from-blue-50 via-blue-50 to-blue-100">
-					<img
-						src={HERO_IMAGE_URL}
-						alt=""
-						aria-hidden="true"
-						className="absolute inset-y-0 right-0 hidden h-full w-1/2 object-cover opacity-90 mask-[linear-gradient(to_right,transparent,black_40%)] lg:block"
-					/>
+		<section className="relative overflow-hidden py-20">
+			<div className="mx-auto max-w-[1280px] px-7">
+				<div className="mb-6 flex justify-center">
+					<span className="inline-flex items-center gap-2 font-mono-jb text-xs font-semibold uppercase tracking-[0.12em] text-teal-700 before:inline-block before:h-[1.5px] before:w-6 before:rounded-sm before:bg-teal-500">
+						JobFinder · Tuyển dụng 2026
+					</span>
 				</div>
+				<h1 className="mx-auto max-w-[1000px] text-center font-display text-[clamp(48px,8vw,96px)] font-bold leading-[0.95] tracking-[-0.04em] text-ink">
+					Tìm việc làm,
+					<br />
+					<span className="relative inline-block italic text-teal-700">
+						xây sự nghiệp
+						<span className="absolute inset-x-0 bottom-[6%] -z-10 h-[14%] rounded bg-teal-100" />
+					</span>
+				</h1>
+				<p className="mx-auto mt-6 max-w-[580px] text-center text-[clamp(16px,1.5vw,18px)] leading-relaxed text-slate-600">
+					Khám phá việc làm chất lượng từ các công ty hàng đầu Việt Nam — kết hợp
+					gợi ý AI dựa trên hồ sơ kỹ năng của bạn.
+				</p>
 
-				{/* Content layer — NOT clipped, so autocomplete dropdown can overflow */}
-				<div className="relative px-6 pt-32 pb-20 sm:px-12 sm:pt-40 sm:pb-28 lg:pt-44 lg:pb-32">
-					{/* Search bar — centered, narrower */}
-					<form
-						onSubmit={handleSearch}
-						className="mx-auto flex max-w-3xl flex-col gap-2 rounded-2xl bg-white p-2 shadow-xl shadow-blue-900/5 ring-1 ring-slate-100 sm:flex-row sm:items-center"
+				<form
+					onSubmit={handleSearch}
+					className="mx-auto mt-12 flex max-w-[880px] flex-wrap items-stretch overflow-hidden rounded-xl border-[1.5px] border-ink bg-white shadow-[8px_8px_0_#0a0f1a] transition-all duration-200 focus-within:-translate-x-0.5 focus-within:-translate-y-0.5 focus-within:shadow-[10px_10px_0_#0a0f1a]"
+				>
+					<button
+						type="button"
+						onClick={() => setSpecModalOpen(true)}
+						className={cn(
+							"flex min-h-[60px] flex-[0_1_220px] items-center gap-2.5 border-r border-line px-[18px] text-[15px] font-medium",
+							specializations.length > 0 ? "text-teal-700" : "text-ink",
+						)}
 					>
-						<button
-							type="button"
-							onClick={() => setSpecModalOpen(true)}
-							className={cn(
-								"flex h-12 shrink-0 items-center gap-2 rounded-xl px-3 text-left text-sm font-medium transition-colors sm:max-w-48",
-								specializations.length > 0
-									? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-									: "text-slate-700 hover:bg-slate-50",
-							)}
-						>
-							<Layers className="h-4 w-4 shrink-0" />
-							<span className="min-w-0 flex-1 truncate">
-								{specializations.length === 0
-									? "Danh mục"
-									: `Danh mục (${specializations.length})`}
-							</span>
-							<ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-60" />
-						</button>
-
-						<div className="hidden h-6 w-px bg-slate-200 sm:block" />
-
-						<div className="relative flex-1">
-							<SearchAutocomplete
-								value={keyword}
-								onChange={setKeyword}
-								onSelect={(v) => {
-									setKeyword(v);
-									submitWith(v);
-								}}
-								placeholder="Tên công việc, kỹ năng..."
-								showIcon
-								inputClassName="h-12 border-0 bg-transparent pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:ring-0"
-							/>
-						</div>
-
-						<div className="hidden h-6 w-px bg-slate-200 sm:block" />
-
-						<div className="flex-1 [&_button]:h-12 [&_button]:rounded-xl [&_button]:text-sm">
-							<LocationMultiSelect value={locations} onChange={setLocations} />
-						</div>
-
-						<Button
-							type="submit"
-							className="h-12 min-w-32 cursor-pointer rounded-xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-colors duration-150 hover:bg-blue-700"
-						>
-							<Search className="mr-2 h-4 w-4" />
-							Tìm kiếm
-						</Button>
-					</form>
-
-					<CategorySpecializationModal
-						open={specModalOpen}
-						onOpenChange={setSpecModalOpen}
-						initialSpecializations={specializations}
-						onConfirm={({ specializations: next }) => setSpecializations(next)}
-					/>
-
-					{/* Popular keywords */}
-					<div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-						<span className="text-sm font-medium text-slate-700">
-							Từ khóa phổ biến:
+						<Layers className="h-[18px] w-[18px] shrink-0 text-slate-400" />
+						<span className="flex-1 truncate text-left">
+							{specializations.length === 0
+								? "Danh mục"
+								: `Danh mục (${specializations.length})`}
 						</span>
-						{POPULAR_KEYWORDS.map((kw) => (
-							<button
-								key={kw}
-								type="button"
-								onClick={() => {
-									setKeyword(kw);
-									submitWith(kw);
-								}}
-								className="cursor-pointer rounded-full border border-slate-200 bg-white/80 px-4 py-1.5 text-sm text-slate-700 backdrop-blur transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-							>
-								{kw}
-							</button>
-						))}
+						<ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-60" />
+					</button>
+
+					<div className="flex min-h-[60px] flex-1 items-center gap-2.5 border-r border-line px-[18px]">
+						<Search className="h-[18px] w-[18px] shrink-0 text-slate-400" />
+						<SearchAutocomplete
+							value={keyword}
+							onChange={setKeyword}
+							onSelect={(v) => {
+								setKeyword(v);
+								submitWith(v);
+							}}
+							placeholder="Tên công việc, kỹ năng..."
+							showIcon={false}
+							inputClassName="border-0 bg-transparent p-0 text-[15px] font-medium text-ink shadow-none focus-visible:ring-0"
+						/>
 					</div>
+
+					<div className="flex min-h-[60px] flex-[0_1_220px] items-center px-2">
+						<LocationMultiSelect value={locations} onChange={setLocations} />
+					</div>
+
+					<button
+						type="submit"
+						className="m-2 flex shrink-0 items-center gap-2 rounded-lg bg-ink px-7 text-sm font-semibold text-white transition-colors hover:bg-black"
+					>
+						<Search className="h-4 w-4" />
+						Tìm kiếm
+					</button>
+				</form>
+
+				<div className="mt-8 flex flex-wrap items-center justify-center gap-2.5">
+					<span className="mr-1 text-[13px] font-medium text-slate-600">
+						Phổ biến:
+					</span>
+					{POPULAR_KEYWORDS.map((kw) => (
+						<button
+							key={kw}
+							type="button"
+							onClick={() => {
+								setKeyword(kw);
+								submitWith(kw);
+							}}
+							className="rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-medium text-slate-700 transition-colors hover:border-ink hover:bg-ink hover:text-white"
+						>
+							{kw}
+						</button>
+					))}
 				</div>
+
+				<CategorySpecializationModal
+					open={specModalOpen}
+					onOpenChange={setSpecModalOpen}
+					initialSpecializations={specializations}
+					onConfirm={({ specializations: next }) => setSpecializations(next)}
+				/>
 			</div>
 		</section>
 	);

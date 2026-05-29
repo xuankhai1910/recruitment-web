@@ -5,18 +5,16 @@ import { toast } from "sonner";
 import {
 	Award,
 	Briefcase,
-	Building2,
-	Calendar,
 	Download,
 	FileEdit,
 	Globe,
 	GraduationCap,
-	Link2 as LinkedinIcon,
+	Link2,
 	Link as GithubIcon,
 	Mail,
 	MapPin,
-	Pencil,
 	Phone,
+	Pencil,
 	Shield,
 	Sparkles,
 	Star,
@@ -30,13 +28,10 @@ import { useUser } from "@/hooks/useUsers";
 import { useMyProfile } from "@/hooks/useUserProfile";
 import { CvPreview } from "@/components/common/cv-builder/CvPreview";
 import { downloadNodeAsPdf } from "@/lib/pdf";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { brandShort } from "@/lib/brand";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ui } from "@/lib/ui";
+import { cn } from "@/lib/utils";
 
 const SKILL_LEVEL_LABEL: Record<string, string> = {
 	BEGINNER: "Cơ bản",
@@ -63,7 +58,7 @@ function fmt(d?: string) {
 	}
 }
 
-function ProfileSection({
+function ProfileCard({
 	title,
 	icon: Icon,
 	children,
@@ -73,39 +68,22 @@ function ProfileSection({
 	children: ReactNode;
 }) {
 	return (
-		<Card>
-			<CardContent className="p-5">
-				<h2 className="flex items-center gap-2 font-heading text-base font-semibold text-foreground mb-3">
-					<Icon className="h-4 w-4 text-blue-500" />
-					{title}
-				</h2>
-				{children}
-			</CardContent>
-		</Card>
-	);
-}
-
-function InfoRow({
-	icon: Icon,
-	label,
-	value,
-}: {
-	icon: LucideIcon;
-	label: string;
-	value: string;
-}) {
-	return (
-		<div className="flex items-center justify-between gap-3">
-			<dt className="flex items-center gap-1.5 text-muted-foreground">
-				<Icon className="h-3.5 w-3.5" />
-				{label}
-			</dt>
-			<dd className="font-medium text-foreground text-right truncate">
-				{value}
-			</dd>
+		<div className="mb-4 rounded-xl border border-line bg-white p-6">
+			<h3 className="mb-4 flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink">
+				<Icon className="h-[18px] w-[18px] text-teal-500" />
+				{title}
+			</h3>
+			{children}
 		</div>
 	);
 }
+
+const iconLinkBtn =
+	"grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-slate-600 transition-colors hover:border-ink hover:text-ink";
+const asideCard = "rounded-xl border border-line bg-white p-6";
+const asideH4 =
+	"mb-4 font-mono-jb text-[11px] font-bold uppercase tracking-[0.12em] text-slate-600";
+const metaDl = "grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm";
 
 export function ProfilePage() {
 	const navigate = useNavigate();
@@ -121,10 +99,7 @@ export function ProfilePage() {
 		if (!printRef.current) return;
 		try {
 			setExporting(true);
-			await downloadNodeAsPdf(
-				printRef.current,
-				profile?.personalInfo.fullName || "CV",
-			);
+			await downloadNodeAsPdf(printRef.current, profile?.personalInfo.fullName || "CV");
 			toast.success("Đã tải CV PDF");
 		} catch (e) {
 			console.error(e);
@@ -136,498 +111,376 @@ export function ProfilePage() {
 
 	if (isLoading) {
 		return (
-			<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-				<div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-					<Skeleton className="h-48 rounded-lg" />
-					<Skeleton className="h-64 rounded-lg" />
+			<div className="mx-auto max-w-[1280px] px-7 py-12">
+				<Skeleton className="h-40 rounded-xl" />
+				<div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
+					<Skeleton className="h-96 rounded-xl" />
+					<Skeleton className="h-64 rounded-xl" />
 				</div>
 			</div>
 		);
 	}
 
-	// Empty state
 	if (!profile) {
 		return (
-			<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-				<Card>
-					<CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-						<div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 p-3 text-blue-700">
-							<FileEdit className="h-8 w-8" />
-						</div>
-						<h2 className="font-heading text-base font-semibold text-foreground">
-							Chưa có hồ sơ trực tuyến
-						</h2>
-						<p className="max-w-md text-sm text-muted-foreground">
-							Tạo CV chuyên nghiệp ngay trên hệ thống. Nhà tuyển dụng có thể tìm
-							thấy hồ sơ của bạn dễ dàng hơn.
-						</p>
-						<div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-							<Button
-								onClick={() => {
-									navigate("/account/cv-builder");
-								}}
-								className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
-							>
-								<Sparkles className="mr-2 h-4 w-4" />
-								Tạo CV ngay
-							</Button>
-							<Button
-								variant="outline"
-								onClick={() => {
-									navigate("/account/settings");
-								}}
-								className="cursor-pointer"
-							>
-								Chỉnh sửa thông tin
-							</Button>
-						</div>
-					</CardContent>
-				</Card>
+			<div className="mx-auto max-w-[1280px] px-7 py-12">
+				<div className={ui.empty}>
+					<div className={ui.emptyIcon}>
+						<FileEdit className="h-7 w-7" />
+					</div>
+					<h3 className="mb-2 text-xl font-semibold text-ink">Chưa có hồ sơ trực tuyến</h3>
+					<p className="max-w-[380px] text-sm text-slate-600">
+						Tạo CV chuyên nghiệp ngay trên hệ thống. Nhà tuyển dụng có thể tìm
+						thấy hồ sơ của bạn dễ dàng hơn.
+					</p>
+					<div className="mt-5 flex flex-wrap justify-center gap-2.5">
+						<button className={ui.btnAccent} onClick={() => navigate("/account/cv-builder")}>
+							<Sparkles className="h-4 w-4" />
+							Tạo CV ngay
+						</button>
+						<button className={ui.btnOutline} onClick={() => navigate("/account/settings")}>
+							Chỉnh sửa thông tin
+						</button>
+					</div>
+				</div>
 			</div>
 		);
 	}
 
 	const pi = profile.personalInfo;
-	const initials = (pi.fullName || user?.name || "U")
-		.split(" ")
-		.map((w) => w[0])
-		.join("")
-		.slice(0, 2)
-		.toUpperCase();
-
-	const completionScore = Math.max(
-		0,
-		Math.min(100, profile.completionScore ?? 0),
-	);
+	const initials = brandShort(pi.fullName || user?.name);
+	const completion = Math.max(0, Math.min(100, profile.completionScore ?? 0));
+	const dash = 2 * Math.PI * 28;
+	const offset = dash * (1 - completion / 100);
 
 	return (
-		<div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-			<div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-				{/* Main column */}
+		<div className="mx-auto max-w-[1280px] px-7 pb-16 pt-12">
+			<div className="mb-7 flex flex-wrap items-end justify-between gap-4">
 				<div>
-					{/* Hero */}
-					<Card>
-						<CardContent className="p-5 sm:p-6">
-							<div className="flex flex-row items-start gap-4">
-								<Avatar className="h-20 w-20">
-									<AvatarFallback className="bg-blue-100 text-xl font-bold text-blue-700">
-										{initials}
-									</AvatarFallback>
-								</Avatar>
-								<div className="min-w-0 flex-1">
-									<h1 className="font-heading text-xl font-bold text-foreground">
-										{pi.fullName || user?.name}
-									</h1>
-									{profile.title && (
-										<p className="mt-0.5 text-sm text-muted-foreground">
-											{profile.title}
-										</p>
-									)}
-									{fullUser?.isJobSeeking && (
-										<div className="mt-2 flex items-center gap-2">
-											<Badge className="border border-blue-200 bg-blue-50 text-xs font-normal text-blue-600">
-												Đang tìm việc
-											</Badge>
-										</div>
-									)}
-									<div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-										{pi.email && (
-											<span className="inline-flex items-center gap-1">
-												<Mail className="h-3 w-3" />
-												{pi.email}
-											</span>
-										)}
-										{pi.phone && (
-											<span className="inline-flex items-center gap-1">
-												<Phone className="h-3 w-3" />
-												{pi.phone}
-											</span>
-										)}
-										{pi.address && (
-											<span className="inline-flex items-center gap-1">
-												<MapPin className="h-3 w-3" />
-												{pi.address}
-											</span>
-										)}
-									</div>
-									{(pi.github || pi.linkedin || pi.portfolio) && (
-										<div className="mt-3 flex items-center gap-1.5">
-											{pi.github && (
-												<a
-													href={pi.github}
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 cursor-pointer"
-													>
-														<GithubIcon className="h-4 w-4" />
-													</Button>
-												</a>
-											)}
-											{pi.linkedin && (
-												<a
-													href={pi.linkedin}
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 cursor-pointer"
-													>
-														<LinkedinIcon className="h-4 w-4" />
-													</Button>
-												</a>
-											)}
-											{pi.portfolio && (
-												<a
-													href={pi.portfolio}
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													<Button
-														variant="ghost"
-														size="icon"
-														className="h-8 w-8 cursor-pointer"
-													>
-														<Globe className="h-4 w-4" />
-													</Button>
-												</a>
-											)}
-										</div>
-									)}
-								</div>
-							</div>
+					<h1 className="font-display text-[32px] font-bold tracking-tight text-ink">
+						Hồ sơ cá nhân
+					</h1>
+					<p className="mt-1.5 text-sm text-slate-600">
+						Xem trước hồ sơ trực tuyến mà nhà tuyển dụng nhìn thấy.
+					</p>
+				</div>
+				<div className="flex items-center gap-2">
+					<button className={ui.btnOutline} onClick={handleExportPdf} disabled={exporting}>
+						<Download className="h-4 w-4" />
+						{exporting ? "Đang tạo PDF..." : "Tải CV PDF"}
+					</button>
+					<button className={ui.btnAccent} onClick={() => navigate("/account/cv-builder")}>
+						<Pencil className="h-4 w-4" />
+						Chỉnh sửa
+					</button>
+				</div>
+			</div>
 
-							<Separator className="my-4" />
-
-							<div className="flex items-center justify-between gap-4">
-								<div className="flex-1">
-									<div className="flex justify-between text-xs mb-1">
-										<span className="text-muted-foreground">
-											Hoàn thiện hồ sơ
-										</span>
-										<span className="font-heading font-semibold text-blue-600">
-											{completionScore}%
-										</span>
-									</div>
-									<div className="h-2 rounded-full bg-muted overflow-hidden">
-										<div
-											className="h-full rounded-full bg-blue-500 transition-all"
-											style={{ width: `${completionScore}%` }}
-										/>
-									</div>
-								</div>
-								<Button
-									variant="outline"
-									size="sm"
-									onClick={() => {
-										navigate("/account/cv-builder");
-									}}
-									className="cursor-pointer"
-								>
-									<Pencil className="mr-1.5 h-3.5 w-3.5" />
-									Chỉnh sửa
-								</Button>
-							</div>
-						</CardContent>
-					</Card>
-
-					{/* Sections */}
-					<div className="space-y-5 mt-5">
-						{profile.summary && (
-							<ProfileSection title="Giới thiệu" icon={User}>
-								<p className="whitespace-pre-line text-sm text-foreground/90 leading-relaxed">
-									{profile.summary}
-								</p>
-							</ProfileSection>
-						)}
-
-						{profile.skills?.length > 0 && (
-							<ProfileSection title="Kỹ năng" icon={Star}>
-								<div className="flex flex-wrap gap-2">
-									{profile.skills.map((s, i) => (
-										<Badge
-											key={`${s.name}-${i}`}
-											variant="secondary"
-											className="font-normal"
-										>
-											{s.name}
-											<span className="ml-1 text-[10px] text-muted-foreground">
-												{SKILL_LEVEL_LABEL[s.level] ?? s.level}
-											</span>
-										</Badge>
-									))}
-								</div>
-							</ProfileSection>
-						)}
-
-						{profile.experiences?.length > 0 && (
-							<ProfileSection title="Kinh nghiệm" icon={Briefcase}>
-								<ol className="relative ml-3 border-l-2 border-border space-y-4">
-									{profile.experiences.map((exp, i) => (
-										<li key={`${exp.company}-${i}`} className="relative pl-6">
-											<span className="absolute -left-2.25 top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-card" />
-											<p className="font-heading text-sm font-semibold text-foreground">
-												{exp.position}
-											</p>
-											<p className="text-sm text-blue-600">{exp.company}</p>
-											<p className="text-xs text-muted-foreground mt-0.5">
-												{fmt(exp.startDate)} –{" "}
-												{exp.isCurrent ? "Hiện tại" : fmt(exp.endDate)}
-											</p>
-											{exp.description && (
-												<p className="text-sm text-foreground/80 mt-1.5 whitespace-pre-line">
-													{exp.description}
-												</p>
-											)}
-										</li>
-									))}
-								</ol>
-							</ProfileSection>
-						)}
-
-						{profile.education?.length > 0 && (
-							<ProfileSection title="Học vấn" icon={GraduationCap}>
-								<ol className="relative ml-3 border-l-2 border-border space-y-4">
-									{profile.education.map((edu, i) => (
-										<li key={`${edu.school}-${i}`} className="relative pl-6">
-											<span className="absolute -left-2.25 top-1 h-4 w-4 rounded-full border-2 border-blue-500 bg-card" />
-											<p className="font-heading text-sm font-semibold text-foreground">
-												{edu.school}
-											</p>
-											<p className="text-sm text-foreground/80">
-												{edu.degree}
-												{edu.field ? ` · ${edu.field}` : ""}
-											</p>
-											<p className="text-xs text-muted-foreground mt-0.5">
-												{fmt(edu.startDate)} – {fmt(edu.endDate)}
-											</p>
-											{edu.description && (
-												<p className="text-sm text-foreground/70 mt-1">
-													{edu.description}
-												</p>
-											)}
-										</li>
-									))}
-								</ol>
-							</ProfileSection>
-						)}
-
-						{profile.projects?.length > 0 && (
-							<ProfileSection title="Dự án" icon={Wrench}>
-								<div className="space-y-4">
-									{profile.projects.map((proj, i) => (
-										<div key={`${proj.name}-${i}`}>
-											<div className="flex items-baseline justify-between gap-2">
-												<p className="font-heading text-sm font-semibold text-foreground">
-													{proj.name}
-												</p>
-												{proj.role && (
-													<span className="text-xs text-muted-foreground">
-														{proj.role}
-													</span>
-												)}
-											</div>
-											{proj.techStack?.length > 0 && (
-												<div className="flex flex-wrap gap-1 mt-1">
-													{proj.techStack.map((t) => (
-														<Badge
-															key={t}
-															variant="outline"
-															className="text-[10px] font-normal"
-														>
-															{t}
-														</Badge>
-													))}
-												</div>
-											)}
-											{proj.description && (
-												<p className="text-sm text-foreground/80 mt-1.5 whitespace-pre-line">
-													{proj.description}
-												</p>
-											)}
-											{proj.url && (
-												<a
-													href={proj.url}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="mt-1 inline-block text-xs text-blue-600 hover:underline"
-												>
-													{proj.url}
-												</a>
-											)}
-										</div>
-									))}
-								</div>
-							</ProfileSection>
-						)}
-
-						{profile.certifications?.length > 0 && (
-							<ProfileSection title="Chứng chỉ" icon={Award}>
-								<ul className="space-y-2">
-									{profile.certifications.map((c, i) => (
-										<li key={`${c.name}-${i}`} className="text-sm">
-											<span className="font-medium text-foreground">
-												{c.name}
-											</span>
-											<span className="text-muted-foreground">
-												{" — "}
-												{c.issuer}
-												{c.date
-													? ` · ${format(new Date(c.date), "dd/MM/yyyy")}`
-													: ""}
-											</span>
-											{c.url && (
-												<a
-													href={c.url}
-													target="_blank"
-													rel="noopener noreferrer"
-													className="ml-2 text-xs text-blue-600 hover:underline"
-												>
-													Xem
-												</a>
-											)}
-										</li>
-									))}
-								</ul>
-							</ProfileSection>
-						)}
-
-						{profile.awards?.length > 0 && (
-							<ProfileSection title="Giải thưởng" icon={Star}>
-								<ul className="space-y-2">
-									{profile.awards.map((a, i) => (
-										<li key={`${a.name}-${i}`} className="text-sm">
-											<span className="font-medium text-foreground">
-												{a.name}
-											</span>
-											<span className="text-muted-foreground">
-												{" — "}
-												{a.issuer}
-												{a.date
-													? ` · ${format(new Date(a.date), "dd/MM/yyyy")}`
-													: ""}
-											</span>
-										</li>
-									))}
-								</ul>
-							</ProfileSection>
-						)}
+			<div className="mb-5 flex flex-wrap items-center gap-4 rounded-xl bg-ink p-6 text-white">
+				<div className="relative h-16 w-16 shrink-0">
+					<svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+						<circle cx="32" cy="32" r="28" fill="none" strokeWidth="6" className="stroke-white/10" />
+						<circle
+							cx="32"
+							cy="32"
+							r="28"
+							fill="none"
+							strokeWidth="6"
+							strokeLinecap="round"
+							strokeDasharray={dash}
+							strokeDashoffset={offset}
+							className="stroke-teal-400"
+						/>
+					</svg>
+					<div className="absolute inset-0 grid place-items-center font-display text-base font-bold text-teal-400">
+						{completion}%
 					</div>
 				</div>
+				<div className="min-w-[200px] flex-1">
+					<h4 className="font-display text-base font-semibold text-white">
+						Hồ sơ của bạn đã hoàn thành {completion}%
+					</h4>
+					<p className="mt-1 text-[13px] text-white/65">
+						Bổ sung kinh nghiệm, kỹ năng và dự án để hồ sơ nổi bật hơn với nhà
+						tuyển dụng.
+					</p>
+				</div>
+			</div>
 
-				{/* Sidebar */}
-				<aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-					<Card>
-						<CardContent className="p-5">
-							<h3 className="font-heading text-sm font-semibold text-foreground mb-3">
-								Thông tin
-							</h3>
-							<dl className="space-y-2.5 text-sm">
-								<InfoRow
-									icon={Calendar}
-									label="Tuổi"
-									value={fullUser?.age ? String(fullUser.age) : "—"}
-								/>
-								<InfoRow
-									icon={User}
-									label="Giới tính"
-									value={genderLabel(fullUser?.gender)}
-								/>
-								<InfoRow
-									icon={MapPin}
-									label="Địa chỉ"
-									value={fullUser?.address || "—"}
-								/>
-								<InfoRow
-									icon={Building2}
-									label="Công ty"
-									value={fullUser?.company?.name || "—"}
-								/>
-								<InfoRow
-									icon={Shield}
-									label="Vai trò"
-									value={fullUser?.role?.name || "—"}
-								/>
-							</dl>
-						</CardContent>
-					</Card>
+			<div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
+				<div>
+					<div className="mb-4 rounded-xl border border-line bg-white p-6">
+						<div className="flex items-start gap-4">
+							<div className="grid h-18 w-18 shrink-0 place-items-center rounded-full bg-teal-500 text-2xl font-semibold text-ink">
+								{initials}
+							</div>
+							<div className="min-w-0 flex-1">
+								<h2 className="font-display text-2xl font-bold tracking-tight text-ink">
+									{pi.fullName || user?.name}
+								</h2>
+								{profile.title && (
+									<p className="mt-0.5 font-semibold text-teal-700">{profile.title}</p>
+								)}
+								{fullUser?.isJobSeeking && (
+									<span className="mt-2 inline-flex rounded-full border border-teal-100 bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700">
+										Đang tìm việc
+									</span>
+								)}
+								<div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-[13px] text-slate-600">
+									{pi.email && (
+										<span className="inline-flex items-center gap-1.5">
+											<Mail className="h-[13px] w-[13px]" />
+											{pi.email}
+										</span>
+									)}
+									{pi.phone && (
+										<span className="inline-flex items-center gap-1.5">
+											<Phone className="h-[13px] w-[13px]" />
+											{pi.phone}
+										</span>
+									)}
+									{pi.address && (
+										<span className="inline-flex items-center gap-1.5">
+											<MapPin className="h-[13px] w-[13px]" />
+											{pi.address}
+										</span>
+									)}
+								</div>
+								{(pi.github || pi.linkedin || pi.portfolio) && (
+									<div className="mt-3 flex gap-2">
+										{pi.github && (
+											<a href={pi.github} target="_blank" rel="noopener noreferrer" className={iconLinkBtn} aria-label="GitHub">
+												<GithubIcon className="h-4 w-4" />
+											</a>
+										)}
+										{pi.linkedin && (
+											<a href={pi.linkedin} target="_blank" rel="noopener noreferrer" className={iconLinkBtn} aria-label="LinkedIn">
+												<Link2 className="h-4 w-4" />
+											</a>
+										)}
+										{pi.portfolio && (
+											<a href={pi.portfolio} target="_blank" rel="noopener noreferrer" className={iconLinkBtn} aria-label="Portfolio">
+												<Globe className="h-4 w-4" />
+											</a>
+										)}
+									</div>
+								)}
+							</div>
+						</div>
+					</div>
 
-					{profile.languages?.length > 0 && (
-						<Card>
-							<CardContent className="p-5">
-								<h3 className="font-heading text-sm font-semibold text-foreground mb-3">
-									Ngôn ngữ
-								</h3>
-								<ul className="space-y-1.5">
-									{profile.languages.map((l, i) => (
-										<li
-											key={`${l.name}-${i}`}
-											className="flex justify-between text-sm"
-										>
-											<span className="text-foreground">{l.name}</span>
-											<span className="text-muted-foreground">
-												{l.proficiency}
-											</span>
-										</li>
-									))}
-								</ul>
-							</CardContent>
-						</Card>
+					{profile.summary && (
+						<ProfileCard title="Giới thiệu" icon={User}>
+							<p className="whitespace-pre-line text-sm leading-7 text-slate-700">
+								{profile.summary}
+							</p>
+						</ProfileCard>
 					)}
 
-					<Card>
-						<CardContent className="p-5 space-y-2">
-							<Button
-								className="w-full cursor-pointer"
-								variant="outline"
-								size="sm"
-								onClick={handleExportPdf}
-								disabled={exporting || !profile}
-							>
-								<Download className="mr-2 h-4 w-4" />
-								{exporting ? "Đang tạo PDF..." : "Tải CV PDF"}
-							</Button>
-							<Button
-								className="w-full cursor-pointer"
-								variant="outline"
-								size="sm"
-								onClick={() => {
-									navigate("/jobs/recommended");
-								}}
-							>
-								<Sparkles className="mr-2 h-4 w-4" />
+					{profile.skills?.length > 0 && (
+						<ProfileCard title="Kỹ năng" icon={Star}>
+							<div className="flex flex-wrap gap-2">
+								{profile.skills.map((s, i) => (
+									<span
+										key={`${s.name}-${i}`}
+										className="inline-flex rounded-full border-[1.5px] border-ink px-3.5 py-2 font-mono-jb text-[13px] font-semibold text-ink"
+									>
+										{s.name}
+										<span className="font-normal text-slate-600">
+											{" "}
+											· {SKILL_LEVEL_LABEL[s.level] ?? s.level}
+										</span>
+									</span>
+								))}
+							</div>
+						</ProfileCard>
+					)}
+
+					{profile.experiences?.length > 0 && (
+						<ProfileCard title="Kinh nghiệm" icon={Briefcase}>
+							{profile.experiences.map((exp, i) => (
+								<div
+									key={`${exp.company}-${i}`}
+									className={cn(
+										"pb-3.5",
+										i < profile.experiences.length - 1 && "mb-3.5 border-b border-dashed border-line",
+									)}
+								>
+									<div className="flex items-baseline justify-between gap-3">
+										<div className="font-display text-[15px] font-semibold text-ink">
+											{exp.position}
+										</div>
+										<div className="font-mono-jb text-xs text-slate-400">
+											{fmt(exp.startDate)} – {exp.isCurrent ? "Hiện tại" : fmt(exp.endDate)}
+										</div>
+									</div>
+									<div className="mt-0.5 text-[13px] font-medium text-teal-700">{exp.company}</div>
+									{exp.description && (
+										<p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-slate-600">
+											{exp.description}
+										</p>
+									)}
+								</div>
+							))}
+						</ProfileCard>
+					)}
+
+					{profile.education?.length > 0 && (
+						<ProfileCard title="Học vấn" icon={GraduationCap}>
+							{profile.education.map((edu, i) => (
+								<div
+									key={`${edu.school}-${i}`}
+									className={cn(
+										"pb-3.5",
+										i < profile.education.length - 1 && "mb-3.5 border-b border-dashed border-line",
+									)}
+								>
+									<div className="flex items-baseline justify-between gap-3">
+										<div className="font-display text-[15px] font-semibold text-ink">
+											{edu.school}
+										</div>
+										<div className="font-mono-jb text-xs text-slate-400">
+											{fmt(edu.startDate)} – {fmt(edu.endDate)}
+										</div>
+									</div>
+									<div className="mt-0.5 text-[13px] text-slate-600">
+										{edu.degree}
+										{edu.field ? ` · ${edu.field}` : ""}
+									</div>
+								</div>
+							))}
+						</ProfileCard>
+					)}
+
+					{profile.projects?.length > 0 && (
+						<ProfileCard title="Dự án" icon={Wrench}>
+							{profile.projects.map((proj, i) => (
+								<div
+									key={`${proj.name}-${i}`}
+									className={cn(
+										"pb-3.5",
+										i < profile.projects.length - 1 && "mb-3.5 border-b border-dashed border-line",
+									)}
+								>
+									<div className="flex items-baseline justify-between gap-3">
+										<div className="font-display text-[15px] font-semibold text-ink">{proj.name}</div>
+										{proj.role && <div className="text-xs text-slate-400">{proj.role}</div>}
+									</div>
+									{proj.techStack?.length > 0 && (
+										<div className="mt-1.5 flex flex-wrap gap-1.5">
+											{proj.techStack.map((t) => (
+												<span key={t} className="rounded border border-line px-2 py-0.5 text-[11px] text-slate-700">
+													{t}
+												</span>
+											))}
+										</div>
+									)}
+									{proj.description && (
+										<p className="mt-1.5 whitespace-pre-line text-sm leading-relaxed text-slate-600">
+											{proj.description}
+										</p>
+									)}
+									{proj.url && (
+										<a href={proj.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block text-xs text-teal-700">
+											{proj.url}
+										</a>
+									)}
+								</div>
+							))}
+						</ProfileCard>
+					)}
+
+					{profile.certifications?.length > 0 && (
+						<ProfileCard title="Chứng chỉ" icon={Award}>
+							<ul className="flex flex-col gap-2">
+								{profile.certifications.map((c, i) => (
+									<li key={`${c.name}-${i}`} className="text-sm">
+										<span className="font-semibold text-ink">{c.name}</span>
+										<span className="text-slate-600">
+											{" — "}
+											{c.issuer}
+											{c.date ? ` · ${format(new Date(c.date), "dd/MM/yyyy")}` : ""}
+										</span>
+									</li>
+								))}
+							</ul>
+						</ProfileCard>
+					)}
+
+					{profile.awards?.length > 0 && (
+						<ProfileCard title="Giải thưởng" icon={Star}>
+							<ul className="flex flex-col gap-2">
+								{profile.awards.map((a, i) => (
+									<li key={`${a.name}-${i}`} className="text-sm">
+										<span className="font-semibold text-ink">{a.name}</span>
+										<span className="text-slate-600">
+											{" — "}
+											{a.issuer}
+											{a.date ? ` · ${format(new Date(a.date), "dd/MM/yyyy")}` : ""}
+										</span>
+									</li>
+								))}
+							</ul>
+						</ProfileCard>
+					)}
+				</div>
+
+				<aside className="flex flex-col gap-5">
+					<div className={asideCard}>
+						<h4 className={asideH4}>Thông tin</h4>
+						<dl className={metaDl}>
+							<dt className="text-slate-400">Tuổi</dt>
+							<dd className="text-right font-medium text-ink">
+								{fullUser?.age ? String(fullUser.age) : "—"}
+							</dd>
+							<dt className="text-slate-400">Giới tính</dt>
+							<dd className="text-right font-medium text-ink">{genderLabel(fullUser?.gender)}</dd>
+							<dt className="text-slate-400">Địa chỉ</dt>
+							<dd className="text-right font-medium text-ink">{fullUser?.address || "—"}</dd>
+							<dt className="text-slate-400">Vai trò</dt>
+							<dd className="text-right font-medium text-ink">{fullUser?.role?.name || "—"}</dd>
+						</dl>
+					</div>
+
+					{profile.languages?.length > 0 && (
+						<div className={asideCard}>
+							<h4 className={asideH4}>Ngôn ngữ</h4>
+							<dl className={metaDl}>
+								{profile.languages.map((l, i) => (
+									<div key={`${l.name}-${i}`} className="contents">
+										<dt className="text-slate-400">{l.name}</dt>
+										<dd className="text-right font-medium text-ink">{l.proficiency}</dd>
+									</div>
+								))}
+							</dl>
+						</div>
+					)}
+
+					<div className={asideCard}>
+						<div className="flex flex-col gap-2.5">
+							<button className={ui.btnOutline + " w-full"} onClick={() => navigate("/jobs/recommended")}>
+								<Sparkles className="h-4 w-4" />
 								Xem việc gợi ý
-							</Button>
-							<Button
-								className="w-full cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
-								size="sm"
-								onClick={() => {
-									navigate("/account/cv-builder");
-								}}
-							>
-								<FileEdit className="mr-2 h-4 w-4" />
+							</button>
+							<button className={ui.btnAccent + " w-full"} onClick={() => navigate("/account/cv-builder")}>
+								<FileEdit className="h-4 w-4" />
 								Chỉnh sửa hồ sơ
-							</Button>
-						</CardContent>
-					</Card>
+							</button>
+						</div>
+					</div>
+
+					<div className={asideCard + " flex items-center gap-2 text-xs text-slate-600"}>
+						<Shield className="h-3.5 w-3.5 text-teal-500" />
+						{profile.isPublic
+							? "Hồ sơ đang công khai với nhà tuyển dụng."
+							: "Hồ sơ đang ở chế độ riêng tư."}
+					</div>
 				</aside>
 			</div>
 
-			{/* Offscreen render target for PDF capture (kept off-canvas, never visible) */}
 			<div
 				aria-hidden="true"
-				style={{
-					position: "fixed",
-					left: "-10000px",
-					top: 0,
-					width: "794px",
-					pointerEvents: "none",
-				}}
+				style={{ position: "fixed", left: "-10000px", top: 0, width: "794px", pointerEvents: "none" }}
 			>
 				<div ref={printRef}>
 					<CvPreview profile={profile} />

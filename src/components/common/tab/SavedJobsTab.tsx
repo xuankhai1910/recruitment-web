@@ -96,7 +96,7 @@ function ExpiredJobCardWrapper({
 				{isPastDeadline ? "Hết hạn" : "Đã đóng"}
 			</span>
 			<div className="pointer-events-none opacity-60">
-				<JobCard job={item.job} variant="card" />
+				<JobCard job={item.job} variant="default" />
 			</div>
 		</div>
 	);
@@ -279,7 +279,7 @@ export function SavedJobsTab() {
 							<JobCard
 								key={item._id}
 								job={item.job}
-								variant="card"
+								variant="default"
 							/>
 						);
 					})}

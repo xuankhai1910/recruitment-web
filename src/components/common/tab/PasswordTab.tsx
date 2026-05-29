@@ -65,7 +65,7 @@ export function PasswordTab() {
 					<Button
 						type="submit"
 						disabled
-						className="cursor-not-allowed bg-blue-500 px-5 text-white opacity-60"
+						className="cursor-not-allowed bg-teal-500 px-5 text-white opacity-60"
 					>
 						<Lock className="mr-2 h-4 w-4" />
 						Đổi mật khẩu

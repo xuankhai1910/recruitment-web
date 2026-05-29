@@ -1,28 +1,19 @@
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Loader2, RefreshCcw, Sparkles, UserCog } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, RefreshCcw, Sparkles, UserCog } from "lucide-react";
 import { AxiosError } from "axios";
 
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-
 import { useAuthStore } from "@/stores/auth.store";
 import { useProfileJobRecommendations } from "@/hooks/useJobRecommendations";
 import { RecommendedJobCard } from "@/components/common/RecommendedJobCard";
+import { ui } from "@/lib/ui";
+import { cn } from "@/lib/utils";
 import type { ProfileRecommendedJob } from "@/types/job-recommendation";
 import type { RecommendedJobItem } from "@/types/cv-recommendation";
 
 const HOME_LIMIT = 4;
-const SKELETON_KEYS = [
-	"profile-rec-sk-1",
-	"profile-rec-sk-2",
-	"profile-rec-sk-3",
-	"profile-rec-sk-4",
-];
+const SKELETON_KEYS = ["p-1", "p-2", "p-3", "p-4"];
 
-/**
- * Map the profile recommendation response into the shape that
- * `RecommendedJobCard` expects, so we can reuse the existing card.
- */
 function toCardItem(rec: ProfileRecommendedJob): RecommendedJobItem {
 	const { recommendation, ...job } = rec;
 	return {
@@ -37,43 +28,36 @@ function toCardItem(rec: ProfileRecommendedJob): RecommendedJobItem {
 	};
 }
 
-interface ErrorBannerProps {
-	icon: React.ReactNode;
-	title: string;
-	description: string;
-	ctaLabel: string;
-	onCta: () => void;
-}
-
-function ProfileRecBanner({
-	icon,
+function Banner({
 	title,
 	description,
 	ctaLabel,
 	onCta,
-}: ErrorBannerProps) {
+}: {
+	title: string;
+	description: string;
+	ctaLabel: string;
+	onCta: () => void;
+}) {
 	return (
-		<div className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
-			<div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div className="flex items-start gap-4">
-					<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-blue-600">
-						{icon}
+		<div className={ui.card}>
+			<div className="flex flex-wrap items-center justify-between gap-4">
+				<div className="flex items-center gap-4">
+					<div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-teal-50 text-teal-700">
+						<UserCog className="h-5 w-5" />
 					</div>
-					<div className="space-y-1">
-						<h2 className="text-base font-semibold text-slate-900 sm:text-lg">
+					<div>
+						<h3 className="font-display text-lg font-bold tracking-tight text-ink">
 							{title}
-						</h2>
-						<p className="max-w-2xl text-sm leading-6 text-slate-600">
+						</h3>
+						<p className="mt-1 max-w-xl text-[13px] text-slate-600">
 							{description}
 						</p>
 					</div>
 				</div>
-				<Button
-					onClick={onCta}
-					className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
-				>
+				<button className={ui.btnAccent} onClick={onCta}>
 					{ctaLabel}
-				</Button>
+				</button>
 			</div>
 		</div>
 	);
@@ -88,147 +72,115 @@ export function ProfileRecommendedJobs() {
 
 	if (!isAuthenticated) return null;
 
-	const sectionWrap = "px-4 py-4 sm:px-6 lg:px-8";
-
 	const header = (
-		<div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-			<div className="min-w-0">
-				<h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
-					Việc làm gợi ý cho bạn
-					<span className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
-						<Sparkles className="h-3 w-3" />
-						AI
-					</span>
-				</h2>
-				<p className="mt-1 max-w-2xl text-sm text-slate-500">
-					Hệ thống AI của chúng tôi gợi ý việc làm phù hợp dựa trên hồ sơ của
-					bạn
+		<div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+			<div>
+				<div className={cn(ui.eyebrow, "mb-3")}>
+					<Sparkles className="h-3 w-3 text-teal-500" />
+					Gợi ý bằng AI
+					<span className="font-medium text-slate-400">· 01</span>
+				</div>
+				<h2 className={ui.h2}>Việc làm gợi ý cho bạn</h2>
+				<p className={ui.sub}>
+					Hệ thống AI gợi ý việc làm phù hợp dựa trên hồ sơ kỹ năng và kinh
+					nghiệm của bạn.
 				</p>
 			</div>
-
 			{data && data.items.length > 0 && (
 				<div className="flex items-center gap-2">
-					<Button
-						variant="outline"
-						size="sm"
+					<button
+						className={ui.btnOutline}
 						disabled={isFetching}
-						onClick={() => {
-							void refetch();
-						}}
-						className="cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+						onClick={() => void refetch()}
 					>
-						<RefreshCcw
-							className={`mr-1.5 h-3.5 w-3.5 ${
-								isFetching ? "animate-spin" : ""
-							}`}
-						/>
+						<RefreshCcw className={cn("h-4 w-4", isFetching && "animate-spin")} />
 						Làm mới
-					</Button>
-					<Link to="/jobs">
-						<Button
-							size="sm"
-							className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
-						>
-							Xem thêm
-							<ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-						</Button>
-					</Link>
+					</button>
+					<button className={ui.btnPrimary} onClick={() => navigate("/jobs")}>
+						Xem thêm
+						<ArrowRight className="h-4 w-4" />
+					</button>
 				</div>
 			)}
 		</div>
 	);
 
+	let body: React.ReactNode;
 	if (isLoading) {
-		return (
-			<section className={sectionWrap}>
-				{header}
-				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					{SKELETON_KEYS.map((key) => (
-						<Skeleton key={key} className="h-36 rounded-xl" />
-					))}
-				</div>
-			</section>
+		body = (
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+				{SKELETON_KEYS.map((k) => (
+					<Skeleton key={k} className="h-36 rounded-xl" />
+				))}
+			</div>
 		);
-	}
-
-	if (error) {
-		const axiosErr = error as AxiosError<{ message?: string }>;
-		const status = axiosErr.response?.status;
-
+	} else if (error) {
+		const status = (error as AxiosError<{ message?: string }>).response?.status;
 		if (status === 404) {
-			return (
-				<section className={sectionWrap}>
-					{header}
-					<ProfileRecBanner
-						icon={<UserCog className="h-5 w-5" />}
-						title="Tạo hồ sơ để nhận gợi ý cá nhân hóa"
-						description="Cập nhật kỹ năng, kinh nghiệm và mục tiêu nghề nghiệp. AI sẽ phân tích hồ sơ và tự động khớp với các vị trí phù hợp nhất."
-						ctaLabel="Tạo hồ sơ ngay"
-						onCta={() => navigate("/account/cv-builder")}
-					/>
-				</section>
+			body = (
+				<Banner
+					title="Tạo hồ sơ để nhận gợi ý cá nhân hóa"
+					description="Cập nhật kỹ năng, kinh nghiệm và mục tiêu nghề nghiệp. AI sẽ phân tích hồ sơ và tự động khớp với các vị trí phù hợp nhất."
+					ctaLabel="Tạo hồ sơ ngay"
+					onCta={() => navigate("/account/cv-builder")}
+				/>
 			);
-		}
-
-		if (status === 400) {
-			return (
-				<section className={sectionWrap}>
-					{header}
-					<ProfileRecBanner
-						icon={<UserCog className="h-5 w-5" />}
-						title="Hồ sơ của bạn còn thiếu thông tin"
-						description="Hãy bổ sung kỹ năng, kinh nghiệm và học vấn để hệ thống AI gợi ý chính xác hơn."
-						ctaLabel="Hoàn thiện hồ sơ"
-						onCta={() => navigate("/account/cv-builder")}
-					/>
-				</section>
+		} else if (status === 400) {
+			body = (
+				<Banner
+					title="Hồ sơ của bạn còn thiếu thông tin"
+					description="Hãy bổ sung kỹ năng, kinh nghiệm và học vấn để hệ thống AI gợi ý chính xác hơn."
+					ctaLabel="Hoàn thiện hồ sơ"
+					onCta={() => navigate("/account/cv-builder")}
+				/>
 			);
+		} else {
+			return null;
 		}
-
-		return null;
-	}
-
-	const items = data?.items ?? [];
-
-	return (
-		<section className={sectionWrap}>
-			{header}
-
-			{items.length === 0 ? (
-				<div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 py-12 text-center">
-					<Sparkles className="h-10 w-10 text-slate-300" />
-					<p className="text-sm text-slate-500">
+	} else {
+		const items = data?.items ?? [];
+		if (items.length === 0) {
+			body = (
+				<div className={ui.empty}>
+					<div className={ui.emptyIcon}>
+						<Sparkles className="h-7 w-7" />
+					</div>
+					<h3 className="mb-2 text-xl font-semibold text-ink">
+						Chưa có việc làm phù hợp
+					</h3>
+					<p className="max-w-[380px] text-sm text-slate-600">
 						Hiện chưa có việc làm nào phù hợp với hồ sơ của bạn.
 					</p>
-					<Button
-						variant="outline"
+					<button
+						className={cn(ui.btnOutline, "mt-5")}
 						onClick={() => navigate("/account/cv-builder")}
-						className="cursor-pointer border-slate-200 text-slate-700 hover:bg-slate-50"
 					>
 						Cập nhật hồ sơ
-					</Button>
+					</button>
 				</div>
-			) : (
-				<div className="relative">
-					<div
-						className={`grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 transition-opacity ${
-							isFetching ? "opacity-60" : ""
-						}`}
-					>
-						{items.map((rec) => (
-							<RecommendedJobCard key={rec._id} item={toCardItem(rec)} />
-						))}
-					</div>
-					{isFetching && (
-						<div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-							<div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-600 shadow-sm backdrop-blur">
-								<Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
-								Đang cập nhật gợi ý...
-							</div>
-						</div>
+			);
+		} else {
+			body = (
+				<div
+					className={cn(
+						"grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4",
+						isFetching && "opacity-60",
 					)}
+				>
+					{items.map((rec) => (
+						<RecommendedJobCard key={rec._id} item={toCardItem(rec)} />
+					))}
 				</div>
-			)}
+			);
+		}
+	}
+
+	return (
+		<section className={ui.section}>
+			<div className={ui.wrap}>
+				{header}
+				{body}
+			</div>
 		</section>
 	);
 }

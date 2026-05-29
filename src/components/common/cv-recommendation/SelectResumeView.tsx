@@ -73,7 +73,7 @@ export function SelectResumeView({ onBack, onSelect }: SelectResumeViewProps) {
 						if (selectedResume) onSelect(selectedResume);
 					}}
 					disabled={!selectedResume}
-					className="cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
+					className="cursor-pointer bg-teal-600 text-white transition-colors duration-150 hover:bg-teal-700"
 				>
 					<Sparkles className="mr-2 h-4 w-4" />
 					Phân tích & thiết lập
@@ -107,12 +107,12 @@ function ResumeRow({
 			onClick={onSelect}
 			className={`flex w-full cursor-pointer items-center gap-3 rounded-lg border p-3 text-left transition-all duration-150 ${
 				selected
-					? "border-blue-400 bg-blue-50 ring-2 ring-blue-200"
-					: "border-border/60 bg-card hover:border-blue-300 hover:bg-blue-50"
+					? "border-teal-400 bg-teal-50 ring-2 ring-teal-200"
+					: "border-border/60 bg-card hover:border-teal-300 hover:bg-teal-50"
 			}`}
 		>
-			<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-				<FileText className="h-5 w-5 text-blue-600" />
+			<div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-teal-50">
+				<FileText className="h-5 w-5 text-teal-600" />
 			</div>
 			<div className="min-w-0 flex-1">
 				<p className="truncate text-sm font-semibold text-foreground">
@@ -122,7 +122,7 @@ function ResumeRow({
 					{company.name} · {format(new Date(resume.createdAt), "dd/MM/yyyy")}
 				</p>
 			</div>
-			{selected && <CheckCircle2 className="h-5 w-5 shrink-0 text-blue-600" />}
+			{selected && <CheckCircle2 className="h-5 w-5 shrink-0 text-teal-600" />}
 		</button>
 	);
 }

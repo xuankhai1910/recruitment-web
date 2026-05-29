@@ -12,7 +12,7 @@ export function SettingsPage() {
 				tone="blue"
 			/>
 
-			<section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-100">
+			<section className="rounded-xl border border-line bg-white p-6">
 				<header className="mb-4 flex items-center gap-2.5">
 					<div className="grid h-8 w-8 place-items-center rounded-lg bg-blue-50 text-blue-500">
 						<UserCircle className="h-4 w-4" />
@@ -29,7 +29,7 @@ export function SettingsPage() {
 				<ProfileTab />
 			</section>
 
-			<section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-100">
+			<section className="rounded-xl border border-line bg-white p-6">
 				<header className="mb-4 flex items-center gap-2.5">
 					<div className="grid h-8 w-8 place-items-center rounded-lg bg-emerald-50 text-emerald-500">
 						<ShieldCheck className="h-4 w-4" />

@@ -130,7 +130,7 @@ export function SearchAutocomplete({
 					}}
 					onKeyDown={handleKeyDown}
 					placeholder={placeholder}
-					className={cn(showIcon && "pl-9", inputClassName)}
+					className={cn(inputClassName, showIcon && "pl-9")}
 				/>
 			</div>
 

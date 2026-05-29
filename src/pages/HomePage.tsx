@@ -6,7 +6,7 @@ import { ProfileRecommendedJobs } from "@/components/common/ProfileRecommendedJo
 
 export function HomePage() {
 	return (
-		<div className="-mt-24 bg-slate-50 pb-12 [&>section+section]:mt-10">
+		<div>
 			<HeroSearch />
 			<ProfileRecommendedJobs />
 			<RecommendedJobs />
