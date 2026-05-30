@@ -19,6 +19,18 @@ export function useJobs(params: JobQueryParams) {
   });
 }
 
+export function useJobCount(params: JobQueryParams, enabled = true) {
+  return useQuery({
+    queryKey: ["jobs", "count", params],
+    queryFn: () =>
+      jobsApi
+        .getList({ ...params, current: 1, pageSize: 1 })
+        .then((r) => r.data.data.meta.total),
+    enabled,
+    staleTime: 60 * 1000,
+  });
+}
+
 /**
  * Warm the React Query cache for an upcoming `useJobs` call. Used to prefetch
  * adjacent pages so paginating feels instant (cache hit, no network wait).

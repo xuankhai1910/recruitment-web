@@ -62,7 +62,7 @@ export function TopCompanies() {
 				{isLoading ? (
 					<div className="flex gap-4 overflow-hidden pb-3">
 						{SKELETON_KEYS.map((k) => (
-							<Skeleton key={k} className="h-28 w-[280px] shrink-0 rounded-xl" />
+							<Skeleton key={k} className="h-40 w-[280px] shrink-0 rounded-xl" />
 						))}
 					</div>
 				) : companies.length === 0 ? (

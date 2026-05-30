@@ -64,6 +64,7 @@ export function JobCard({
 	const negotiable = !!job.salary?.isNegotiable;
 	const detailHref = `/jobs/${job._id}`;
 	const posted = timeAgo(job);
+	const skills = job.skills || [];
 
 	const open = () => {
 		if (onClick) onClick();
@@ -133,13 +134,13 @@ export function JobCard({
 					: "border-line hover:border-ink hover:shadow-[0_16px_32px_-16px_rgba(0,0,0,0.18)]",
 			)}
 		>
-			<div className="mb-4 flex items-start justify-between gap-3">
+			<div className="mb-4 flex h-[60px] items-start justify-between gap-3">
 				<div className="flex min-w-0 flex-1 items-start gap-3.5">
 					<JobLogo job={job} size="md" />
 					<div className="min-w-0 flex-1">
 						<div
 							className={cn(
-								"line-clamp-2 text-[13px] font-semibold leading-[1.35] [min-height:2.7em]",
+								"line-clamp-2 text-[13px] font-semibold leading-[1.35]",
 								isDark ? "text-teal-400" : "text-ink",
 							)}
 						>
@@ -182,30 +183,45 @@ export function JobCard({
 			</div>
 
 			<div className="mb-4 flex min-h-6 flex-nowrap gap-1.5 overflow-hidden">
-				{(job.skills || []).slice(0, 3).map((s) => (
+				{skills.length === 0 ? (
 					<span
-						key={s}
 						className={cn(
-							"shrink-0 rounded px-2 py-0.5 text-[11px] font-medium",
+							"truncate rounded px-2 py-0.5 text-[11px] font-medium",
 							isDark
 								? "bg-white/10 text-white/85"
 								: "border border-line bg-transparent text-slate-700",
 						)}
 					>
-						{s}
+						Không có yêu cầu kỹ năng cụ thể
 					</span>
-				))}
-				{(job.skills?.length ?? 0) > 3 && (
-					<span
-						className={cn(
-							"shrink-0 rounded px-2 py-0.5 text-[11px] font-medium",
-							isDark
-								? "bg-white/10 text-white/85"
-								: "border border-line bg-transparent text-slate-700",
+				) : (
+					<>
+						{skills.slice(0, 3).map((s) => (
+							<span
+								key={s}
+								className={cn(
+									"shrink-0 rounded px-2 py-0.5 text-[11px] font-medium",
+									isDark
+										? "bg-white/10 text-white/85"
+										: "border border-line bg-transparent text-slate-700",
+								)}
+							>
+								{s}
+							</span>
+						))}
+						{skills.length > 3 && (
+							<span
+								className={cn(
+									"shrink-0 rounded px-2 py-0.5 text-[11px] font-medium",
+									isDark
+										? "bg-white/10 text-white/85"
+										: "border border-line bg-transparent text-slate-700",
+								)}
+							>
+								+{skills.length - 3} kỹ năng
+							</span>
 						)}
-					>
-						+{(job.skills?.length ?? 0) - 3} kỹ năng
-					</span>
+					</>
 				)}
 			</div>
 
