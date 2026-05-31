@@ -4,7 +4,6 @@ import {
   Briefcase,
   FileText,
   Calendar,
-  FileDown,
 } from "lucide-react";
 import { useAdminOverview } from "@/hooks/useStats";
 import { KpiCard } from "@/components/dashboard/KpiCard";
@@ -91,10 +90,6 @@ export default function DashboardPage() {
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-sm text-muted-foreground">
             <Calendar className="h-4 w-4" />
             30 ngày qua
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-sm text-muted-foreground">
-            <FileDown className="h-4 w-4" />
-            Xuất báo cáo
           </span>
         </div>
       </div>
