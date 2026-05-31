@@ -60,6 +60,7 @@ export function CategorySpecializationModal({
 	const [activeCategory, setActiveCategory] = useState<string>("");
 	const [search, setSearch] = useState("");
 	const scrollRef = useRef<HTMLDivElement>(null);
+	const listHeaderRef = useRef<HTMLDivElement>(null);
 	const groupRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
 	const [prevOpen, setPrevOpen] = useState(open);
@@ -127,8 +128,19 @@ export function CategorySpecializationModal({
 	const scrollToGroup = (cat: string) => {
 		setActiveCategory(cat);
 		const el = groupRefs.current[cat];
-		if (el && scrollRef.current) {
-			scrollRef.current.scrollTo({ top: el.offsetTop - 12, behavior: "smooth" });
+		const scrollEl = scrollRef.current;
+		if (el && scrollEl) {
+			const headerHeight = listHeaderRef.current?.offsetHeight ?? 0;
+			const scrollRect = scrollEl.getBoundingClientRect();
+			const elRect = el.getBoundingClientRect();
+			const visibleHeight = scrollEl.clientHeight - headerHeight;
+			const currentCenter = elRect.top + elRect.height / 2;
+			const targetCenter = scrollRect.top + headerHeight + visibleHeight / 2;
+
+			scrollEl.scrollTo({
+				top: scrollEl.scrollTop + currentCenter - targetCenter,
+				behavior: "smooth",
+			});
 		}
 	};
 
@@ -241,7 +253,10 @@ export function CategorySpecializationModal({
 
 					{/* Main */}
 					<div className="relative min-h-0 overflow-y-auto bg-white" ref={scrollRef}>
-						<div className="sticky top-0 z-[1] grid grid-cols-[240px_1fr] gap-6 border-b border-line bg-white px-6 py-3.5 font-mono-jb text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 max-[720px]:grid-cols-1">
+						<div
+							ref={listHeaderRef}
+							className="sticky top-0 z-[1] grid grid-cols-[240px_1fr] gap-6 border-b border-line bg-white px-6 py-3.5 font-mono-jb text-[11px] font-bold uppercase tracking-[0.12em] text-slate-400 max-[720px]:grid-cols-1"
+						>
 							<span>Nghề</span>
 							<span>Vị trí chuyên môn</span>
 						</div>
