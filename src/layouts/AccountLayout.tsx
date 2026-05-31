@@ -35,14 +35,14 @@ export function AccountLayout() {
 				{ to: "/account/cv-builder", label: "Tạo CV", icon: FileEdit },
 				{ to: "/account/recommendation", label: "CV gợi ý", icon: Brain },
 				{ to: "/account/resumes", label: "Đơn ứng tuyển", icon: FileText },
-				{ to: "/account/saved-jobs", label: "Việc đã lưu", icon: Bookmark },
 			],
 		},
 		{
 			title: "Tài khoản",
 			items: [
 				{ to: "/profile", label: "Hồ sơ cá nhân", icon: UserCircle },
-				{ to: "/notifications", label: "Thông báo", icon: Bell, badge: unread },
+				{ to: "/account/saved-jobs", label: "Việc đã lưu", icon: Bookmark },
+				{ to: "/account/notifications", label: "Thông báo", icon: Bell, badge: unread },
 				{ to: "/account/subscriber", label: "Nhận việc qua email", icon: Mail },
 				{ to: "/account/settings", label: "Cài đặt", icon: Settings },
 			],

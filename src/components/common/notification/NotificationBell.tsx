@@ -26,9 +26,9 @@ export function NotificationBell() {
 					variant="ghost"
 					size="icon"
 					aria-label={`Thông báo${unread > 0 ? ` (${unread} chưa đọc)` : ""}`}
-					className="relative h-9 w-9 cursor-pointer rounded-full transition-colors duration-200 hover:bg-accent"
+					className="relative h-10 w-10 cursor-pointer rounded-full border border-line bg-white text-slate-600 transition-colors duration-200 hover:border-ink hover:bg-white hover:text-ink"
 				>
-					<Bell className="h-5 w-5 text-foreground/80" />
+					<Bell className="h-5 w-5" />
 					{unread > 0 && (
 						<span
 							className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-card"

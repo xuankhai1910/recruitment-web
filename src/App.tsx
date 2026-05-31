@@ -97,7 +97,10 @@ export default function App() {
 				<Route path="/companies/:id" element={<CompanyDetailPage />} />
 				<Route path="/profiles/:userId" element={<PublicProfilePage />} />
 				<Route element={<AuthenticatedRoute />}>
-					<Route path="/notifications" element={<NotificationsPage />} />
+					<Route
+						path="/notifications"
+						element={<Navigate to="/account/notifications" replace />}
+					/>
 					<Route path="/profile" element={<ProfilePage />} />
 					<Route element={<AccountLayout />}>
 						<Route
@@ -111,6 +114,10 @@ export default function App() {
 						/>
 						<Route path="/account/resumes" element={<ResumesPage />} />
 						<Route path="/account/saved-jobs" element={<SavedJobsPage />} />
+						<Route
+							path="/account/notifications"
+							element={<NotificationsPage variant="account" />}
+						/>
 						<Route path="/account/subscriber" element={<SubscriberPage />} />
 						<Route path="/account/settings" element={<SettingsPage />} />
 					</Route>

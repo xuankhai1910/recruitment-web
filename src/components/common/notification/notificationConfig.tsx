@@ -33,20 +33,20 @@ export const NOTIFICATION_ICON: Record<NotificationType, IconRenderer> = {
 };
 
 export const NOTIFICATION_ACCENT: Record<NotificationType, string> = {
-	NEW_RESUME_RECEIVED: "bg-blue-100 text-blue-700",
-	RESUME_SUBMITTED: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-	RESUME_STATUS_CHANGED: "bg-secondary/40 text-secondary-foreground",
+	NEW_RESUME_RECEIVED: "bg-[#EFF6FF] text-[#1D4ED8]",
+	RESUME_SUBMITTED: "bg-[#F0FDFA] text-[#0F766E]",
+	RESUME_STATUS_CHANGED: "bg-[#F4F4EF] text-[#0F172A]",
 };
 
 export function getNotificationAccent(n: AppNotification): string {
 	if (n.type === "RESUME_STATUS_CHANGED") {
 		switch (n.data.status) {
 			case "APPROVED":
-				return "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400";
+				return "bg-[#ECFDF5] text-[#047857]";
 			case "REJECTED":
-				return "bg-destructive/10 text-destructive";
+				return "bg-[#FEF2F2] text-[#B91C1C]";
 			case "REVIEWING":
-				return "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+				return "bg-[#FFFBEB] text-[#B45309]";
 			default:
 				return NOTIFICATION_ACCENT[n.type];
 		}
@@ -90,7 +90,7 @@ export function resolveCtaUrl(n: AppNotification): string {
 
 	const fromBe = n.ctaUrl ?? "";
 	// Whitelist FE-known prefixes — anything else falls back to home.
-	const allowed = ["/jobs", "/companies", "/admin", "/hr", "/notifications"];
+	const allowed = ["/jobs", "/companies", "/admin", "/hr", "/account"];
 	if (allowed.some((p) => fromBe.startsWith(p))) return fromBe;
 	return "/";
 }

@@ -75,7 +75,6 @@ function RemovedJobCard({ savedAt, onRemove, disabled }: RemovedJobCardProps) {
 	);
 }
 
-/** Wraps an expired JobCard with a "Hết hạn" overlay badge. */
 function ExpiredJobCardWrapper({
 	item,
 }: {
@@ -96,7 +95,7 @@ function ExpiredJobCardWrapper({
 				{isPastDeadline ? "Hết hạn" : "Đã đóng"}
 			</span>
 			<div className="pointer-events-none opacity-60">
-				<JobCard job={item.job} variant="default" />
+				<JobCard job={item.job} variant="row" />
 			</div>
 		</div>
 	);
@@ -129,9 +128,9 @@ export function SavedJobsTab() {
 		return (
 			<div className="space-y-4">
 				<Skeleton className="h-11 rounded-lg" />
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				<div className="flex flex-col gap-3">
 					{["a", "b", "c", "d"].map((k) => (
-						<Skeleton key={`saved-sk-${k}`} className="h-44 rounded-xl" />
+						<Skeleton key={`saved-sk-${k}`} className="h-24 rounded-xl" />
 					))}
 				</div>
 			</div>
@@ -251,13 +250,13 @@ export function SavedJobsTab() {
 				</form>
 			</div>
 
-			{/* Grid */}
+			{/* List */}
 			{items.length === 0 ? (
 				<div className="rounded-2xl border border-dashed border-slate-200 bg-white py-10 text-center text-sm text-slate-500">
 					Không tìm thấy việc làm phù hợp với "{appliedKeyword}"
 				</div>
 			) : (
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				<div className="flex flex-col gap-3">
 					{items.map((item) => {
 						const state = classifyItem(item);
 						if (state === "removed") {
@@ -279,7 +278,7 @@ export function SavedJobsTab() {
 							<JobCard
 								key={item._id}
 								job={item.job}
-								variant="default"
+								variant="row"
 							/>
 						);
 					})}

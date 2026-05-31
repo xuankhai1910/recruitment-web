@@ -88,46 +88,49 @@ export function Header() {
 					</nav>
 				</div>
 
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-3">
 					{isAuthenticated && user ? (
 						<>
 							<NotificationBell />
 							<Link
 								to="/account/saved-jobs"
 								aria-label="Việc đã lưu"
-								className="grid h-10 w-10 place-items-center rounded-lg border border-line bg-white text-slate-600 transition-colors hover:border-ink hover:text-ink"
+								className="grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-slate-600 transition-colors hover:border-ink hover:text-ink"
 							>
 								<Bookmark className="h-4 w-4" />
 							</Link>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<button
-										className="grid h-9 w-9 place-items-center rounded-full bg-teal-500 text-[13px] font-semibold text-ink"
+										className="grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-teal-500 text-[13px] font-semibold text-ink ring-2 ring-transparent ring-offset-2 ring-offset-cream transition hover:ring-teal-500/40 focus-visible:outline-none focus-visible:ring-teal-500/60"
 										title="Tài khoản"
 										aria-label="Tài khoản"
 									>
 										{initials}
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-52">
-									<div className="px-3 py-2.5">
-										<p className="text-sm font-semibold text-foreground">
+								<DropdownMenuContent
+									align="end"
+									className="w-56 rounded-xl border border-line bg-cream p-1.5 shadow-lg ring-0"
+								>
+									<div className="px-2.5 py-2">
+										<p className="text-sm font-semibold text-ink">
 											{user.name}
 										</p>
-										<p className="truncate text-xs text-muted-foreground">
+										<p className="truncate text-xs text-slate-500">
 											{user.email}
 										</p>
 									</div>
-									<DropdownMenuSeparator />
+									<DropdownMenuSeparator className="bg-line" />
 									<DropdownMenuItem
-										className="cursor-pointer gap-2"
+										className="cursor-pointer gap-2.5 rounded-lg px-2.5 py-2 text-slate-700 focus:bg-line-soft focus:text-ink"
 										onClick={() => navigate("/profile")}
 									>
 										<UserCircle className="h-4 w-4" />
 										Hồ sơ cá nhân
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										className="cursor-pointer gap-2"
+										className="cursor-pointer gap-2.5 rounded-lg px-2.5 py-2 text-slate-700 focus:bg-line-soft focus:text-ink"
 										onClick={() => navigate("/account")}
 									>
 										<Settings className="h-4 w-4" />
@@ -135,9 +138,9 @@ export function Header() {
 									</DropdownMenuItem>
 									{isAdmin && (
 										<>
-											<DropdownMenuSeparator />
+											<DropdownMenuSeparator className="bg-line" />
 											<DropdownMenuItem
-												className="cursor-pointer gap-2"
+												className="cursor-pointer gap-2.5 rounded-lg px-2.5 py-2 text-slate-700 focus:bg-line-soft focus:text-ink"
 												onClick={() => navigate(portalPath)}
 											>
 												<LayoutDashboard className="h-4 w-4" />
@@ -145,9 +148,9 @@ export function Header() {
 											</DropdownMenuItem>
 										</>
 									)}
-									<DropdownMenuSeparator />
+									<DropdownMenuSeparator className="bg-line" />
 									<DropdownMenuItem
-										className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+										className="cursor-pointer gap-2.5 rounded-lg px-2.5 py-2 text-rose-600 focus:bg-rose-50 focus:text-rose-700"
 										onClick={() => {
 											logout.mutate();
 											navigate("/");

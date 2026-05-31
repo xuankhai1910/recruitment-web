@@ -1,14 +1,14 @@
 import { useMemo, useState } from "react";
-import { CheckCheck, Inbox } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bell, CheckCheck, Inbox } from "lucide-react";
+
+import { PageHeader } from "@/components/common/account/PageHeader";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	NotificationEmpty,
+	NotificationItem,
+	NotificationListSkeleton,
+} from "@/components/common/notification";
+import { NOTIFICATION_TYPE_LABEL } from "@/components/common/notification/notificationConfig";
+import { Button } from "@/components/ui/button";
 import {
 	Pagination,
 	PaginationContent,
@@ -17,17 +17,19 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useNotificationStore } from "@/stores/notification.store";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	useMarkAllNotificationsRead,
 	useNotificationList,
 } from "@/hooks/useNotifications";
-import {
-	NotificationItem,
-	NotificationEmpty,
-	NotificationListSkeleton,
-} from "@/components/common/notification";
-import { NOTIFICATION_TYPE_LABEL } from "@/components/common/notification/notificationConfig";
+import { useNotificationStore } from "@/stores/notification.store";
 import type { NotificationType } from "@/types/notification";
 
 type TabValue = "all" | "unread";
@@ -51,7 +53,13 @@ const TYPE_OPTIONS: Array<{ value: NotificationType | "ALL"; label: string }> =
 
 const PAGE_SIZE = 12;
 
-export function NotificationsPage() {
+interface NotificationsPageProps {
+	variant?: "standalone" | "account";
+}
+
+export function NotificationsPage({
+	variant = "standalone",
+}: NotificationsPageProps) {
 	const [tab, setTab] = useState<TabValue>("all");
 	const [type, setType] = useState<NotificationType | "ALL">("ALL");
 	const [page, setPage] = useState(1);
@@ -86,38 +94,27 @@ export function NotificationsPage() {
 		setPage(1);
 	};
 
-	return (
-		<section className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-			{/* Header */}
-			<header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<div className="flex items-center gap-2">
-						<Inbox className="h-5 w-5 text-muted-foreground" />
-						<h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-							Thông báo
-						</h1>
-					</div>
-					<p className="mt-1 text-sm text-muted-foreground">
-						{unread > 0
-							? `Bạn có ${unread} thông báo chưa đọc.`
-							: "Bạn đã xem tất cả các thông báo gần đây."}
-					</p>
-				</div>
+	const description =
+		unread > 0
+			? `Bạn có ${unread} thông báo chưa đọc.`
+			: "Bạn đã xem tất cả các thông báo gần đây.";
 
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					disabled={unread === 0 || markAll.isPending}
-					onClick={() => markAll.mutate()}
-					className="cursor-pointer gap-1.5"
-				>
-					<CheckCheck className="h-4 w-4" />
-					Đánh dấu đã đọc tất cả
-				</Button>
-			</header>
+	const markAllButton = (
+		<Button
+			type="button"
+			variant="outline"
+			size="sm"
+			disabled={unread === 0 || markAll.isPending}
+			onClick={() => markAll.mutate()}
+			className="cursor-pointer gap-1.5"
+		>
+			<CheckCheck className="h-4 w-4" />
+			Đánh dấu đã đọc tất cả
+		</Button>
+	);
 
-			{/* Filters */}
+	const content = (
+		<>
 			<div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<Tabs value={tab} onValueChange={handleTabChange}>
 					<TabsList>
@@ -153,8 +150,7 @@ export function NotificationsPage() {
 				</Select>
 			</div>
 
-			{/* List */}
-			<div className="overflow-hidden rounded-lg border border-border bg-card">
+			<div className="overflow-hidden rounded-xl border border-[#E5E5DF] bg-white">
 				{showSkeleton ? (
 					<NotificationListSkeleton count={6} />
 				) : items.length === 0 ? (
@@ -162,20 +158,14 @@ export function NotificationsPage() {
 						title={tab === "unread" ? "Không có thông báo chưa đọc" : undefined}
 					/>
 				) : (
-					<ul className="divide-y divide-border">
+					<div>
 						{items.map((n) => (
-							<li key={n._id}>
-								<NotificationItem
-									notification={n}
-									className="rounded-none px-4 py-4"
-								/>
-							</li>
+							<NotificationItem key={n._id} notification={n} />
 						))}
-					</ul>
+					</div>
 				)}
 			</div>
 
-			{/* Pagination */}
 			{totalPages > 1 && (
 				<Pagination className="mt-6">
 					<PaginationContent>
@@ -218,6 +208,39 @@ export function NotificationsPage() {
 					</PaginationContent>
 				</Pagination>
 			)}
+		</>
+	);
+
+	if (variant === "account") {
+		return (
+			<div>
+				<PageHeader
+					icon={Bell}
+					title="Thông báo"
+					description={description}
+					action={markAllButton}
+					tone="blue"
+				/>
+				{content}
+			</div>
+		);
+	}
+
+	return (
+		<section className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+			<header className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<div className="flex items-center gap-2">
+						<Inbox className="h-5 w-5 text-muted-foreground" />
+						<h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+							Thông báo
+						</h1>
+					</div>
+					<p className="mt-1 text-sm text-muted-foreground">{description}</p>
+				</div>
+				{markAllButton}
+			</header>
+			{content}
 		</section>
 	);
 }

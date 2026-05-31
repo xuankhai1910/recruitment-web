@@ -44,72 +44,78 @@ export function NotificationItem({
 	};
 
 	const accent = getNotificationAccent(notification);
+	const isUnread = !notification.isRead;
 	const relative = formatDistanceToNow(new Date(notification.createdAt), {
 		addSuffix: true,
 		locale: vi,
 	});
+	const iconClass = isUnread ? accent : "bg-[#F4F4EF] text-[#0F172A]";
 
 	return (
-		<button
-			type="button"
-			onClick={handleClick}
+		<div
 			className={cn(
-				"group flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-3 text-left transition-colors duration-150",
-				"hover:bg-accent focus-visible:bg-accent focus-visible:outline-none",
-				!notification.isRead && "bg-blue-50/70",
+				"group relative flex w-full cursor-pointer items-start gap-4 border-b border-[#EFEFE9] px-5 py-[18px] text-left transition-colors",
+				"last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#14B8A6]/35 focus-visible:ring-offset-0",
+				isUnread
+					? "bg-[#F0FDFA] hover:bg-[#CCFBF1] before:absolute before:left-2 before:top-[26px] before:h-1.5 before:w-1.5 before:rounded-full before:bg-[#14B8A6] before:content-['']"
+					: "bg-white hover:bg-[#FAFAF7]",
 				className,
 			)}
-			aria-label={notification.title}
 		>
-			<div
-				className={cn(
-					"mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-					accent,
-				)}
-				aria-hidden
+			<button
+				type="button"
+				onClick={handleClick}
+				className="flex min-w-0 flex-1 cursor-pointer items-start gap-4 text-left focus-visible:outline-none"
+				aria-label={notification.title}
 			>
-				{renderNotificationIcon(notification)}
-			</div>
+				<div
+					className={cn(
+						"grid h-10 w-10 shrink-0 place-items-center rounded-lg [&_svg]:h-[18px] [&_svg]:w-[18px]",
+						iconClass,
+					)}
+					aria-hidden
+				>
+					{renderNotificationIcon(notification)}
+				</div>
 
-			<div className="min-w-0 flex-1">
-				<div className="flex items-start justify-between gap-2">
-					<p
-						className={cn(
-							"line-clamp-1 text-sm text-foreground",
-							!notification.isRead ? "font-semibold" : "font-medium",
+				<div className="min-w-0 flex-1">
+					<div className="line-clamp-2 text-sm leading-[1.5] text-[#0F172A]">
+						<span>{notification.title}</span>
+						{notification.message && (
+							<span className="font-semibold text-[#0A0F1A]">
+								{" "}
+								&middot; {notification.message}
+							</span>
 						)}
-					>
-						{notification.title}
-					</p>
-					{!notification.isRead && (
-						<span
-							className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500"
-							role="status"
-							aria-label="Chưa đọc"
-						/>
-					)}
-				</div>
-				<p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-					{notification.message}
-				</p>
-				<div className="mt-1.5 flex items-center justify-between gap-2">
-					<span className="text-[11px] font-medium text-muted-foreground">
+					</div>
+					<div className="mt-1 font-mono text-xs text-[#94A3B8]">
 						{relative}
-					</span>
-					{showDelete && (
-						<Button
-							variant="ghost"
-							size="icon"
-							type="button"
-							onClick={handleDelete}
-							aria-label="Xoá thông báo"
-							className="h-7 w-7 cursor-pointer opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100"
-						>
-							<Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-						</Button>
-					)}
+					</div>
 				</div>
+
+				{isUnread && (
+					<span
+						className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#14B8A6]"
+						role="status"
+						aria-label="Chua doc"
+					/>
+				)}
+			</button>
+
+			<div className="h-7 w-7 shrink-0">
+				{showDelete && (
+					<Button
+						variant="ghost"
+						size="icon"
+						type="button"
+						onClick={handleDelete}
+						aria-label="Xoa thong bao"
+						className="h-7 w-7 cursor-pointer opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-visible:opacity-100"
+					>
+						<Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+					</Button>
+				)}
 			</div>
-		</button>
+		</div>
 	);
 }

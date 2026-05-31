@@ -96,7 +96,7 @@ export function NotificationDropdown({
 			{/* Footer */}
 			<div className="px-4 py-2.5">
 				<Link
-					to="/notifications"
+					to="/account/notifications"
 					onClick={onItemNavigate}
 					className="block w-full rounded-md py-1.5 text-center text-xs font-semibold text-blue-600 transition-colors duration-150 hover:bg-blue-50"
 				>

@@ -38,10 +38,10 @@ export function RecommendedJobCard({ item }: RecommendedJobCardProps) {
 					</div>
 				)}
 				<div className="min-w-0 flex-1">
-					<div className="line-clamp-2 min-h-[2.5em] font-display text-[15px] font-semibold leading-tight tracking-tight text-ink">
+					<div className="line-clamp-2 font-display text-[15px] font-semibold leading-tight tracking-tight text-ink">
 						{job.name}
 					</div>
-					<div className="mt-1 truncate font-mono-jb text-[10.5px] font-semibold uppercase tracking-[0.08em] text-slate-600">
+					<div className="mt-0.5 truncate font-mono-jb text-[10.5px] font-semibold uppercase tracking-[0.08em] text-slate-600">
 						{job.company?.name}
 					</div>
 				</div>

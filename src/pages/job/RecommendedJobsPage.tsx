@@ -66,10 +66,10 @@ export function RecommendedJobsPage() {
 		return (
 			<div className="px-4 py-16">
 				<div className="mx-auto max-w-md rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
-					<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+					<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
 						<Brain className="h-6 w-6" />
 					</div>
-					<h2 className="font-heading text-lg font-semibold text-foreground">
+					<h2 className="font-display text-lg font-semibold text-ink">
 						Đăng nhập để xem việc gợi ý
 					</h2>
 					<p className="mt-1 text-sm text-muted-foreground">
@@ -89,7 +89,7 @@ export function RecommendedJobsPage() {
 							onClick={() => {
 								navigate("/login");
 							}}
-							className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+							className="cursor-pointer bg-teal-600 text-white hover:bg-teal-700"
 						>
 							Đăng nhập
 						</Button>
@@ -114,23 +114,23 @@ export function RecommendedJobsPage() {
 				</div>
 
 				{/* Hero header */}
-				<div className="mb-6 overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm sm:p-6">
+				<div className="mb-6 overflow-hidden rounded-2xl border border-teal-200 bg-teal-50 p-5 shadow-sm sm:p-6">
 					<div className="flex flex-wrap items-start justify-between gap-4">
 						<div className="flex items-start gap-3">
-							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md">
+							<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-600 text-white shadow-md">
 								<Sparkles className="h-6 w-6" />
 							</div>
 							<div className="space-y-1">
-								<h1 className="flex items-center gap-2 font-heading text-2xl font-bold text-slate-900">
+								<h1 className="flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-ink">
 									Việc làm gợi ý cho bạn
-									<Badge className="bg-blue-100 font-semibold text-blue-700">
+									<Badge className="bg-teal-100 font-semibold text-teal-700">
 										AI
 									</Badge>
 								</h1>
 								{cvData?.recommendationCv ? (
 									<p className="text-sm text-slate-600">
 										Dựa trên CV{" "}
-										<span className="font-medium text-slate-900">
+										<span className="font-display font-semibold text-ink">
 											{extractOriginalFileName(
 												cvData.recommendationCv.resumeUrl,
 											)}
@@ -174,7 +174,7 @@ export function RecommendedJobsPage() {
 								onClick={() => {
 									navigate("/account/recommendation");
 								}}
-								className="cursor-pointer border-blue-200 bg-white text-blue-700 hover:bg-blue-50 hover:text-blue-700"
+								className="cursor-pointer border-teal-200 bg-white text-teal-700 hover:bg-teal-50 hover:text-teal-700"
 							>
 								<Settings2 className="mr-1.5 h-3.5 w-3.5" />
 								{hasCv ? "Đổi CV" : "Thiết lập CV"}
@@ -186,10 +186,10 @@ export function RecommendedJobsPage() {
 				{/* Empty CV state */}
 				{!cvLoading && !hasCv && (
 					<div className="rounded-2xl border border-dashed border-border bg-card p-10 text-center">
-						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-50 text-teal-600">
 							<Brain className="h-7 w-7" />
 						</div>
-						<h3 className="font-heading text-base font-semibold text-foreground">
+						<h3 className="font-display text-base font-semibold text-ink">
 							Chưa có CV để phân tích
 						</h3>
 						<p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
@@ -200,7 +200,7 @@ export function RecommendedJobsPage() {
 							onClick={() => {
 								navigate("/account/recommendation");
 							}}
-							className="mt-5 cursor-pointer bg-blue-600 text-white transition-colors duration-150 hover:bg-blue-700"
+							className="mt-5 cursor-pointer bg-teal-600 text-white transition-colors duration-150 hover:bg-teal-700"
 						>
 							<Sparkles className="mr-2 h-4 w-4" />
 							Thiết lập CV ngay
@@ -268,7 +268,7 @@ export function RecommendedJobsPage() {
 							<div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border/60 py-16 text-center">
 								<Sparkles className="h-12 w-12 text-muted-foreground/40" />
 								<div>
-									<p className="font-heading text-sm font-semibold text-foreground">
+									<p className="font-display text-sm font-semibold text-ink">
 										{allRecs.length === 0
 											? "Chưa có việc làm nào phù hợp với CV của bạn"
 											: "Không có việc nào đạt mức tối thiểu này"}
