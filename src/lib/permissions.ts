@@ -99,6 +99,7 @@ export const ALL_MODULES = [
   "SUBSCRIBERS",
   "CV_ANALYSIS",
   "NOTIFICATIONS",
+  "STATS",
 ] as const;
 
 export type ModuleName = (typeof ALL_MODULES)[number];

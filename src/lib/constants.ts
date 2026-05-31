@@ -70,3 +70,19 @@ export function formatDateTime(date: string): string {
     second: "2-digit",
   });
 }
+
+export function formatDate(date: string): string {
+  return new Date(date).toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+/** Short MM/DD label for a week-start ISO date (dashboard chart axes). */
+export function formatWeekLabel(iso: string): string {
+  const d = new Date(iso);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${mm}/${dd}`;
+}
