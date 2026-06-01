@@ -4,17 +4,14 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { authApi } from "@/api/auth.api";
 import { useAuthStore } from "@/stores/auth.store";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { Building2, Eye, EyeOff, Loader2 } from "lucide-react";
+	HrAuthShell,
+	hrFieldWrap,
+	hrIcon,
+	hrInput,
+	hrLabel,
+} from "@/components/hr/HrAuthShell";
+import { Eye, EyeOff, Loader2, LogIn, Mail, Lock } from "lucide-react";
 
 /**
  * HR Login Page — dùng route /hr/login.
@@ -68,113 +65,99 @@ export function HrLoginPage() {
 	};
 
 	return (
-		<div className="w-full max-w-sm px-4">
-			{/* Logo */}
-			<div className="mb-6 flex flex-col items-center">
-				<div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600">
-					<Building2 className="h-6 w-6" />
-				</div>
-				<h1 className="font-heading text-xl font-bold text-foreground">
-					Job<span className="text-blue-600">Finder</span>{" "}
-					<span className="text-sm font-medium text-muted-foreground">
-						· HR
-					</span>
-				</h1>
-				<p className="mt-1 text-xs text-muted-foreground">
-					Cổng dành cho nhà tuyển dụng
+		<HrAuthShell mode="login">
+			<div className="mb-6">
+				<h2 className="font-heading text-2xl font-bold text-slate-900">
+					Chào mừng trở lại
+				</h2>
+				<p className="mt-1.5 text-sm text-slate-600">
+					Đăng nhập để tiếp tục quản lý tuyển dụng của bạn.
 				</p>
 			</div>
 
-			<Card>
-				<CardHeader className="pb-3 text-center">
-					<CardTitle className="font-heading text-lg">
-						Đăng nhập nhà tuyển dụng
-					</CardTitle>
-					<CardDescription>
-						Quản lý tin tuyển dụng & hồ sơ ứng viên
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<form onSubmit={handleSubmit} className="space-y-3.5">
-						<div className="space-y-1.5">
-							<Label htmlFor="email">Email công ty</Label>
-							<Input
-								id="email"
-								type="email"
-								placeholder="hr@company.com"
-								value={form.username}
-								onChange={(e) => {
-									setForm({ ...form, username: e.target.value });
-								}}
-								required
-								className="h-10"
-							/>
-						</div>
+			<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+				<div className="flex flex-col gap-1.5">
+					<label htmlFor="email" className={hrLabel}>
+						Email công ty
+					</label>
+					<div className={hrFieldWrap}>
+						<Mail className={hrIcon} />
+						<input
+							id="email"
+							type="email"
+							placeholder="hr@company.com"
+							value={form.username}
+							onChange={(e) => {
+								setForm({ ...form, username: e.target.value });
+							}}
+							required
+							className={hrInput}
+						/>
+					</div>
+				</div>
 
-						<div className="space-y-1.5">
-							<Label htmlFor="password">Mật khẩu</Label>
-							<div className="relative">
-								<Input
-									id="password"
-									type={showPassword ? "text" : "password"}
-									placeholder="6-15 ký tự"
-									value={form.password}
-									onChange={(e) => {
-										setForm({ ...form, password: e.target.value });
-									}}
-									required
-									className="h-10 pr-10"
-								/>
-								<button
-									type="button"
-									onClick={() => {
-										setShowPassword(!showPassword);
-									}}
-									className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors duration-150 hover:text-foreground"
-									aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-								>
-									{showPassword ? (
-										<EyeOff className="h-4 w-4" />
-									) : (
-										<Eye className="h-4 w-4" />
-									)}
-								</button>
-							</div>
-							<div className="text-right">
-								<Link
-									to="/forgot-password"
-									className="text-xs font-medium text-blue-600 hover:text-blue-700"
-								>
-									Quên mật khẩu?
-								</Link>
-							</div>
-						</div>
-
-						<Button
-							type="submit"
-							disabled={submitting}
-							className="h-10 w-full cursor-pointer rounded-lg bg-blue-600 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700"
-						>
-							{submitting ? (
-								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-							) : null}
-							Đăng nhập
-						</Button>
-					</form>
-
-					<div className="mt-5 text-center text-sm text-muted-foreground">
-						Chưa có tài khoản?{" "}
+				<div className="flex flex-col gap-1.5">
+					<div className="flex items-center justify-between">
+						<label htmlFor="password" className={hrLabel}>
+							Mật khẩu
+						</label>
 						<Link
-							to="/hr/register"
-							className="cursor-pointer font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700"
+							to="/forgot-password"
+							className="text-xs font-medium text-blue-600 hover:text-blue-700"
 						>
-							Đăng ký nhà tuyển dụng
+							Quên mật khẩu?
 						</Link>
 					</div>
-				</CardContent>
-			</Card>
+					<div className={hrFieldWrap}>
+						<Lock className={hrIcon} />
+						<input
+							id="password"
+							type={showPassword ? "text" : "password"}
+							placeholder="6-15 ký tự"
+							value={form.password}
+							onChange={(e) => {
+								setForm({ ...form, password: e.target.value });
+							}}
+							required
+							className={hrInput}
+						/>
+						<button
+							type="button"
+							onClick={() => {
+								setShowPassword(!showPassword);
+							}}
+							className="grid cursor-pointer place-items-center text-slate-400 transition-colors hover:text-slate-600"
+							aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+						>
+							{showPassword ? (
+								<EyeOff className="h-4.5 w-4.5" />
+							) : (
+								<Eye className="h-4.5 w-4.5" />
+							)}
+						</button>
+					</div>
+				</div>
 
-			<div className="mt-4 text-center text-sm text-muted-foreground">
+				<button
+					type="submit"
+					disabled={submitting}
+					className="mt-1 inline-flex h-12 cursor-pointer items-center justify-center gap-2.5 rounded-lg bg-blue-600 text-[15px] font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+				>
+					{submitting ? (
+						<>
+							<Loader2 className="h-4.5 w-4.5 animate-spin" />
+							Đang đăng nhập...
+						</>
+					) : (
+						<>
+							<LogIn className="h-4.5 w-4.5" />
+							Đăng nhập
+						</>
+					)}
+				</button>
+			</form>
+
+			<p className="mt-5 text-center text-sm text-slate-600">
 				Bạn là người tìm việc?{" "}
 				<Link
 					to="/login"
@@ -182,7 +165,7 @@ export function HrLoginPage() {
 				>
 					Đăng nhập tại đây
 				</Link>
-			</div>
-		</div>
+			</p>
+		</HrAuthShell>
 	);
 }
