@@ -29,12 +29,11 @@ import {
 	FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import { CompanySearchCombobox } from "@/components/common/CompanySearchCombobox";
 import { useCreateUser, useUpdateUser } from "@/hooks/useUsers";
 import { rolesApi } from "@/api/roles.api";
-import { companiesApi } from "@/api/companies.api";
 import type { User } from "@/types/user";
 import type { Role } from "@/types/role";
-import type { Company } from "@/types/company";
 
 const userCreateSchema = z.object({
 	email: z.string().email("Email không hợp lệ"),
@@ -77,7 +76,7 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 
 	// Dropdown data
 	const [roles, setRoles] = useState<Role[]>([]);
-	const [companies, setCompanies] = useState<Company[]>([]);
+	const [companyName, setCompanyName] = useState("");
 
 	const form = useForm<UserFormValues>({
 		resolver: zodResolver(isEdit ? userEditSchema : userCreateSchema),
@@ -93,14 +92,11 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 		},
 	});
 
-	// Fetch roles + companies when modal opens
+	// Fetch roles when modal opens
 	useEffect(() => {
 		if (open) {
 			rolesApi.getList({ current: 1, pageSize: 100 }).then((r) => {
 				setRoles(r.data.data.result);
-			});
-			companiesApi.getList({ current: 1, pageSize: 100 }).then((r) => {
-				setCompanies(r.data.data.result);
 			});
 		}
 	}, [open]);
@@ -109,6 +105,7 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 	useEffect(() => {
 		if (open) {
 			if (user) {
+				setCompanyName(user.company?.name ?? "");
 				form.reset({
 					email: user.email,
 					password: "",
@@ -120,6 +117,7 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 					address: user.address,
 				});
 			} else {
+				setCompanyName("");
 				form.reset({
 					email: "",
 					password: "",
@@ -135,9 +133,9 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 	}, [open, user, form]);
 
 	const onSubmit = async (values: UserFormValues) => {
-		const selectedCompany = companies.find((c) => c._id === values.companyId);
-		const company = selectedCompany
-			? { _id: selectedCompany._id, name: selectedCompany.name }
+		const company =
+			values.companyId && companyName
+				? { _id: values.companyId, name: companyName }
 			: undefined;
 
 		try {
@@ -282,13 +280,13 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 								control={form.control}
 								name="gender"
 								render={({ field }) => (
-									<FormItem className="sm:col-span-2">
+									<FormItem className="sm:col-span-3">
 										<FormLabel>
 											Giới tính <span className="text-destructive">*</span>
 										</FormLabel>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<FormControl>
-												<SelectTrigger className="cursor-pointer">
+												<SelectTrigger className="w-full cursor-pointer">
 													<SelectValue />
 												</SelectTrigger>
 											</FormControl>
@@ -313,13 +311,13 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 								control={form.control}
 								name="roleId"
 								render={({ field }) => (
-									<FormItem className="sm:col-span-2">
+									<FormItem className="sm:col-span-3">
 										<FormLabel>
 											Vai trò <span className="text-destructive">*</span>
 										</FormLabel>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<FormControl>
-												<SelectTrigger className="cursor-pointer">
+												<SelectTrigger className="w-full cursor-pointer">
 													<SelectValue placeholder="Chọn vai trò" />
 												</SelectTrigger>
 											</FormControl>
@@ -344,26 +342,19 @@ export function UserModal({ open, onOpenChange, user }: UserModalProps) {
 								control={form.control}
 								name="companyId"
 								render={({ field }) => (
-									<FormItem className="sm:col-span-2">
+									<FormItem className="sm:col-span-6">
 										<FormLabel>Thuộc công ty</FormLabel>
-										<Select value={field.value} onValueChange={field.onChange}>
-											<FormControl>
-												<SelectTrigger className="cursor-pointer">
-													<SelectValue placeholder="Chọn công ty" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{companies.map((c) => (
-													<SelectItem
-														key={c._id}
-														value={c._id}
-														className="cursor-pointer"
-													>
-														{c.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
+										<FormControl>
+											<CompanySearchCombobox
+												value={field.value}
+												selectedName={companyName}
+												onSelect={(company) => {
+													field.onChange(company._id);
+													setCompanyName(company.name);
+												}}
+												triggerClassName="h-10"
+											/>
+										</FormControl>
 										<FormMessage />
 									</FormItem>
 								)}

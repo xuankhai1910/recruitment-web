@@ -4,8 +4,7 @@ import { toast } from "sonner";
 import { isAxiosError } from "axios";
 import { useRegister } from "@/hooks/useAuth";
 import { rolesApi } from "@/api/roles.api";
-import { companiesApi } from "@/api/companies.api";
-import { Button } from "@/components/ui/button";
+import { CompanySearchCombobox } from "@/components/common/CompanySearchCombobox";
 import {
 	Select,
 	SelectContent,
@@ -13,18 +12,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-	Command,
-	CommandEmpty,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from "@/components/ui/command";
 import {
 	HrAuthShell,
 	hrFieldWrap,
@@ -34,9 +21,6 @@ import {
 	PasswordStrength,
 } from "@/components/hr/HrAuthShell";
 import {
-	Building2,
-	Check,
-	ChevronsUpDown,
 	Eye,
 	EyeOff,
 	Loader2,
@@ -46,9 +30,7 @@ import {
 	User,
 	UserPlus,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import type { Role } from "@/types/role";
-import type { Company } from "@/types/company";
 
 /**
  * HR Register Page — đăng ký tài khoản nhà tuyển dụng.
@@ -85,36 +67,8 @@ export function HrRegisterPage() {
 	}, []);
 
 	// Company picker
-	const [companyOpen, setCompanyOpen] = useState(false);
 	const [companyId, setCompanyId] = useState("");
 	const [companyName, setCompanyName] = useState("");
-	const [companySearch, setCompanySearch] = useState("");
-	const [companies, setCompanies] = useState<Company[]>([]);
-	const [companiesLoading, setCompaniesLoading] = useState(false);
-
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setCompaniesLoading(true);
-			companiesApi
-				.getList({
-					current: 1,
-					pageSize: 20,
-					...(companySearch ? { name: `/${companySearch}/i` } : {}),
-				})
-				.then((r) => {
-					setCompanies(r.data.data.result);
-				})
-				.catch(() => {
-					// ignore
-				})
-				.finally(() => {
-					setCompaniesLoading(false);
-				});
-		}, 300);
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [companySearch]);
 
 	const canSubmit = useMemo(
 		() =>
@@ -293,76 +247,18 @@ export function HrRegisterPage() {
 
 				<div className="flex flex-col gap-1.5">
 					<span className={hrLabel}>Công ty của bạn</span>
-					<Popover open={companyOpen} onOpenChange={setCompanyOpen}>
-						<PopoverTrigger asChild>
-							<Button
-								type="button"
-								variant="outline"
-								role="combobox"
-								aria-expanded={companyOpen}
-								className="h-11 w-full cursor-pointer justify-between rounded-lg border-slate-200 font-normal"
-							>
-								<span className="flex min-w-0 items-center gap-2.5">
-									<Building2 className={hrIcon} />
-									<span
-										className={cn(
-											"truncate",
-											!companyName && "text-slate-400",
-										)}
-									>
-										{companyName || "Chọn công ty"}
-									</span>
-								</span>
-								<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent
-							className="w-(--radix-popover-trigger-width) p-0"
-							align="start"
-						>
-							<Command shouldFilter={false}>
-								<CommandInput
-									placeholder="Tìm công ty..."
-									value={companySearch}
-									onValueChange={setCompanySearch}
-								/>
-								<CommandList>
-									{companiesLoading ? (
-										<div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											Đang tải...
-										</div>
-									) : (
-										<>
-											<CommandEmpty>Không tìm thấy công ty</CommandEmpty>
-											{companies.map((c) => (
-												<CommandItem
-													key={c._id}
-													value={c._id}
-													onSelect={() => {
-														setCompanyId(c._id);
-														setCompanyName(c.name);
-														setCompanyOpen(false);
-													}}
-													className="cursor-pointer"
-												>
-													<Check
-														className={cn(
-															"mr-2 h-4 w-4",
-															companyId === c._id
-																? "opacity-100"
-																: "opacity-0",
-														)}
-													/>
-													<span className="truncate">{c.name}</span>
-												</CommandItem>
-											))}
-										</>
-									)}
-								</CommandList>
-							</Command>
-						</PopoverContent>
-					</Popover>
+					<CompanySearchCombobox
+						value={companyId}
+						selectedName={companyName}
+						onSelect={(company) => {
+							setCompanyId(company._id);
+							setCompanyName(company.name);
+						}}
+						triggerClassName="h-11 rounded-lg border-slate-200"
+						iconClassName={hrIcon}
+						valueWrapClassName="gap-2.5"
+						placeholderClassName="text-slate-400"
+					/>
 					<p className="text-xs text-slate-400">
 						Công ty phải tồn tại trong hệ thống. Liên hệ admin nếu chưa có.
 					</p>
