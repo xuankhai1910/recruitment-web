@@ -4,7 +4,6 @@ import {
 	Briefcase,
 	Building2,
 	LayoutList,
-	ShieldCheck,
 	Sparkles,
 } from "lucide-react";
 
@@ -63,61 +62,61 @@ const BENEFITS = [
 
 function BrandPanel() {
 	return (
-		<aside className="relative hidden flex-col gap-6 overflow-hidden bg-blue-50 p-8 lg:flex xl:p-11">
+		<aside className="relative hidden flex-col justify-between overflow-hidden bg-blue-50 p-12 lg:flex xl:p-16">
 			{/* soft floating orb — flat tint, no gradient */}
-			<span className="pointer-events-none absolute -bottom-28 -right-24 h-65 w-65 rounded-full bg-blue-100" />
+			<span className="pointer-events-none absolute -bottom-32 -right-28 h-80 w-80 rounded-full bg-blue-100" />
 
-			<div className="relative">
+			<div className="relative flex flex-col gap-6">
 				<BrandLogo />
-			</div>
 
-			<div className="relative flex flex-col gap-3">
-				<span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-blue-200 bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-blue-800">
-					<Building2 className="h-3 w-3 text-blue-600" />
-					Cổng nhà tuyển dụng
-				</span>
-				<h1 className="font-heading text-[1.7rem] font-bold leading-tight tracking-tight text-slate-900 text-balance">
-					Tuyển dụng thông minh hơn cùng JobFinder
-				</h1>
-				<p className="max-w-[38ch] text-[15px] text-slate-600">
-					Tiếp cận hàng nghìn ứng viên chất lượng và để AI giúp bạn tìm đúng
-					người, nhanh hơn.
-				</p>
-			</div>
+				<div className="flex flex-col gap-3">
+					<span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-blue-200 bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-blue-800">
+						<Building2 className="h-3 w-3 text-blue-600" />
+						Cổng nhà tuyển dụng
+					</span>
+					<h1 className="max-w-[16ch] font-heading text-[clamp(2rem,3vw,2.75rem)] font-bold leading-[1.1] tracking-tight text-slate-900 text-balance">
+						Tuyển dụng thông minh hơn cùng JobFinder
+					</h1>
+					<p className="max-w-[42ch] text-base text-slate-600">
+						Tiếp cận hàng nghìn ứng viên chất lượng và để AI giúp bạn tìm đúng
+						người, nhanh hơn.
+					</p>
+				</div>
 
-			<div className="relative mt-auto flex flex-col gap-2">
-				{BENEFITS.map(({ Icon, title, desc }) => (
-					<div
-						key={title}
-						className="flex items-center gap-3 rounded-xl border border-blue-100 bg-white/70 px-3 py-2.5 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md"
-					>
-						<span className="grid h-8.5 w-8.5 shrink-0 place-items-center rounded-lg bg-white text-blue-600 shadow-xs">
-							<Icon className="h-4.5 w-4.5" />
-						</span>
-						<span>
-							<b className="block text-sm font-semibold text-slate-900">
-								{title}
-							</b>
-							<span className="text-xs leading-snug text-slate-600">
-								{desc}
+				<div className="mt-2 flex flex-col gap-2.5">
+					{BENEFITS.map(({ Icon, title, desc }) => (
+						<div
+							key={title}
+							className="flex items-center gap-3 rounded-xl border border-blue-100 bg-white/70 px-3.5 py-3 transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md"
+						>
+							<span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-blue-600 shadow-xs">
+								<Icon className="h-4.5 w-4.5" />
 							</span>
-						</span>
-					</div>
-				))}
+							<span>
+								<b className="block text-sm font-semibold text-slate-900">
+									{title}
+								</b>
+								<span className="text-xs leading-snug text-slate-600">
+									{desc}
+								</span>
+							</span>
+						</div>
+					))}
+				</div>
 			</div>
 
-			<div className="relative flex gap-6 pt-1">
+			<div className="relative flex gap-8 pt-10">
 				<div>
-					<div className="font-heading text-lg font-bold tracking-tight text-blue-800">
+					<div className="font-heading text-2xl font-bold tracking-tight text-blue-800">
 						2.400+
 					</div>
-					<div className="text-xs text-slate-600">Doanh nghiệp tin dùng</div>
+					<div className="text-sm text-slate-600">Doanh nghiệp tin dùng</div>
 				</div>
 				<div>
-					<div className="font-heading text-lg font-bold tracking-tight text-blue-800">
+					<div className="font-heading text-2xl font-bold tracking-tight text-blue-800">
 						180k+
 					</div>
-					<div className="text-xs text-slate-600">Ứng viên tiềm năng</div>
+					<div className="text-sm text-slate-600">Ứng viên tiềm năng</div>
 				</div>
 			</div>
 		</aside>
@@ -155,26 +154,20 @@ export function HrAuthShell({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 sm:p-8">
-			<div className="grid w-full max-w-250 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl lg:grid-cols-[0.92fr_1.08fr]">
-				<BrandPanel />
+		<div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
+			<BrandPanel />
 
-				<main className="flex flex-col justify-center p-7 sm:p-10 xl:p-12">
-					<div className="mx-auto w-full max-w-100">
-						<div className="mb-6 flex items-center justify-between">
-							<BrandLogo className="lg:hidden" />
-							<span className="ml-auto inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-								<ShieldCheck className="h-3 w-3 text-blue-600" />
-								HR Portal
-							</span>
-						</div>
-
-						<SegToggle mode={mode} />
-
-						{children}
+			<main className="flex flex-col justify-center bg-white px-6 py-12 sm:px-12">
+				<div className="mx-auto w-full max-w-100">
+					<div className="mb-8 lg:hidden">
+						<BrandLogo />
 					</div>
-				</main>
-			</div>
+
+					<SegToggle mode={mode} />
+
+					{children}
+				</div>
+			</main>
 		</div>
 	);
 }
