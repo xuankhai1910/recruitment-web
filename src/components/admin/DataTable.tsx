@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { PaginationMeta } from "@/types/api";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Inbox, Search } from "lucide-react";
 
 export interface Column<T> {
@@ -40,6 +41,8 @@ interface DataTableProps<T> {
 	onPageChange?: (page: number) => void;
 	onPageSizeChange?: (pageSize: number) => void;
 	toolbar?: ReactNode;
+	/** "between" (default) đẩy search trái – toolbar phải; "start" gom 2 thứ cạnh nhau. */
+	toolbarPlacement?: "between" | "start";
 	filters?: ReactNode;
 	rowKey: (row: T) => string;
 	selectedRowKeys?: string[];
@@ -58,6 +61,7 @@ export function DataTable<T>({
 	onPageChange,
 	onPageSizeChange,
 	toolbar,
+	toolbarPlacement = "between",
 	filters,
 	rowKey,
 	selectedRowKeys,
@@ -107,7 +111,14 @@ export function DataTable<T>({
 	return (
 		<div className="space-y-4">
 			{/* Toolbar: search + actions */}
-			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+			<div
+				className={cn(
+					"flex flex-col gap-3 sm:flex-row sm:items-center",
+					toolbarPlacement === "start"
+						? "sm:justify-start"
+						: "sm:justify-between",
+				)}
+			>
 				{onSearchChange !== undefined ? (
 					<div className="relative w-full sm:max-w-xs">
 						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

@@ -15,10 +15,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, FileDown } from "lucide-react";
-import { useUpdateResumeStatus } from "@/hooks/useResumes";
+import {
+  Loader2,
+  FileDown,
+  Sparkles,
+  Brain,
+  AlertTriangle,
+} from "lucide-react";
+import {
+  useUpdateResumeStatus,
+  useAnalyzeResumeMatch,
+} from "@/hooks/useResumes";
 import { STATUS_LIST, formatDateTime } from "@/lib/constants";
-import type { Resume, UpdateResumeStatusDto } from "@/types/resume";
+import type {
+  Resume,
+  UpdateResumeStatusDto,
+  ResumeMatch,
+  ResumeMatchResult,
+} from "@/types/resume";
 
 interface ResumeDetailProps {
   open: boolean;
@@ -39,14 +53,30 @@ export function ResumeDetail({
   resume,
 }: ResumeDetailProps) {
   const updateStatus = useUpdateResumeStatus();
+  const analyzeMatch = useAnalyzeResumeMatch();
   const [status, setStatus] =
     useState<UpdateResumeStatusDto["status"]>("PENDING");
+  const [match, setMatch] = useState<ResumeMatch | ResumeMatchResult | null>(
+    null,
+  );
 
   useEffect(() => {
-    if (resume) setStatus(resume.status);
+    if (resume) {
+      setStatus(resume.status);
+      setMatch(resume.match ?? null);
+    }
   }, [resume]);
 
   if (!resume) return null;
+
+  const handleAnalyze = async () => {
+    try {
+      const res = await analyzeMatch.mutateAsync(resume._id);
+      setMatch(res);
+    } catch {
+      // toast đã xử lý trong hook
+    }
+  };
 
   const jobName =
     typeof resume.jobId === "object" ? resume.jobId.name : resume.jobId;
@@ -62,7 +92,7 @@ export function ResumeDetail({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Thông tin hồ sơ</DialogTitle>
         </DialogHeader>
@@ -100,6 +130,40 @@ export function ResumeDetail({
               "—"
             )}
           </InfoItem>
+        </div>
+
+        <Separator />
+
+        {/* AI match analysis */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-medium text-foreground">
+              Độ phù hợp với tin tuyển dụng
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
+              disabled={analyzeMatch.isPending}
+              onClick={handleAnalyze}
+            >
+              {analyzeMatch.isPending ? (
+                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="mr-1.5 h-4 w-4" />
+              )}
+              {match ? "Phân tích lại" : "Phân tích độ phù hợp"}
+            </Button>
+          </div>
+
+          {match ? (
+            <MatchPanel match={match} />
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Bấm "Phân tích độ phù hợp" để AI chấm điểm CV của ứng viên so với
+              tin tuyển dụng họ đã ứng tuyển.
+            </p>
+          )}
         </div>
 
         <Separator />
@@ -161,6 +225,105 @@ function InfoItem({
       <div className="mt-0.5 text-sm text-foreground">
         {children ?? value ?? "—"}
       </div>
+    </div>
+  );
+}
+
+const BREAKDOWN_LABELS: {
+  key: keyof ResumeMatch["breakdown"];
+  label: string;
+}[] = [
+  { key: "skillScore", label: "Kỹ năng" },
+  { key: "vectorScore", label: "Tương đồng ngữ nghĩa" },
+  { key: "levelScore", label: "Cấp độ" },
+  { key: "specializationScore", label: "Chuyên môn" },
+  { key: "desiredTitleScore", label: "Vị trí mong muốn" },
+  { key: "titleScore", label: "Kỹ năng trong tiêu đề" },
+  { key: "locationScore", label: "Địa điểm" },
+];
+
+function MatchPanel({ match }: { match: ResumeMatch | ResumeMatchResult }) {
+  const pct = Math.round((match.score ?? 0) * 100);
+  const scoreColor =
+    pct >= 70
+      ? "text-green-600"
+      : pct >= 40
+        ? "text-amber-600"
+        : "text-red-600";
+
+  return (
+    <div className="space-y-4 rounded-xl border border-border bg-muted/30 p-4">
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col items-center">
+          <span className={`font-heading text-3xl font-bold ${scoreColor}`}>
+            {pct}%
+          </span>
+          <span className="text-xs text-muted-foreground">phù hợp</span>
+        </div>
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+            <Brain className="h-4 w-4 text-teal-600" />
+            {match.analyzedBy === "ai"
+              ? "Phân tích bởi Gemini AI"
+              : "Phân tích cơ bản"}
+          </div>
+          {match.analyzedBy === "keyword" && (
+            <div className="flex items-center gap-1 text-xs text-amber-600">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Phân tích bằng từ khoá — có thể kém chính xác
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Matched skills */}
+      <div>
+        <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Kỹ năng khớp ({match.matchedSkills.length})
+        </p>
+        {match.matchedSkills.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Không có kỹ năng khớp</p>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {match.matchedSkills.map((s) => (
+              <Badge
+                key={s}
+                variant="outline"
+                className="border-teal-200 bg-teal-50 font-normal text-teal-700"
+              >
+                {s}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Breakdown */}
+      <div className="space-y-2">
+        {BREAKDOWN_LABELS.map(({ key, label }) => (
+          <BreakdownBar key={key} label={label} value={match.breakdown[key] ?? 0} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BreakdownBar({ label, value }: { label: string; value: number }) {
+  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-40 shrink-0 text-xs text-muted-foreground">
+        {label}
+      </span>
+      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full bg-teal-500 transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="w-9 shrink-0 text-right text-xs font-medium text-foreground">
+        {pct}%
+      </span>
     </div>
   );
 }

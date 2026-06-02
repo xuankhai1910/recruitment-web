@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useState } from 'react';
 import { resumesApi, type ResumeQueryParams } from '@/api/resumes.api';
 import type { CreateResumeDto, UpdateResumeStatusDto } from '@/types/resume';
 import { toast } from 'sonner';
@@ -47,6 +48,86 @@ export function useUpdateResumeStatus() {
       toast.success('Cập nhật trạng thái thành công');
     },
   });
+}
+
+export function useAnalyzeResumeMatch() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      resumesApi.analyzeMatch(id).then((r) => r.data.data),
+    onSuccess: () => {
+      // Match được lưu trên resume → làm mới list để cột "Độ phù hợp" cập nhật.
+      qc.invalidateQueries({ queryKey: ['resumes'] });
+    },
+    onError: () => {
+      toast.error('Phân tích độ phù hợp thất bại. Vui lòng thử lại.');
+    },
+  });
+}
+
+export function useMatchBatchQuota() {
+  return useQuery({
+    queryKey: ['match-batch-quota'],
+    queryFn: () => resumesApi.getMatchBatchQuota().then((r) => r.data.data),
+  });
+}
+
+/**
+ * "Phân tích tất cả CV chưa chấm" cho HR. Xin server 1 lượt (server trừ quota +
+ * trả danh sách resumeIds đã cap), rồi gọi analyzeMatch lần lượt phía client để
+ * tránh timeout và hiện tiến trình X/Y. Mỗi CV đã cache sẽ chấm gần như tức thì.
+ */
+export function useBatchAnalyzeResumes() {
+  const qc = useQueryClient();
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState<{ done: number; total: number }>({
+    done: 0,
+    total: 0,
+  });
+
+  const run = useCallback(async () => {
+    setRunning(true);
+    setProgress({ done: 0, total: 0 });
+    try {
+      const start = await resumesApi
+        .startMatchBatch()
+        .then((r) => r.data.data);
+
+      if (!start.resumeIds.length) {
+        toast.info(start.message ?? 'Không có CV nào cần phân tích');
+        return;
+      }
+
+      setProgress({ done: 0, total: start.resumeIds.length });
+      let ok = 0;
+      let fail = 0;
+      for (const id of start.resumeIds) {
+        try {
+          await resumesApi.analyzeMatch(id);
+          ok++;
+        } catch {
+          fail++;
+        }
+        setProgress((p) => ({ done: p.done + 1, total: p.total }));
+      }
+
+      qc.invalidateQueries({ queryKey: ['resumes'] });
+      qc.invalidateQueries({ queryKey: ['match-batch-quota'] });
+      toast.success(
+        `Đã phân tích ${ok}/${start.resumeIds.length} CV` +
+          (fail ? `, ${fail} lỗi` : '') +
+          `. Còn ${start.remaining}/${start.limit} lượt trong tháng.`,
+      );
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message;
+      toast.error(msg ?? 'Không thể bắt đầu phân tích hàng loạt');
+    } finally {
+      setRunning(false);
+    }
+  }, [qc]);
+
+  return { run, running, progress };
 }
 
 export function useDeleteResume() {

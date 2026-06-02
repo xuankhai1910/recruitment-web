@@ -85,6 +85,26 @@ export const ALL_PERMISSIONS = {
     UPDATE: { method: "PATCH", apiPath: "/api/v1/roles/:id", module: "ROLES" },
     DELETE: { method: "DELETE", apiPath: "/api/v1/roles/:id", module: "ROLES" },
   },
+  CV_ANALYSIS: {
+    // HR chấm độ phù hợp CV ứng viên với tin tuyển dụng họ đã ứng tuyển.
+    MATCH_RESUME: {
+      method: "POST",
+      apiPath: "/api/v1/cv-analysis/resumes/:id/match",
+      module: "CV_ANALYSIS",
+    },
+    // HR xem hạn mức phân tích hàng loạt còn lại trong tháng.
+    MATCH_BATCH_QUOTA: {
+      method: "GET",
+      apiPath: "/api/v1/cv-analysis/resumes/match-batch/quota",
+      module: "CV_ANALYSIS",
+    },
+    // HR bắt đầu 1 lượt phân tích tất cả CV chưa chấm của công ty.
+    MATCH_BATCH_START: {
+      method: "POST",
+      apiPath: "/api/v1/cv-analysis/resumes/match-batch/start",
+      module: "CV_ANALYSIS",
+    },
+  },
 } as const;
 
 export const ALL_MODULES = [
