@@ -41,7 +41,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* JobFinder (candidate-side) design tokens — Wellfound vibe.
+/* DevMarket (candidate-side) design tokens — Wellfound vibe.
    Built on Tailwind's teal/rose/amber/emerald/violet palettes; only the
    bespoke ink/cream/line + display font are registered here. These do NOT
    touch shadcn's --primary, so the HR/admin portals stay blue. */

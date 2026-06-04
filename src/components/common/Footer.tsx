@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { Briefcase } from "lucide-react";
 
 function FooterBrandMark() {
 	return (
-		<span className="relative grid h-9 w-9 place-items-center rounded-lg bg-teal-500 text-ink">
-			<Briefcase className="h-[18px] w-[18px]" />
-			<span className="absolute -right-[3px] -top-[3px] h-2.5 w-2.5 rounded-full bg-rose-400 ring-2 ring-ink" />
-		</span>
+		<img
+			src="/logo.png"
+			alt="DevMarket"
+			className="h-9 w-9 object-contain"
+		/>
 	);
 }
 
@@ -18,7 +18,7 @@ export function Footer() {
 					<Link to="/" className="flex items-center gap-2.5">
 						<FooterBrandMark />
 						<span className="font-display text-[19px] font-bold tracking-tight text-white">
-							JobFinder
+							DevMarket
 						</span>
 					</Link>
 					<p className="max-w-xs text-sm leading-relaxed text-white/65">
@@ -45,7 +45,7 @@ export function Footer() {
 					]}
 				/>
 				<FooterCol
-					title="JobFinder"
+					title="DevMarket"
 					links={[
 						{ to: "/jobs", label: "Giới thiệu" },
 						{ to: "/companies", label: "Liên hệ" },
@@ -55,7 +55,7 @@ export function Footer() {
 				/>
 			</div>
 			<div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 border-t border-white/10 px-7 py-5 text-xs text-white/50">
-				<div>© {new Date().getFullYear()} JobFinder Vietnam</div>
+				<div>© {new Date().getFullYear()} DevMarket Vietnam</div>
 				<div>Made in Hà Nội · Sài Gòn</div>
 			</div>
 		</footer>

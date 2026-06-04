@@ -42,7 +42,7 @@ export function HeroSearch() {
 			<div className="mx-auto max-w-[1280px] px-7">
 				<div className="mb-6 flex justify-center">
 					<span className="inline-flex items-center gap-2 font-mono-jb text-xs font-semibold uppercase tracking-[0.12em] text-teal-700 before:inline-block before:h-[1.5px] before:w-6 before:rounded-sm before:bg-teal-500">
-						JobFinder · Tuyển dụng 2026
+						DevMarket · Tuyển dụng 2026
 					</span>
 				</div>
 				<h1 className="mx-auto max-w-[1000px] text-center font-display text-[clamp(48px,8vw,96px)] font-bold leading-[0.95] tracking-[-0.04em] text-ink">

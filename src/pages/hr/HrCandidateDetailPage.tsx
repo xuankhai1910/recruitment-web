@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useResumes } from "@/hooks/useResumes";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { usePublicUserProfile } from "@/hooks/useUserProfile";
 import { usersApi } from "@/api/users.api";
 import { ResumeDetail } from "@/components/admin/resume/ResumeDetail";
@@ -74,6 +75,8 @@ export function HrCandidateDetailPage() {
 
 	const user = userQ.data;
 	const profile = profileQ.data?.profile;
+
+	useDocumentTitle(user?.name);
 
 	return (
 		<div className="space-y-6">

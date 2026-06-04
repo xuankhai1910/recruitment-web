@@ -83,7 +83,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Bảng điều khiển</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tổng quan toàn hệ thống JobFinder · cập nhật {today}
+            Tổng quan toàn hệ thống DevMarket · cập nhật {today}
           </p>
         </div>
         <div className="flex gap-2">

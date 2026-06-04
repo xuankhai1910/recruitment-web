@@ -42,7 +42,7 @@ export function LoginPage() {
 					</h1>
 					<p className="mt-5 max-w-[440px] text-base leading-relaxed text-white/65">
 						Đăng nhập để tiếp tục tìm kiếm việc làm phù hợp với bạn qua
-						JobFinder.
+						DevMarket.
 					</p>
 					<ul className="mt-10 flex flex-col gap-3.5">
 						{[
@@ -58,7 +58,7 @@ export function LoginPage() {
 					</ul>
 				</div>
 				<div className="relative font-mono-jb text-[13px] uppercase tracking-[0.1em] text-white/40">
-					JobFinder · v2026
+					DevMarket · v2026
 				</div>
 			</div>
 

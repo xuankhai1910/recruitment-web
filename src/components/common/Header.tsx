@@ -22,7 +22,6 @@ import { brandShort } from "@/lib/brand";
 import {
 	ArrowRight,
 	Bookmark,
-	Briefcase,
 	LayoutDashboard,
 	LogOut,
 	Menu,
@@ -59,12 +58,13 @@ export function Header() {
 			<div className="mx-auto flex h-18 max-w-[1280px] items-center justify-between px-7">
 				<div className="flex items-center gap-9">
 					<Link to="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-85">
-						<span className="relative grid h-9 w-9 place-items-center rounded-lg bg-ink text-teal-500">
-							<Briefcase className="h-[18px] w-[18px]" />
-							<span className="absolute -right-[3px] -top-[3px] h-2.5 w-2.5 rounded-full bg-teal-500 ring-2 ring-cream" />
-						</span>
+						<img
+							src="/logo.png"
+							alt="DevMarket"
+							className="h-9 w-9 rounded-lg object-contain"
+						/>
 						<span className="font-display text-[19px] font-bold tracking-tight text-ink">
-							JobFinder
+							DevMarket
 						</span>
 					</Link>
 					<nav className="hidden items-center gap-1 md:flex">

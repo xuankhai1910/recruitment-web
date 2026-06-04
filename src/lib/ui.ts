@@ -1,4 +1,4 @@
-// Shared Tailwind class strings for the JobFinder (candidate-side) design.
+// Shared Tailwind class strings for the DevMarket (candidate-side) design.
 // Keeps the teal/ink/cream visual language consistent across pages without a
 // separate stylesheet. Compose with cn() when local overrides are needed.
 

@@ -1,4 +1,5 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useCompany } from "@/hooks/useCompanies";
 import { useJobs } from "@/hooks/useJobs";
 import { JobCard } from "@/components/common/job-card/JobCard";
@@ -19,6 +20,7 @@ export function CompanyDetailPage() {
   const { id = "" } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: company, isLoading } = useCompany(id);
+  useDocumentTitle(company?.name);
   const { data: jobsData, isLoading: jobsLoading } = useJobs({
     current: 1,
     pageSize: 20,

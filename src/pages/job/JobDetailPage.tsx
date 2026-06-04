@@ -19,6 +19,7 @@ import {
   Users,
 } from "lucide-react";
 
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useJob, useSimilarJobs } from "@/hooks/useJobs";
 import { useCompany } from "@/hooks/useCompanies";
 import { useAuthStore } from "@/stores/auth.store";
@@ -51,6 +52,7 @@ export function JobDetailPage() {
   const { id = "" } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: job, isLoading } = useJob(id);
+  useDocumentTitle(job?.name);
   const { data: company } = useCompany(job?.company._id ?? "");
   const { data: similarJobs, isLoading: isLoadingSimilar } = useSimilarJobs(id);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);

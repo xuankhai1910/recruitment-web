@@ -32,6 +32,7 @@ import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { useNotificationBootstrap } from "@/hooks/useNotifications";
+import { useRouteDocumentTitle } from "@/hooks/useDocumentTitle";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CompanyPage from "@/pages/admin/CompanyPage";
 import UserPage from "@/pages/admin/UserPage";
@@ -53,6 +54,9 @@ export default function App() {
 
 	// Manage notification socket lifecycle alongside auth state.
 	useNotificationBootstrap();
+
+	// Đặt tên tab trình duyệt theo route hiện tại.
+	useRouteDocumentTitle();
 
 	useEffect(() => {
 		setLoading(true);

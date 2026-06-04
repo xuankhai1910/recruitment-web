@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 
 import { usePublicUserProfile } from "@/hooks/useUserProfile";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import type { PublicProfile } from "@/types/user-profile";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -294,6 +295,9 @@ function PublicHero({
 export function PublicProfilePage() {
 	const { userId = "" } = useParams();
 	const { data, isLoading, isError } = usePublicUserProfile(userId);
+	useDocumentTitle(
+		data?.profile?.personalInfo?.fullName || data?.user?.name,
+	);
 
 	if (isLoading) return <LoadingState />;
 	if (!userId || isError || !data) return <ProfileUnavailable />;

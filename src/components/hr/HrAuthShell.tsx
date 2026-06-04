@@ -75,7 +75,7 @@ function BrandPanel() {
 						Cổng nhà tuyển dụng
 					</span>
 					<h1 className="max-w-[16ch] font-heading text-[clamp(2rem,3vw,2.75rem)] font-bold leading-[1.1] tracking-tight text-slate-900 text-balance">
-						Tuyển dụng thông minh hơn cùng JobFinder
+						Tuyển dụng thông minh hơn cùng DevMarket
 					</h1>
 					<p className="max-w-[42ch] text-base text-slate-600">
 						Tiếp cận hàng nghìn ứng viên chất lượng và để AI giúp bạn tìm đúng

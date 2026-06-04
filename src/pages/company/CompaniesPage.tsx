@@ -61,7 +61,7 @@ export function CompaniesPage() {
 						{meta ? (
 							<>
 								<b className="font-display font-bold text-ink">{meta.total}</b>{" "}
-								công ty đang tuyển dụng trên JobFinder
+								công ty đang tuyển dụng trên DevMarket
 							</>
 						) : (
 							"Đang tải..."

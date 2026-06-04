@@ -1,4 +1,4 @@
-// Deterministic brand color + initials for logo blocks in the JobFinder design.
+// Deterministic brand color + initials for logo blocks in the DevMarket design.
 // Used when a company has no uploaded logo image.
 
 const PALETTE = [

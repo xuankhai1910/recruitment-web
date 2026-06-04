@@ -79,7 +79,7 @@ export function RegisterPage() {
 					<h1 className="mt-10 max-w-[480px] font-display text-[clamp(40px,5vw,64px)] font-bold leading-none tracking-[-0.035em] text-white">
 						Bắt đầu <em className="italic text-teal-400">sự nghiệp mới</em>
 						<br />
-						cùng JobFinder
+						cùng DevMarket
 					</h1>
 					<p className="mt-5 max-w-[440px] text-base leading-relaxed text-white/65">
 						Tạo tài khoản miễn phí, hoàn thành hồ sơ và nhận gợi ý việc làm phù
@@ -99,7 +99,7 @@ export function RegisterPage() {
 					</ul>
 				</div>
 				<div className="relative font-mono-jb text-[13px] uppercase tracking-[0.1em] text-white/40">
-					JobFinder · v2026
+					DevMarket · v2026
 				</div>
 			</div>
 

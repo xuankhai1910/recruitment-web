@@ -3,7 +3,7 @@ import type { CvTemplate, UserProfile } from "@/types/user-profile";
 
 interface CvPreviewProps {
 	profile: UserProfile;
-	/** Kept for backward-compat; there is now a single JobFinder template. */
+	/** Kept for backward-compat; there is now a single DevMarket template. */
 	template?: CvTemplate;
 }
 
@@ -71,7 +71,7 @@ function ItemHead({ role, when }: { role: string; when?: string }) {
 }
 
 /**
- * Single JobFinder CV template (Wellfound-style: Space Grotesk display, mono
+ * Single DevMarket CV template (Wellfound-style: Space Grotesk display, mono
  * teal section labels, sharp skill tags). Rendered at A4 width for PDF export.
  */
 export function CvPreview({ profile }: CvPreviewProps) {
