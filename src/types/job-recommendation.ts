@@ -1,4 +1,5 @@
 import type { Job } from "./job";
+import type { MatchBreakdown, MatchCvSide } from "./match";
 
 /** Score breakdown returned by the profile-based recommendation engine. */
 export interface ProfileRecommendation {
@@ -6,6 +7,8 @@ export interface ProfileRecommendation {
   vectorScore: number;
   skillScore: number;
   matchedSkills: string[];
+  /** Full 7-signal breakdown (profile recommender now uses the hybrid scorer). */
+  breakdown: MatchBreakdown;
 }
 
 /** A single recommended job: full Job fields + recommendation metadata. */
@@ -22,6 +25,8 @@ export interface ProfileRecommendationProfile {
 
 export interface ProfileRecommendationsResponse {
   profile: ProfileRecommendationProfile;
+  /** Candidate side derived from the profile — for the comparison modal. */
+  cvSummary: MatchCvSide;
   total: number;
   items: ProfileRecommendedJob[];
 }

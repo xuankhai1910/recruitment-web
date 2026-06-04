@@ -1,4 +1,5 @@
 import type { Job } from "./job";
+import type { MatchBreakdown } from "./match";
 
 export type CvLevel = "INTERN" | "JUNIOR" | "MID" | "SENIOR" | "LEAD" | string;
 
@@ -6,6 +7,10 @@ export interface CvExtractedData {
   skills: string[];
   level: CvLevel;
   yearsOfExperience: number;
+  /** Vị trí ứng viên hướng tới (vd "Backend Developer"). */
+  desiredJobTitle?: string;
+  desiredCategory?: string;
+  desiredSpecialization?: string;
   education: string;
   preferredLocations: string[];
   summary: string;
@@ -39,11 +44,7 @@ export interface RecommendedJobItem {
   job: Job;
   score: number;
   matchedSkills: string[];
-  breakdown: {
-    skillScore: number;
-    levelScore: number;
-    locationScore: number;
-  };
+  breakdown: MatchBreakdown;
 }
 
 export interface RecommendJobsResponse {

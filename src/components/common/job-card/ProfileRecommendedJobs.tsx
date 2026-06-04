@@ -20,11 +20,7 @@ function toCardItem(rec: ProfileRecommendedJob): RecommendedJobItem {
     job,
     score: recommendation.finalScore,
     matchedSkills: recommendation.matchedSkills,
-    breakdown: {
-      skillScore: recommendation.skillScore,
-      levelScore: 0,
-      locationScore: 0,
-    },
+    breakdown: recommendation.breakdown,
   };
 }
 
@@ -170,7 +166,13 @@ export function ProfileRecommendedJobs() {
           )}
         >
           {items.map((rec) => (
-            <RecommendedJobCard key={rec._id} item={toCardItem(rec)} />
+            <RecommendedJobCard
+              key={rec._id}
+              item={toCardItem(rec)}
+              cvSide={data?.cvSummary}
+              estimated
+              analyzedBy="ai"
+            />
           ))}
         </div>
       );

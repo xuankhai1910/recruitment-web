@@ -56,6 +56,17 @@ export function RecommendedJobsPage() {
   }, [hasCv, refetch]);
 
   const allRecs = data?.recommendations ?? [];
+  const analysis = data?.analysis;
+  const cvSide = analysis
+    ? {
+        skills: analysis.extractedData.skills,
+        level: analysis.extractedData.level,
+        yearsOfExperience: analysis.extractedData.yearsOfExperience,
+        desiredJobTitle: analysis.extractedData.desiredJobTitle,
+        desiredSpecialization: analysis.extractedData.desiredSpecialization,
+        preferredLocations: analysis.extractedData.preferredLocations,
+      }
+    : undefined;
   const filtered = useMemo(() => {
     const min = Number(minScore);
     return min > 0 ? allRecs.filter((r) => r.score * 100 >= min) : allRecs;
@@ -297,7 +308,12 @@ export function RecommendedJobsPage() {
             ) : (
               <div className="grid gap-4 lg:grid-cols-2">
                 {filtered.map((item) => (
-                  <RecommendedJobCard key={item.job._id} item={item} />
+                  <RecommendedJobCard
+                    key={item.job._id}
+                    item={item}
+                    cvSide={cvSide}
+                    analyzedBy={analysis?.analyzedBy}
+                  />
                 ))}
               </div>
             )}

@@ -1,18 +1,16 @@
+import type {
+  MatchBreakdown,
+  MatchCvSide,
+  MatchJobSide,
+} from "./match";
+
 export interface ResumeHistory {
   status: string;
   updatedAt: string;
   updatedBy: { _id: string; email: string };
 }
 
-export interface ResumeMatchBreakdown {
-  skillScore: number;
-  titleScore: number;
-  desiredTitleScore: number;
-  specializationScore: number;
-  levelScore: number;
-  locationScore: number;
-  vectorScore: number;
-}
+export type ResumeMatchBreakdown = MatchBreakdown;
 
 export interface ResumeMatch {
   score: number; // 0..1
@@ -21,17 +19,14 @@ export interface ResumeMatch {
   analyzedBy: "ai" | "keyword";
   analyzedAt: string;
   jobId: string;
+  /** Snapshot phía CV — có từ khi feature so sánh ra mắt; match cũ sẽ thiếu. */
+  extracted?: MatchCvSide;
+  /** Snapshot phía job (yêu cầu đã chấm). */
+  jobRequirements?: MatchJobSide;
 }
 
-/** Trả về từ POST /cv-analysis/resumes/:id/match — match + tóm tắt CV. */
-export interface ResumeMatchResult extends ResumeMatch {
-  extracted: {
-    skills: string[];
-    level: string;
-    yearsOfExperience: number;
-    desiredJobTitle?: string;
-  };
-}
+/** Trả về từ POST /cv-analysis/resumes/:id/match. Nay match đã gồm extracted + jobRequirements. */
+export type ResumeMatchResult = ResumeMatch;
 
 /** Hạn mức phân tích hàng loạt của công ty trong tháng. */
 export interface MatchBatchQuota {

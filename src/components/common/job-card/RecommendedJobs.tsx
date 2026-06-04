@@ -112,6 +112,17 @@ export function RecommendedJobs() {
   }
 
   const recs = recData?.recommendations ?? [];
+  const analysis = recData?.analysis;
+  const cvSide = analysis
+    ? {
+        skills: analysis.extractedData.skills,
+        level: analysis.extractedData.level,
+        yearsOfExperience: analysis.extractedData.yearsOfExperience,
+        desiredJobTitle: analysis.extractedData.desiredJobTitle,
+        desiredSpecialization: analysis.extractedData.desiredSpecialization,
+        preferredLocations: analysis.extractedData.preferredLocations,
+      }
+    : undefined;
 
   return (
     <section className={ui.section}>
@@ -149,7 +160,12 @@ export function RecommendedJobs() {
             )}
           >
             {recs.map((item) => (
-              <RecommendedJobCard key={item.job._id} item={item} />
+              <RecommendedJobCard
+                key={item.job._id}
+                item={item}
+                cvSide={cvSide}
+                analyzedBy={analysis?.analyzedBy}
+              />
             ))}
           </div>
         )}

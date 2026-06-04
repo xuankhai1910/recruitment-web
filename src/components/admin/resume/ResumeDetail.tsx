@@ -21,11 +21,14 @@ import {
   Sparkles,
   Brain,
   AlertTriangle,
+  ListChecks,
 } from "lucide-react";
 import {
   useUpdateResumeStatus,
   useAnalyzeResumeMatch,
 } from "@/hooks/useResumes";
+import { MatchComparisonModal } from "@/components/common/match/MatchComparisonModal";
+import { matchInputFromResumeMatch } from "@/lib/match-explanation";
 import { STATUS_LIST, formatDateTime } from "@/lib/constants";
 import type {
   Resume,
@@ -229,20 +232,8 @@ function InfoItem({
   );
 }
 
-const BREAKDOWN_LABELS: {
-  key: keyof ResumeMatch["breakdown"];
-  label: string;
-}[] = [
-  { key: "skillScore", label: "Kỹ năng" },
-  { key: "vectorScore", label: "Tương đồng ngữ nghĩa" },
-  { key: "levelScore", label: "Cấp độ" },
-  { key: "specializationScore", label: "Chuyên môn" },
-  { key: "desiredTitleScore", label: "Vị trí mong muốn" },
-  { key: "titleScore", label: "Kỹ năng trong tiêu đề" },
-  { key: "locationScore", label: "Địa điểm" },
-];
-
 function MatchPanel({ match }: { match: ResumeMatch | ResumeMatchResult }) {
+  const [compareOpen, setCompareOpen] = useState(false);
   const pct = Math.round((match.score ?? 0) * 100);
   const scoreColor =
     pct >= 70
@@ -298,32 +289,22 @@ function MatchPanel({ match }: { match: ResumeMatch | ResumeMatchResult }) {
         )}
       </div>
 
-      {/* Breakdown */}
-      <div className="space-y-2">
-        {BREAKDOWN_LABELS.map(({ key, label }) => (
-          <BreakdownBar key={key} label={label} value={match.breakdown[key] ?? 0} />
-        ))}
-      </div>
-    </div>
-  );
-}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full cursor-pointer"
+        onClick={() => setCompareOpen(true)}
+      >
+        <ListChecks className="mr-1.5 h-4 w-4" />
+        Xem so sánh chi tiết CV ↔ tin tuyển
+      </Button>
 
-function BreakdownBar({ label, value }: { label: string; value: number }) {
-  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
-  return (
-    <div className="flex items-center gap-3">
-      <span className="w-40 shrink-0 text-xs text-muted-foreground">
-        {label}
-      </span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full rounded-full bg-teal-500 transition-all"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="w-9 shrink-0 text-right text-xs font-medium text-foreground">
-        {pct}%
-      </span>
+      <MatchComparisonModal
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        input={matchInputFromResumeMatch(match)}
+        incomplete={!match.jobRequirements}
+      />
     </div>
   );
 }

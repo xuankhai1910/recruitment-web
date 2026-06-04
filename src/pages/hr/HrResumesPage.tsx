@@ -38,6 +38,8 @@ import { formatDateTime } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { nonAccentVietnamese, toSearchRegex } from "@/lib/vietnamese";
 import { ResumeDetail } from "@/components/admin/resume/ResumeDetail";
+import { MatchComparisonModal } from "@/components/common/match/MatchComparisonModal";
+import { matchInputFromResumeMatch } from "@/lib/match-explanation";
 import { usersApi } from "@/api/users.api";
 import type { Resume } from "@/types/resume";
 
@@ -217,6 +219,7 @@ export function HrResumesPage() {
 
   const [selected, setSelected] = useState<Resume | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [explainRow, setExplainRow] = useState<Resume | null>(null);
 
   const getJobName = (r: Resume) => {
     if (!r.jobId) return "—";
@@ -323,14 +326,20 @@ export function HrResumesPage() {
         const pct = Math.round((row.match.score ?? 0) * 100);
         const color =
           pct >= 70
-            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-50"
+            ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
             : pct >= 40
-              ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50"
-              : "bg-red-50 text-red-700 border-red-200 hover:bg-red-50";
+              ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+              : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100";
         return (
-          <Badge variant="outline" className={color}>
-            {pct}%
-          </Badge>
+          <button
+            type="button"
+            onClick={() => setExplainRow(row)}
+            title="Xem vì sao phù hợp"
+          >
+            <Badge variant="outline" className={cn("cursor-pointer", color)}>
+              {pct}%
+            </Badge>
+          </button>
         );
       },
     },
@@ -550,6 +559,16 @@ export function HrResumesPage() {
         onOpenChange={setDetailOpen}
         resume={selected}
       />
+
+      {explainRow?.match && (
+        <MatchComparisonModal
+          open={!!explainRow}
+          onOpenChange={(o) => !o && setExplainRow(null)}
+          input={matchInputFromResumeMatch(explainRow.match)}
+          jobName={getJobName(explainRow)}
+          incomplete={!explainRow.match.jobRequirements}
+        />
+      )}
     </div>
   );
 }
