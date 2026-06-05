@@ -32,6 +32,8 @@ const ROUTE_TITLES: TitledRoute[] = [
 	// Auth
 	{ path: "/login", title: "Đăng nhập" },
 	{ path: "/register", title: "Đăng ký" },
+	{ path: "/forgot-password", title: "Quên mật khẩu" },
+	{ path: "/reset-password", title: "Đặt lại mật khẩu" },
 	{ path: "/hr/login", title: "Đăng nhập nhà tuyển dụng" },
 	{ path: "/hr/register", title: "Đăng ký nhà tuyển dụng" },
 
