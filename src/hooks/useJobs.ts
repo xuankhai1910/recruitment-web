@@ -106,6 +106,8 @@ export function useSimilarJobs(id: string) {
     queryKey: ["jobs", id, "similar"],
     queryFn: () => jobsApi.getSimilar(id).then((r) => r.data.data),
     enabled: !!id,
+    placeholderData: undefined,
+    staleTime: 0,
   });
 }
 
