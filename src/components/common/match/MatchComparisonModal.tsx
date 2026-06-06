@@ -123,7 +123,9 @@ export function MatchComparisonModal({
           </p>
           {ex.matchedSkills.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              Không có kỹ năng khớp.
+              {ex.jobSkillCount === 0
+                ? "Tin tuyển chưa khai báo kỹ năng yêu cầu."
+                : "Không có kỹ năng khớp."}
             </p>
           ) : (
             <div className="flex flex-wrap gap-1.5">

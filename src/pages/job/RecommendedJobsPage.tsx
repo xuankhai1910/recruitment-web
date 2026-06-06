@@ -63,6 +63,7 @@ export function RecommendedJobsPage() {
         level: analysis.extractedData.level,
         yearsOfExperience: analysis.extractedData.yearsOfExperience,
         desiredJobTitle: analysis.extractedData.desiredJobTitle,
+        desiredCategory: analysis.extractedData.desiredCategory,
         desiredSpecialization: analysis.extractedData.desiredSpecialization,
         preferredLocations: analysis.extractedData.preferredLocations,
       }

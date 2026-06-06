@@ -63,7 +63,107 @@ export function matchInputFromResumeMatch(m: ResumeMatch): MatchInput {
   };
 }
 
-const norm = (s: string) => s.toLowerCase().trim();
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\u0111/g, "d")
+    .trim();
+const sameNorm = (a?: string, b?: string) => !!a && !!b && norm(a) === norm(b);
+
+const titleTokens = (title?: string): Set<string> => {
+  const normalized = (title || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\u0111/g, "d")
+    .replace(/\bfull\s*[-/]?\s*stack\b/g, "fullstack")
+    .replace(/\bfront\s*[-/]?\s*end\b/g, "frontend")
+    .replace(/\bback\s*[-/]?\s*end\b/g, "backend")
+    .replace(/\breact\s*[-/]?\s*js\b/g, "reactjs")
+    .replace(/\bnode\s*[-/]?\s*js\b/g, "nodejs")
+    .replace(/\bnext\s*[-/]?\s*js\b/g, "nextjs")
+    .replace(/\bvue\s*[-/]?\s*js\b/g, "vuejs");
+  const stopwords = new Set([
+    "developer",
+    "engineer",
+    "analyst",
+    "intern",
+    "internship",
+    "fresher",
+    "junior",
+    "senior",
+    "thuc",
+    "tap",
+    "sinh",
+    "tts",
+  ]);
+  return new Set(
+    normalized
+      .split(/[^a-z0-9+#./]+/)
+      .map((t) => t.replace(/[./]+/g, ""))
+      .filter((t) => t.length >= 2 && !stopwords.has(t)),
+  );
+};
+
+function titlesOverlap(cvTitle?: string, jobTitle?: string): boolean {
+  const cvTokens = titleTokens(cvTitle);
+  const jobTokens = titleTokens(jobTitle);
+  if (cvTokens.size === 0 || jobTokens.size === 0) return false;
+  for (const token of cvTokens) {
+    if (jobTokens.has(token)) return true;
+  }
+  return false;
+}
+
+function hasStrongSemanticAlignment(
+  input: MatchInput,
+  matchedSkills: string[],
+): boolean {
+  const { breakdown: b, cv, job } = input;
+  const roleScore = b.roleScore;
+  const strongSkillSignal =
+    b.skillScore >= 0.5 || (matchedSkills.length >= 2 && b.skillScore >= 0.3);
+  return (
+    (roleScore ?? 0) >= 0.75 ||
+    b.titleScore >= 0.5 ||
+    b.desiredTitleScore >= 0.34 ||
+    titlesOverlap(cv.desiredJobTitle, job.name) ||
+    sameNorm(cv.desiredSpecialization, job.specialization) ||
+    (strongSkillSignal && (roleScore == null || roleScore >= 0.35))
+  );
+}
+
+function hasWeakSemanticAlignment(
+  input: MatchInput,
+  matchedSkills: string[],
+): boolean {
+  const { breakdown: b, cv, job } = input;
+  const roleScore = b.roleScore;
+  const weakSkillSignal = b.skillScore >= 0.3 || matchedSkills.length >= 2;
+  return (
+    hasStrongSemanticAlignment(input, matchedSkills) ||
+    (roleScore ?? 0) >= 0.35 ||
+    b.titleScore > 0 ||
+    b.desiredTitleScore > 0 ||
+    sameNorm(cv.desiredCategory, job.category) ||
+    (weakSkillSignal && (roleScore == null || roleScore >= 0.2))
+  );
+}
+
+function isClearSemanticMismatch(input: MatchInput): boolean {
+  const { breakdown: b } = input;
+  if (b.roleScore == null) {
+    return b.skillScore === 0 && b.titleScore === 0 && b.desiredTitleScore === 0;
+  }
+  return (
+    b.roleScore < 0.35 &&
+    b.skillScore < 0.5 &&
+    b.titleScore < 0.5 &&
+    b.desiredTitleScore < 0.34
+  );
+}
 
 /** Job-required skills the CV doesn't cover (matchedSkills ⊆ job.skills). */
 function computeMissingSkills(
@@ -80,6 +180,12 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
   const jobSkills = job.skills ?? [];
   const matchedSkills = input.matchedSkills ?? [];
   const missingSkills = computeMissingSkills(jobSkills, matchedSkills);
+  const strongSemanticAlignment = hasStrongSemanticAlignment(
+    input,
+    matchedSkills,
+  );
+  const weakSemanticAlignment = hasWeakSemanticAlignment(input, matchedSkills);
+  const clearSemanticMismatch = isClearSemanticMismatch(input);
   const rows: ComparisonRow[] = [];
 
   // ── Vị trí / lĩnh vực ──────────────────────────────────────
@@ -87,10 +193,22 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     const cvTitle = cv.desiredJobTitle?.trim();
     const jobTitle = job.name?.trim();
     let verdict: Verdict = "unknown";
+    const titleOverlap = titlesOverlap(cvTitle, jobTitle);
     if (cvTitle && jobTitle) {
-      if (b.desiredTitleScore >= 0.34 || b.titleScore >= 0.5) {
+      if (
+        (b.roleScore ?? 0) >= 0.75 ||
+        b.desiredTitleScore >= 0.34 ||
+        b.titleScore >= 0.5 ||
+        titleOverlap ||
+        sameNorm(cv.desiredSpecialization, job.specialization)
+      ) {
         verdict = "match";
-      } else if (b.vectorScore >= VECTOR_MED) {
+      } else if (
+        (b.roleScore ?? 0) >= 0.35 ||
+        b.desiredTitleScore > 0 ||
+        b.titleScore > 0 ||
+        sameNorm(cv.desiredCategory, job.category)
+      ) {
         verdict = "partial";
       } else {
         verdict = "mismatch";
@@ -101,6 +219,36 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
       label: "Vị trí / lĩnh vực",
       cvText: cvTitle || "—",
       jobText: jobTitle || "—",
+      verdict,
+    });
+  }
+
+  // ── Chuyên môn / nhóm nghề ───────────────────────────────────
+  {
+    const cvText = [cv.desiredCategory, cv.desiredSpecialization]
+      .filter(Boolean)
+      .join(" / ");
+    const jobText = [job.category, job.specialization]
+      .filter(Boolean)
+      .join(" / ");
+    let verdict: Verdict = "unknown";
+    const roleScore = b.roleScore;
+    if (typeof roleScore === "number") {
+      if (roleScore >= 0.75) verdict = "match";
+      else if (roleScore >= 0.35) verdict = "partial";
+      else verdict = "mismatch";
+    } else if (cvText && jobText) {
+      if (sameNorm(cv.desiredSpecialization, job.specialization))
+        verdict = "match";
+      else if (sameNorm(cv.desiredCategory, job.category))
+        verdict = "partial";
+      else verdict = "mismatch";
+    }
+    rows.push({
+      key: "role",
+      label: "Chuyên môn",
+      cvText: cvText || "—",
+      jobText: jobText || "—",
       verdict,
     });
   }
@@ -148,16 +296,15 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     });
   }
 
-  // Note: chủ ý KHÔNG hiển thị dòng "Chuyên môn" — CV/hồ sơ thường chỉ có vị
-  // trí mong muốn, không có chuyên môn riêng, nên dòng này hầu như luôn "Không
-  // rõ". Backend vẫn chấm specialization khi có dữ liệu (vd CV trích từ PDF).
-
   // ── Tương đồng ngữ nghĩa ───────────────────────────────────
   {
     let verdict: Verdict = "unknown";
     if (b.vectorScore > 0) {
-      if (b.vectorScore >= VECTOR_HIGH) verdict = "match";
-      else if (b.vectorScore >= VECTOR_MED) verdict = "partial";
+      if (clearSemanticMismatch) verdict = "mismatch";
+      else if (b.vectorScore >= VECTOR_HIGH && strongSemanticAlignment)
+        verdict = "match";
+      else if (b.vectorScore >= VECTOR_MED && weakSemanticAlignment)
+        verdict = "partial";
       else verdict = "mismatch";
     }
     rows.push({
@@ -214,13 +361,20 @@ function buildSentences(args: {
     out.push(`Vị trí phù hợp với tin "${job.name}".`);
   } else if (title?.verdict === "partial") {
     out.push(
-      `CV hướng "${cv.desiredJobTitle}" — khác tên với "${job.name}" nhưng cùng lĩnh vực (độ tương đồng ngữ nghĩa cao).`,
+      `CV hướng "${cv.desiredJobTitle}" — khác tên với "${job.name}", nhưng có một số tín hiệu liên quan.`,
     );
   } else if (title?.verdict === "mismatch") {
     out.push(
       `Vị trí mong muốn ("${cv.desiredJobTitle}") khác với tin tuyển ("${job.name}").`,
     );
   }
+
+  const role = rowByKey.role;
+  if (role?.verdict === "match") out.push("Chuyên môn phù hợp với tin tuyển.");
+  else if (role?.verdict === "partial")
+    out.push("Chuyên môn có liên quan một phần tới tin tuyển.");
+  else if (role?.verdict === "mismatch")
+    out.push("Chuyên môn chính khác với tin tuyển.");
 
   const level = rowByKey.level;
   if (level?.verdict === "match") out.push("Cấp độ phù hợp với yêu cầu.");
@@ -236,7 +390,7 @@ function buildSentences(args: {
 
   const sem = rowByKey.semantic;
   if (sem?.verdict === "match")
-    out.push("Nội dung CV rất tương đồng với mô tả công việc.");
+    out.push("Nội dung tổng thể của CV tương đồng với mô tả công việc.");
 
   return out;
 }

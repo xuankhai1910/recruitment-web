@@ -10,6 +10,8 @@ export interface MatchBreakdown {
   skillScore: number;
   titleScore: number;
   desiredTitleScore: number;
+  /** Newer matches include taxonomy-aware role compatibility. */
+  roleScore?: number;
   specializationScore: number;
   levelScore: number;
   locationScore: number;
@@ -22,6 +24,7 @@ export interface MatchCvSide {
   level?: string;
   yearsOfExperience?: number;
   desiredJobTitle?: string;
+  desiredCategory?: string;
   desiredSpecialization?: string;
   preferredLocations?: string[];
 }
