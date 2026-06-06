@@ -35,6 +35,7 @@ import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
 import { useNotificationBootstrap } from "@/hooks/useNotifications";
 import { useRouteDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useRouteScrollReset } from "@/hooks/useRouteScrollReset";
 import DashboardPage from "@/pages/admin/DashboardPage";
 import CompanyPage from "@/pages/admin/CompanyPage";
 import UserPage from "@/pages/admin/UserPage";
@@ -59,6 +60,7 @@ export default function App() {
 
 	// Đặt tên tab trình duyệt theo route hiện tại.
 	useRouteDocumentTitle();
+	useRouteScrollReset();
 
 	useEffect(() => {
 		setLoading(true);
