@@ -51,7 +51,7 @@ export function MatchComparisonModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-teal-600" />
@@ -187,13 +187,13 @@ export function MatchComparisonModal({
                   {row.label}
                 </span>
                 <span
-                  className="min-w-0 truncate text-sm text-teal-800"
+                  className="min-w-0 wrap-break-word text-sm text-teal-800"
                   title={row.cvText}
                 >
                   {row.cvText}
                 </span>
                 <span
-                  className="min-w-0 truncate text-sm text-foreground"
+                  className="min-w-0 wrap-break-word text-sm text-foreground"
                   title={row.jobText}
                 >
                   {row.jobText}

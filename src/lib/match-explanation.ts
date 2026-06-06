@@ -155,7 +155,9 @@ function hasWeakSemanticAlignment(
 function isClearSemanticMismatch(input: MatchInput): boolean {
   const { breakdown: b } = input;
   if (b.roleScore == null) {
-    return b.skillScore === 0 && b.titleScore === 0 && b.desiredTitleScore === 0;
+    return (
+      b.skillScore === 0 && b.titleScore === 0 && b.desiredTitleScore === 0
+    );
   }
   return (
     b.roleScore < 0.35 &&
@@ -216,7 +218,7 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     }
     rows.push({
       key: "title",
-      label: "Vị trí / lĩnh vực",
+      label: "Vị trí ứng tuyển",
       cvText: cvTitle || "—",
       jobText: jobTitle || "—",
       verdict,
@@ -240,13 +242,12 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     } else if (cvText && jobText) {
       if (sameNorm(cv.desiredSpecialization, job.specialization))
         verdict = "match";
-      else if (sameNorm(cv.desiredCategory, job.category))
-        verdict = "partial";
+      else if (sameNorm(cv.desiredCategory, job.category)) verdict = "partial";
       else verdict = "mismatch";
     }
     rows.push({
       key: "role",
-      label: "Chuyên môn",
+      label: "Nhóm ngành",
       cvText: cvText || "—",
       jobText: jobText || "—",
       verdict,
@@ -289,7 +290,7 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     const jobText = [jobLevel || null, jobYears].filter(Boolean).join(" · ");
     rows.push({
       key: "level",
-      label: "Kinh nghiệm & cấp độ",
+      label: "Kinh nghiệm",
       cvText: cvText || "—",
       jobText: jobText || "—",
       verdict,
@@ -309,7 +310,7 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     }
     rows.push({
       key: "semantic",
-      label: "Tương đồng ngữ nghĩa",
+      label: "Đánh giá tổng thể",
       cvText: "Toàn bộ nội dung CV",
       jobText: "Mô tả công việc",
       verdict,
