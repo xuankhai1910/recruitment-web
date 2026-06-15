@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useUploadFile } from "@/hooks/useFiles";
 import { useCreateResume } from "@/hooks/useResumes";
 import { useAuthStore } from "@/stores/auth.store";
-import { FileText, Upload, X } from "lucide-react";
+import { AlertTriangle, FileText, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Job } from "@/types/job";
 
@@ -23,6 +23,10 @@ interface ApplyModalProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	job: Job;
+	/** Số lần user đã ứng tuyển job này (để cảnh báo lần cuối). */
+	applyCount?: number;
+	/** Hạn mức tối đa (mặc định 3). */
+	applyLimit?: number;
 }
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -34,7 +38,13 @@ const ACCEPT = {
 	],
 };
 
-export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
+export function ApplyModal({
+	open,
+	onOpenChange,
+	job,
+	applyCount = 0,
+	applyLimit = 3,
+}: ApplyModalProps) {
 	const navigate = useNavigate();
 	const { user, isAuthenticated } = useAuthStore();
 	const [file, setFile] = useState<File | null>(null);
@@ -80,12 +90,16 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
 			});
 			onOpenChange(false);
 			setFile(null);
-		} catch {
-			toast.error("Nộp hồ sơ thất bại. Vui lòng thử lại.");
+		} catch (err) {
+			const msg = (err as { response?: { data?: { message?: string } } })
+				?.response?.data?.message;
+			toast.error(msg ?? "Nộp hồ sơ thất bại. Vui lòng thử lại.");
 		}
 	};
 
 	const submitting = uploadFile.isPending || createResume.isPending;
+	// Lần ứng tuyển sắp tới sẽ là lần cuối được phép (vd đã apply 2/3 lần).
+	const isLastAttempt = applyCount === applyLimit - 1;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -166,7 +180,18 @@ export function ApplyModal({ open, onOpenChange, job }: ApplyModalProps) {
 					</div>
 				</div>
 
-				<DialogFooter className="gap-2 sm:gap-2">
+				{isLastAttempt && (
+						<div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3">
+							<AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+							<p className="text-xs leading-relaxed text-amber-700">
+								Đây là{" "}
+								<span className="font-semibold">lần ứng tuyển cuối cùng</span>{" "}
+								bạn có thể nộp cho công việc này (tối đa {applyLimit} lần).
+							</p>
+						</div>
+					)}
+
+					<DialogFooter className="gap-2 sm:gap-2">
 					<Button
 						variant="outline"
 						onClick={() => {

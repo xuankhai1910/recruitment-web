@@ -27,6 +27,15 @@ export function useMyResumes() {
   });
 }
 
+/** Số lần user đã ứng tuyển 1 job — dùng để đổi nhãn nút & cảnh báo lần cuối. */
+export function useApplyCount(jobId: string, enabled = true) {
+  return useQuery({
+    queryKey: ['resumes', 'apply-count', jobId],
+    queryFn: () => resumesApi.getApplyCount(jobId).then((r) => r.data.data),
+    enabled: enabled && !!jobId,
+  });
+}
+
 export function useCreateResume() {
   const qc = useQueryClient();
   return useMutation({

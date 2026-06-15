@@ -30,6 +30,12 @@ export const resumesApi = {
   getByUser: () =>
     api.post<ApiResponse<Resume[]>>('/resumes/by-user'),
 
+  // Số lần user đã ứng tuyển 1 job (+ hạn mức) — FE đổi nhãn nút & cảnh báo.
+  getApplyCount: (jobId: string) =>
+    api.get<ApiResponse<{ count: number; limit: number; remaining: number }>>(
+      `/resumes/apply-count/${jobId}`,
+    ),
+
   updateStatus: (id: string, data: UpdateResumeStatusDto) =>
     api.patch<ApiResponse<Resume>>(`/resumes/${id}`, data),
 

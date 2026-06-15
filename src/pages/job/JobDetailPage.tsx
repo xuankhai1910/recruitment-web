@@ -24,6 +24,7 @@ import { useJob, useSimilarJobs } from "@/hooks/useJobs";
 import { useCompany } from "@/hooks/useCompanies";
 import { useAuthStore } from "@/stores/auth.store";
 import { useCheckSaved, useToggleSaveJob } from "@/hooks/useSavedJobs";
+import { useApplyCount } from "@/hooks/useResumes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApplyModal } from "@/components/common/ApplyModal";
 import { JobCard } from "@/components/common/job-card/JobCard";
@@ -59,6 +60,10 @@ export function JobDetailPage() {
   const { data: savedCheck } = useCheckSaved(isAuthenticated ? id : "");
   const toggleSave = useToggleSaveJob();
   const saved = savedCheck ?? false;
+  const { data: applyInfo } = useApplyCount(id, isAuthenticated);
+  const applyCount = applyInfo?.count ?? 0;
+  const applyLimit = applyInfo?.limit ?? 3;
+  const reachedLimit = applyCount >= applyLimit;
   const [applyOpen, setApplyOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
@@ -73,6 +78,12 @@ export function JobDetailPage() {
   const handleApply = () => {
     if (!isAuthenticated) {
       setLoginDialogOpen(true);
+      return;
+    }
+    if (reachedLimit) {
+      toast.error(
+        `Bạn đã ứng tuyển công việc này tối đa ${applyLimit} lần.`,
+      );
       return;
     }
     setApplyOpen(true);
@@ -211,10 +222,14 @@ export function JobDetailPage() {
                 <button
                   className="inline-flex h-13 items-center gap-2 rounded-lg bg-teal-500 px-7 text-[15px] font-semibold text-white transition-colors hover:bg-teal-600 disabled:opacity-60"
                   onClick={handleApply}
-                  disabled={!job.isActive}
+                  disabled={!job.isActive || reachedLimit}
                 >
                   <Send className="h-[18px] w-[18px]" />
-                  Ứng tuyển ngay
+                  {reachedLimit
+                    ? "Đã đạt giới hạn ứng tuyển"
+                    : applyCount > 0
+                      ? "Ứng tuyển lại"
+                      : "Ứng tuyển ngay"}
                 </button>
                 <button
                   className="inline-flex h-13 items-center gap-2 rounded-lg border border-white/20 bg-transparent px-7 text-[15px] font-semibold text-white transition-colors hover:bg-white/10 disabled:opacity-60"
@@ -421,7 +436,13 @@ export function JobDetailPage() {
         </aside>
       </div>
 
-      <ApplyModal open={applyOpen} onOpenChange={setApplyOpen} job={job} />
+      <ApplyModal
+        open={applyOpen}
+        onOpenChange={setApplyOpen}
+        job={job}
+        applyCount={applyCount}
+        applyLimit={applyLimit}
+      />
       <LoginRequiredDialog
         open={loginDialogOpen}
         onOpenChange={setLoginDialogOpen}
