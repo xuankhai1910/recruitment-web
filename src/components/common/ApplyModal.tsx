@@ -32,7 +32,6 @@ interface ApplyModalProps {
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPT = {
 	"application/pdf": [".pdf"],
-	"application/msword": [".doc"],
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
 		".docx",
 	],
@@ -54,7 +53,7 @@ export function ApplyModal({
 
 	const onDrop = useCallback((accepted: File[], rejected: unknown[]) => {
 		if (rejected.length > 0) {
-			toast.error("File không hợp lệ. Chỉ nhận PDF/DOC/DOCX, tối đa 5MB.");
+			toast.error("File không hợp lệ. Chỉ nhận PDF/DOCX, tối đa 5MB.");
 			return;
 		}
 		if (accepted[0]) setFile(accepted[0]);
@@ -172,7 +171,7 @@ export function ApplyModal({
 										Kéo thả CV vào đây hoặc bấm để chọn
 									</p>
 									<p className="mt-0.5 text-xs text-muted-foreground">
-										PDF, DOC, DOCX · tối đa 5MB
+										PDF, DOCX · tối đa 5MB
 									</p>
 								</div>
 							</div>

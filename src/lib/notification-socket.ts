@@ -6,6 +6,16 @@ import type { AppNotification } from "@/types/notification";
 
 let socket: Socket | null = null;
 
+// Notification types mirror a change to a resume/application. When one arrives
+// we also refetch the ['resumes'] query family so any open list/detail updates
+// in real time — the candidate's "Đơn ứng tuyển" page (['resumes','my']) and
+// the HR resume table (['resumes', params]) — instead of only the bell badge.
+const RESUME_RELATED_TYPES = new Set<AppNotification["type"]>([
+  "RESUME_STATUS_CHANGED",
+  "NEW_RESUME_RECEIVED",
+  "RESUME_SUBMITTED",
+]);
+
 function resolveSocketHost(): string {
   const base = import.meta.env.VITE_API_BASE_URL ?? "";
   return base.replace(/\/?api\/v\d+\/?$/, "");
@@ -58,6 +68,9 @@ export function connectNotificationSocket(
   socket.on("notification:new", (n: AppNotification) => {
     if (!n.isRead) store.getState().incrementUnread();
     queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    if (RESUME_RELATED_TYPES.has(n.type)) {
+      queryClient.invalidateQueries({ queryKey: ["resumes"] });
+    }
     toast(n.title, {
       description: n.message,
       action: onToastClick
