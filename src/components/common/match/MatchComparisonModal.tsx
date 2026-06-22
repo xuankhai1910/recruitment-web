@@ -78,7 +78,6 @@ export function MatchComparisonModal({
           <div className="flex-1 space-y-1">
             {input.analyzedBy && (
               <div className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                <Brain className="h-4 w-4 text-teal-600" />
                 {input.analyzedBy === "ai"
                   ? "Phân tích bởi Gemini AI"
                   : "Phân tích cơ bản (từ khoá)"}
@@ -92,8 +91,8 @@ export function MatchComparisonModal({
             )}
             {ex.estimated && (
               <p className="text-xs text-muted-foreground">
-                Một số thông tin (cấp độ, vị trí, địa điểm) được suy ra từ hồ
-                sơ của bạn.
+                Một số thông tin (cấp độ, vị trí, địa điểm) được suy ra từ hồ sơ
+                của bạn.
               </p>
             )}
           </div>
@@ -169,7 +168,7 @@ export function MatchComparisonModal({
           </p>
           <div className="overflow-hidden rounded-xl border border-border">
             {/* Tiêu đề cột: cột nào là CV/hồ sơ, cột nào là yêu cầu của tin */}
-            <div className="grid grid-cols-[88px_1fr_1fr_auto] gap-2 border-b border-border bg-muted/40 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide sm:grid-cols-[150px_1fr_1fr_auto]">
+            <div className="grid grid-cols-[88px_1fr_1fr_72px] gap-2 border-b border-border bg-muted/40 px-3 py-2 text-[11px] font-semibold uppercase tracking-wide sm:grid-cols-[150px_1fr_1fr_88px]">
               <span />
               <span className="text-teal-700">Hồ sơ / CV</span>
               <span className="text-slate-500">Tin tuyển dụng</span>
@@ -179,7 +178,7 @@ export function MatchComparisonModal({
               <div
                 key={row.key}
                 className={cn(
-                  "grid grid-cols-[88px_1fr_1fr_auto] items-center gap-2 px-3 py-2.5 sm:grid-cols-[150px_1fr_1fr_auto]",
+                  "grid grid-cols-[88px_1fr_1fr_72px] items-center gap-2 px-3 py-2.5 sm:grid-cols-[150px_1fr_1fr_88px]",
                   i > 0 && "border-t border-border",
                 )}
               >
@@ -201,7 +200,7 @@ export function MatchComparisonModal({
                 <Badge
                   variant="outline"
                   className={cn(
-                    "justify-self-end font-normal",
+                    "justify-self-end whitespace-nowrap font-normal",
                     verdictStyle[row.verdict],
                   )}
                 >

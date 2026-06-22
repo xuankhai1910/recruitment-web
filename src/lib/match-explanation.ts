@@ -197,8 +197,12 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     let verdict: Verdict = "unknown";
     const titleOverlap = titlesOverlap(cvTitle, jobTitle);
     if (cvTitle && jobTitle) {
+      // "Khớp" requires the applied positions to genuinely align (overlapping
+      // title text or the same specialization). A high taxonomy roleScore only
+      // means the roles are RELATED — that's a "Một phần" signal below, not a
+      // title match (e.g. Product Manager vs Business Analyst → roleScore 0.75
+      // but clearly different positions).
       if (
-        (b.roleScore ?? 0) >= 0.75 ||
         b.desiredTitleScore >= 0.34 ||
         b.titleScore >= 0.5 ||
         titleOverlap ||
@@ -233,17 +237,23 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     const jobText = [job.category, job.specialization]
       .filter(Boolean)
       .join(" / ");
-    let verdict: Verdict = "unknown";
+    // "Khớp" is reserved for the candidate's EXACT specialization (same role,
+    // or a different label that maps to the same fine-grained group → roleScore
+    // 1). Same category but a different specialization is only "Một phần" — a
+    // related role can still fit well, but it isn't the exact role. Beyond the
+    // category, fall back to the taxonomy roleScore (related → "Một phần").
     const roleScore = b.roleScore;
-    if (typeof roleScore === "number") {
-      if (roleScore >= 0.75) verdict = "match";
-      else if (roleScore >= 0.35) verdict = "partial";
-      else verdict = "mismatch";
+    const sameSpecialization =
+      sameNorm(cv.desiredSpecialization, job.specialization) || roleScore === 1;
+    let verdict: Verdict = "unknown";
+    if (sameSpecialization) {
+      verdict = "match";
+    } else if (sameNorm(cv.desiredCategory, job.category)) {
+      verdict = "partial";
+    } else if (typeof roleScore === "number") {
+      verdict = roleScore >= 0.45 ? "partial" : "mismatch";
     } else if (cvText && jobText) {
-      if (sameNorm(cv.desiredSpecialization, job.specialization))
-        verdict = "match";
-      else if (sameNorm(cv.desiredCategory, job.category)) verdict = "partial";
-      else verdict = "mismatch";
+      verdict = "mismatch";
     }
     rows.push({
       key: "role",
