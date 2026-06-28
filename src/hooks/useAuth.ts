@@ -35,6 +35,22 @@ export function useLogin() {
   });
 }
 
+export function useGoogleLogin() {
+  const setAuth = useAuthStore((s) => s.setAuth);
+
+  return useMutation({
+    mutationFn: (idToken: string) =>
+      authApi.googleLogin({ idToken }).then((r) => r.data.data),
+    onSuccess: ({ access_token, user }) => {
+      setAuth(user, access_token);
+      toast.success("Đăng nhập thành công");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "Đăng nhập Google thất bại"));
+    },
+  });
+}
+
 export function useRegister() {
   return useMutation({
     mutationFn: (data: RegisterRequest) =>

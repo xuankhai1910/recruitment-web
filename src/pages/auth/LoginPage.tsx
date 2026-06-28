@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useLogin } from "@/hooks/useAuth";
+import { GoogleLogin } from "@react-oauth/google";
+import { toast } from "sonner";
+import { useGoogleLogin, useLogin } from "@/hooks/useAuth";
 import {
   ArrowRight,
-  Briefcase,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -19,6 +20,7 @@ const inputCls =
 export function LoginPage() {
   const navigate = useNavigate();
   const login = useLogin();
+  const googleLogin = useGoogleLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
 
@@ -74,10 +76,6 @@ export function LoginPage() {
           <h2 className="mb-2 font-display text-[32px] font-bold tracking-tight text-ink">
             Đăng nhập
           </h2>
-          <p className="mb-8 text-[15px] text-slate-600">
-            Đăng nhập để tiếp tục tìm kiếm việc làm phù hợp với bạn.
-          </p>
-
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-1.5">
               <label className="text-[13px] font-medium text-ink">Email</label>
@@ -148,6 +146,34 @@ export function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="my-6 flex items-center gap-3">
+            <span className="h-px flex-1 bg-line" />
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
+              hoặc
+            </span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+
+          <div className="flex justify-center [&>div]:w-full [&_iframe]:w-full!">
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                const idToken = credentialResponse.credential;
+                if (!idToken) {
+                  toast.error("Không nhận được thông tin từ Google");
+                  return;
+                }
+                googleLogin.mutate(idToken, {
+                  onSuccess: () => navigate("/"),
+                });
+              }}
+              onError={() => toast.error("Đăng nhập Google thất bại")}
+              text="signin_with"
+              shape="rectangular"
+              size="large"
+              width="400"
+            />
+          </div>
 
           <p className="mt-7 text-center text-sm text-slate-600">
             Chưa có tài khoản?{" "}

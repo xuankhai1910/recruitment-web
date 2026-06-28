@@ -7,8 +7,11 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from "react-dom/client";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "@/components/ui/sonner";
 import App from "./App";
+
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -21,11 +24,13 @@ const queryClient = new QueryClient({
 });
 
 createRoot(document.getElementById("root")!).render(
-	<QueryClientProvider client={queryClient}>
-		<BrowserRouter>
-			<App />
-		</BrowserRouter>
-		<Toaster richColors position="top-right" duration={2000} />
-		<ReactQueryDevtools initialIsOpen={false} />
-	</QueryClientProvider>,
+	<GoogleOAuthProvider clientId={googleClientId}>
+		<QueryClientProvider client={queryClient}>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+			<Toaster richColors position="top-right" duration={2000} />
+			<ReactQueryDevtools initialIsOpen={false} />
+		</QueryClientProvider>
+	</GoogleOAuthProvider>,
 );

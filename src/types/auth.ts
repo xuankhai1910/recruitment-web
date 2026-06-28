@@ -65,6 +65,10 @@ export interface RegisterRequest {
   company?: { _id: string; name: string };
 }
 
+export interface GoogleLoginRequest {
+  idToken: string;
+}
+
 export interface LoginResponse {
   access_token: string;
   user: AuthUser;

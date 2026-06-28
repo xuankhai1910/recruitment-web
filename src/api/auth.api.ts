@@ -4,6 +4,7 @@ import type {
   ChangePasswordRequest,
   ForgotPasswordRequest,
   ForgotPasswordResponse,
+  GoogleLoginRequest,
   LoginRequest,
   LoginResponse,
   PasswordActionResponse,
@@ -16,6 +17,9 @@ import type {
 export const authApi = {
   login: (data: LoginRequest) =>
     api.post<ApiResponse<LoginResponse>>('/auth/login', data),
+
+  googleLogin: (data: GoogleLoginRequest) =>
+    api.post<ApiResponse<LoginResponse>>('/auth/google', data),
 
   register: (data: RegisterRequest) =>
     api.post<ApiResponse<{ _id: string; createdAt: string }>>('/auth/register', data),
