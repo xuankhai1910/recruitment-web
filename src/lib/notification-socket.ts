@@ -16,6 +16,14 @@ const RESUME_RELATED_TYPES = new Set<AppNotification["type"]>([
   "RESUME_SUBMITTED",
 ]);
 
+// Các loại noti là "xác nhận hành động do chính user vừa thực hiện ở tab này".
+// Mutation tương ứng (vd useCreateResume) đã bật toast thành công, nên nếu socket
+// bắn thêm toast nữa thì người dùng thấy 2 toast trùng. Vẫn tăng badge + invalidate
+// như thường, chỉ bỏ qua toast cho các loại này.
+const SELF_CONFIRM_TYPES = new Set<AppNotification["type"]>([
+  "RESUME_SUBMITTED",
+]);
+
 function resolveSocketHost(): string {
   const base = import.meta.env.VITE_API_BASE_URL ?? "";
   return base.replace(/\/?api\/v\d+\/?$/, "");
@@ -71,15 +79,17 @@ export function connectNotificationSocket(
     if (RESUME_RELATED_TYPES.has(n.type)) {
       queryClient.invalidateQueries({ queryKey: ["resumes"] });
     }
-    toast(n.title, {
-      description: n.message,
-      action: onToastClick
-        ? {
-            label: "Xem",
-            onClick: () => onToastClick(n),
-          }
-        : undefined,
-    });
+    if (!SELF_CONFIRM_TYPES.has(n.type)) {
+      toast(n.title, {
+        description: n.message,
+        action: onToastClick
+          ? {
+              label: "Xem",
+              onClick: () => onToastClick(n),
+            }
+          : undefined,
+      });
+    }
   });
 
   socket.on("notification:unread-count", ({ unread }: { unread: number }) => {
