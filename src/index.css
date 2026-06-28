@@ -124,3 +124,69 @@
     font-family: var(--font-heading);
   }
 }
+
+/* ─── Toast (sonner) — giao diện hiện đại + thanh thời gian ─────────────────
+   `.cn-toast` được gắn qua toastOptions.classNames trong components/ui/sonner.tsx.
+   Thanh tiến trình chạy theo biến --cn-toast-duration (đặt bằng prop duration). */
+.cn-toast {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 12px 32px -12px rgb(10 15 26 / 0.28),
+    0 3px 10px -4px rgb(10 15 26 / 0.1);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.cn-toast:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 18px 40px -14px rgb(10 15 26 / 0.34),
+    0 4px 12px -4px rgb(10 15 26 / 0.12);
+}
+
+.cn-toast [data-title] {
+  font-weight: 600;
+}
+
+.cn-toast [data-icon] {
+  align-self: flex-start;
+  margin-top: 1px;
+}
+
+/* Thanh thời gian: rút dần từ trái sang phải đúng bằng thời lượng toast.
+   Màu lấy theo currentColor (richColors đổi màu chữ theo loại toast). */
+.cn-toast::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: currentColor;
+  opacity: 0.4;
+  transform-origin: left;
+  animation: cn-toast-progress var(--cn-toast-duration, 2s) linear forwards;
+}
+
+/* Dừng thanh khi hover (khớp với việc sonner tạm dừng đếm giờ khi rê chuột). */
+.cn-toast:hover::after {
+  animation-play-state: paused;
+}
+
+/* Toast loading tồn tại vô hạn → không hiển thị thanh thời gian. */
+.cn-toast[data-type="loading"]::after {
+  display: none;
+}
+
+@keyframes cn-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

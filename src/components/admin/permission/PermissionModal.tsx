@@ -177,11 +177,11 @@ export function PermissionModal({
 										</FormLabel>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<FormControl>
-												<SelectTrigger className="cursor-pointer">
+												<SelectTrigger className="w-full cursor-pointer">
 													<SelectValue />
 												</SelectTrigger>
 											</FormControl>
-											<SelectContent>
+											<SelectContent align="start">
 												{METHODS.map((m) => (
 													<SelectItem
 														key={m}
@@ -207,11 +207,11 @@ export function PermissionModal({
 										</FormLabel>
 										<Select value={field.value} onValueChange={field.onChange}>
 											<FormControl>
-												<SelectTrigger className="cursor-pointer">
+												<SelectTrigger className="w-full cursor-pointer">
 													<SelectValue placeholder="Chọn module" />
 												</SelectTrigger>
 											</FormControl>
-											<SelectContent>
+											<SelectContent align="start">
 												{ALL_MODULES.map((m) => (
 													<SelectItem
 														key={m}

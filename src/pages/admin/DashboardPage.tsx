@@ -1,10 +1,4 @@
-import {
-  Building2,
-  Users,
-  Briefcase,
-  FileText,
-  Calendar,
-} from "lucide-react";
+import { Building2, Users, Briefcase, FileText, Calendar } from "lucide-react";
 import { useAdminOverview } from "@/hooks/useStats";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { DashboardCard } from "@/components/dashboard/DashboardCard";
@@ -81,7 +75,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Bảng điều khiển</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Tổng quan toàn hệ thống DevMarket · cập nhật {today}
           </p>
@@ -158,8 +152,16 @@ export default function DashboardPage() {
             labels={labels}
             height={210}
             series={[
-              { label: "Hồ sơ nộp", values: data.series.resumes, color: "#3B82F6" },
-              { label: "Tin đăng mới", values: data.series.jobs, color: "#10B981" },
+              {
+                label: "Hồ sơ nộp",
+                values: data.series.resumes,
+                color: "#3B82F6",
+              },
+              {
+                label: "Tin đăng mới",
+                values: data.series.jobs,
+                color: "#10B981",
+              },
             ]}
           />
         </DashboardCard>

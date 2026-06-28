@@ -32,13 +32,20 @@ export function LoginPage() {
       <div className="relative hidden flex-col justify-between overflow-hidden bg-ink p-16 text-white lg:flex">
         <span className="pointer-events-none absolute -bottom-30 -right-30 h-100 w-100 rounded-full bg-teal-500/12" />
         <div className="relative">
-          <span className="grid h-10 w-10 place-items-center rounded-lg bg-white/10 text-teal-400">
-            <Briefcase className="h-5 w-5" />
-          </span>
-          <h1 className="mt-10 max-w-[550px] font-display text-[clamp(40px,5vw,64px)] font-bold leading-none tracking-[-0.035em] text-white">
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.png"
+              alt="DevMarket"
+              className="h-9 w-9 -translate-y-0.5 rounded-lg object-contain"
+            />
+            <span className="font-display text-xl font-bold leading-none text-white">
+              DevMarket
+            </span>
+          </div>
+          <h1 className="mt-10 max-w-[700px] font-display text-[clamp(40px,5vw,64px)] font-bold leading-none tracking-[-0.035em] text-white">
             Chào mừng <em className="italic text-teal-400">trở lại,</em>
             <br />
-            thăng tiến sự nghiệp của bạn với DevMarket
+            tìm việc làm phù hợp với bạn một cách nhanh chóng với DevMarket
           </h1>
           <p className="mt-5 max-w-[440px] text-base leading-relaxed text-white/65">
             Đăng nhập để tiếp tục tìm kiếm việc làm phù hợp với bạn qua
