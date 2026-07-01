@@ -45,6 +45,7 @@ const ROUTE_TITLES: TitledRoute[] = [
   { path: "/companies/:id", title: "Chi tiết công ty" },
   { path: "/profiles/:userId", title: "Hồ sơ ứng viên" },
   { path: "/profile", title: "Hồ sơ của tôi" },
+  { path: "/messages", title: "Tin nhắn" },
 
   // Tài khoản ứng viên
   { path: "/account", title: "Tài khoản" },
@@ -72,6 +73,7 @@ const ROUTE_TITLES: TitledRoute[] = [
   { path: "/hr/candidates", title: "Ứng viên" },
   { path: "/hr/candidates/:userId", title: "Chi tiết ứng viên" },
   { path: "/hr/notifications", title: "Thông báo" },
+  { path: "/hr/messages", title: "Tin nhắn" },
   { path: "/hr/company", title: "Công ty của tôi" },
 
   // Trang lỗi

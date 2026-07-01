@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
 	ArrowLeft,
 	Mail,
@@ -10,6 +11,7 @@ import {
 	ExternalLink,
 	Briefcase,
 	Eye,
+	MessageSquare,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +20,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useResumes } from "@/hooks/useResumes";
+import { useStartConversation } from "@/hooks/useChat";
+import { useHasPermission } from "@/stores/auth.store";
+import { ALL_PERMISSIONS } from "@/lib/permissions";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { usePublicUserProfile } from "@/hooks/useUserProfile";
 import { usersApi } from "@/api/users.api";
@@ -46,6 +51,12 @@ function initialsFrom(name?: string) {
  */
 export function HrCandidateDetailPage() {
 	const { userId = "" } = useParams<{ userId: string }>();
+	const navigate = useNavigate();
+	const startConv = useStartConversation();
+	const canChat = useHasPermission(
+		ALL_PERMISSIONS.CHAT.START.method,
+		ALL_PERMISSIONS.CHAT.START.apiPath,
+	);
 
 	// Basic user info
 	const userQ = useQuery({
@@ -77,6 +88,17 @@ export function HrCandidateDetailPage() {
 	const profile = profileQ.data?.profile;
 
 	useDocumentTitle(user?.name);
+
+	const openChat = () => {
+		startConv.mutate(
+			{ candidateId: userId },
+			{
+				onSuccess: (res) => navigate(`/hr/messages?c=${res.data.data._id}`),
+				onError: () =>
+					toast.error("Không thể mở hội thoại với ứng viên này"),
+			},
+		);
+	};
 
 	return (
 		<div className="space-y-6">
@@ -142,17 +164,30 @@ export function HrCandidateDetailPage() {
 											)}
 										</div>
 									</div>
-									<Button
-										asChild
-										variant="outline"
-										size="sm"
-										className="cursor-pointer gap-1.5"
-									>
-										<Link to={`/profiles/${userId}`} target="_blank">
-											<ExternalLink className="h-3.5 w-3.5" />
-											Profile công khai
-										</Link>
-									</Button>
+									<div className="flex flex-col gap-2">
+										{canChat && resumes.length > 0 && (
+											<Button
+												size="sm"
+												className="cursor-pointer gap-1.5"
+												disabled={startConv.isPending}
+												onClick={openChat}
+											>
+												<MessageSquare className="h-3.5 w-3.5" />
+												Nhắn tin
+											</Button>
+										)}
+										<Button
+											asChild
+											variant="outline"
+											size="sm"
+											className="cursor-pointer gap-1.5"
+										>
+											<Link to={`/profiles/${userId}`} target="_blank">
+												<ExternalLink className="h-3.5 w-3.5" />
+												Profile công khai
+											</Link>
+										</Button>
+									</div>
 								</div>
 							)}
 						</CardContent>

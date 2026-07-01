@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
 import { useLogout } from "@/hooks/useAuth";
+import { useChatUnreadTotal } from "@/hooks/useChat";
+import { useChatStore } from "@/stores/chat.store";
 import { NotificationBell } from "@/components/common/notification";
 import {
 	DropdownMenu,
@@ -25,6 +27,7 @@ import {
 	LayoutDashboard,
 	LogOut,
 	Menu,
+	MessageSquare,
 	Settings,
 	UserCircle,
 } from "lucide-react";
@@ -41,6 +44,8 @@ export function Header() {
 	const { pathname } = useLocation();
 	const logout = useLogout();
 	const [mobileOpen, setMobileOpen] = useState(false);
+	const chatUnread = useChatStore((s) => s.unread);
+	useChatUnreadTotal("CANDIDATE");
 
 	const isAdmin = user?.role?.name && user.role.name !== "NORMAL_USER";
 	const isHr = user?.role?.name === "HR";
@@ -92,6 +97,20 @@ export function Header() {
 					{isAuthenticated && user ? (
 						<>
 							<NotificationBell />
+							{/* Hộp thư "ứng viên": ai đăng nhập cũng có thể nhận tin từ HR,
+							    kể cả admin/HR nếu bản thân họ từng ứng tuyển. */}
+							<Link
+								to="/messages"
+								aria-label="Tin nhắn"
+								className="relative grid h-10 w-10 place-items-center rounded-full border border-line bg-white text-slate-600 transition-colors hover:border-ink hover:text-ink"
+							>
+								<MessageSquare className="h-4 w-4" />
+								{chatUnread > 0 && (
+									<span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white tabular-nums">
+										{chatUnread > 99 ? "99+" : chatUnread}
+									</span>
+								)}
+							</Link>
 							<Link
 								to="/account/saved-jobs"
 								aria-label="Việc đã lưu"

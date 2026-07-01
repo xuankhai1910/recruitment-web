@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { HrSidebar } from "@/components/hr/HrSidebar";
 import { useUnreadCount } from "@/hooks/useNotifications";
+import { useChatUnreadTotal } from "@/hooks/useChat";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -15,6 +16,7 @@ export function HrLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useUnreadCount();
+  useChatUnreadTotal("HR");
 
   return (
     <div className="flex h-screen bg-background">
@@ -25,18 +27,12 @@ export function HrLayout() {
 
       {/* Mobile sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <div className="flex h-14 items-center border-b border-border bg-card px-4 lg:hidden">
+        <div className="flex h-12 items-center border-b border-border bg-card px-2 lg:hidden">
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="cursor-pointer">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <span className="ml-3 font-heading text-lg font-bold">
-            Dev<span className="text-primary">Market</span>{" "}
-            <span className="text-xs font-medium text-muted-foreground">
-              / HR
-            </span>
-          </span>
         </div>
         <SheetContent side="left" className="w-60 p-0">
           <SheetTitle className="sr-only">Menu HR</SheetTitle>

@@ -105,6 +105,39 @@ export const ALL_PERMISSIONS = {
       module: "CV_ANALYSIS",
     },
   },
+  CHAT: {
+    // HR mở hội thoại với ứng viên đã nộp CV.
+    START: {
+      method: "POST",
+      apiPath: "/api/v1/chat/hr/conversations",
+      module: "CHAT",
+    },
+    GET_CONVERSATIONS: {
+      method: "GET",
+      apiPath: "/api/v1/chat/hr/conversations",
+      module: "CHAT",
+    },
+    UNREAD_TOTAL: {
+      method: "GET",
+      apiPath: "/api/v1/chat/hr/conversations/unread-total",
+      module: "CHAT",
+    },
+    GET_MESSAGES: {
+      method: "GET",
+      apiPath: "/api/v1/chat/hr/conversations/:id/messages",
+      module: "CHAT",
+    },
+    SEND_MESSAGE: {
+      method: "POST",
+      apiPath: "/api/v1/chat/hr/conversations/:id/messages",
+      module: "CHAT",
+    },
+    MARK_READ: {
+      method: "PATCH",
+      apiPath: "/api/v1/chat/hr/conversations/:id/read",
+      module: "CHAT",
+    },
+  },
 } as const;
 
 export const ALL_MODULES = [
@@ -120,6 +153,7 @@ export const ALL_MODULES = [
   "CV_ANALYSIS",
   "NOTIFICATIONS",
   "STATS",
+  "CHAT",
 ] as const;
 
 export type ModuleName = (typeof ALL_MODULES)[number];

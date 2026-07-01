@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/stores/auth.store";
 import { useNotificationStore } from "@/stores/notification.store";
+import { useChatStore } from "@/stores/chat.store";
 import { useLogout } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -22,6 +23,7 @@ import {
   LogOut,
   Briefcase,
   Users2,
+  MessageSquare,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -53,6 +55,11 @@ const MENU_ITEMS: MenuItem[] = [
     icon: <Users2 className="h-4 w-4" />,
   },
   {
+    label: "Tin nhắn",
+    path: "/hr/messages",
+    icon: <MessageSquare className="h-4 w-4" />,
+  },
+  {
     label: "Thông báo",
     path: "/hr/notifications",
     icon: <Bell className="h-4 w-4" />,
@@ -69,6 +76,7 @@ export function HrSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const unread = useNotificationStore((s) => s.unread);
+  const chatUnread = useChatStore((s) => s.unread);
   const logout = useLogout();
 
   const isActive = (path: string) => {
@@ -117,7 +125,13 @@ export function HrSidebar({ onNavigate }: { onNavigate?: () => void }) {
       {/* Nav */}
       <nav className="mt-2 flex-1 space-y-0.5 overflow-y-auto p-2">
         {MENU_ITEMS.map((item) => {
-          const showBadge = item.path === "/hr/notifications" && unread > 0;
+          const badgeCount =
+            item.path === "/hr/notifications"
+              ? unread
+              : item.path === "/hr/messages"
+                ? chatUnread
+                : 0;
+          const showBadge = badgeCount > 0;
           return (
             <Link
               key={item.path}
@@ -133,7 +147,7 @@ export function HrSidebar({ onNavigate }: { onNavigate?: () => void }) {
               <span className="flex-1">{item.label}</span>
               {showBadge && (
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold leading-none text-white tabular-nums">
-                  {unread > 99 ? "99+" : unread}
+                  {badgeCount > 99 ? "99+" : badgeCount}
                 </span>
               )}
             </Link>

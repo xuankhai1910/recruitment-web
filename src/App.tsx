@@ -33,7 +33,9 @@ import { ResetPasswordPage } from "@/pages/auth/ResetPasswordPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ForbiddenPage } from "@/pages/ForbiddenPage";
 import { NotificationsPage } from "@/pages/NotificationsPage";
+import { MessagesPage } from "@/pages/MessagesPage";
 import { useNotificationBootstrap } from "@/hooks/useNotifications";
+import { useChatBootstrap } from "@/hooks/useChat";
 import { useRouteDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useRouteScrollReset } from "@/hooks/useRouteScrollReset";
 import DashboardPage from "@/pages/admin/DashboardPage";
@@ -51,12 +53,14 @@ import { HrResumesPage } from "@/pages/hr/HrResumesPage";
 import { HrCandidatesPage } from "@/pages/hr/HrCandidatesPage";
 import { HrCandidateDetailPage } from "@/pages/hr/HrCandidateDetailPage";
 import { HrCompanyPage } from "@/pages/hr/HrCompanyPage";
+import { HrMessagesPage } from "@/pages/hr/HrMessagesPage";
 
 export default function App() {
 	const { setAuth, clearAuth, setLoading, isLoading } = useAuthStore();
 
-	// Manage notification socket lifecycle alongside auth state.
+	// Manage realtime socket lifecycles alongside auth state.
 	useNotificationBootstrap();
+	useChatBootstrap();
 
 	// Đặt tên tab trình duyệt theo route hiện tại.
 	useRouteDocumentTitle();
@@ -112,6 +116,7 @@ export default function App() {
 						element={<Navigate to="/account/notifications" replace />}
 					/>
 					<Route path="/profile" element={<ProfilePage />} />
+					<Route path="/messages" element={<MessagesPage />} />
 					<Route element={<AccountLayout />}>
 						<Route
 							path="/account"
@@ -159,6 +164,7 @@ export default function App() {
 						element={<HrCandidateDetailPage />}
 					/>
 					<Route path="/hr/notifications" element={<NotificationsPage />} />
+					<Route path="/hr/messages" element={<HrMessagesPage />} />
 					<Route path="/hr/company" element={<HrCompanyPage />} />
 				</Route>
 			</Route>
