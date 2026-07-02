@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useCompany } from "@/hooks/useCompanies";
@@ -21,15 +22,19 @@ export function CompanyDetailPage() {
   const navigate = useNavigate();
   const { data: company, isLoading } = useCompany(id);
   useDocumentTitle(company?.name);
+  const PAGE_SIZE = 20;
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const { data: jobsData, isLoading: jobsLoading } = useJobs({
     current: 1,
-    pageSize: 20,
+    pageSize,
     sort: "-createdAt",
     isActive: true,
     "company._id": id,
   });
 
   const companyJobs = jobsData?.result ?? [];
+  const jobCount = jobsData?.meta?.total ?? companyJobs.length;
+  const hasMore = companyJobs.length < jobCount;
 
   if (isLoading) {
     return (
@@ -110,7 +115,7 @@ export function CompanyDetailPage() {
                 )}
                 <span className="inline-flex items-center gap-2">
                   <Briefcase className="h-3.5 w-3.5 text-teal-400" />
-                  {companyJobs.length} việc đang tuyển
+                  {jobCount} việc đang tuyển
                 </span>
                 {company.email && (
                   <span className="inline-flex items-center gap-2">
@@ -150,7 +155,7 @@ export function CompanyDetailPage() {
 
           <section className="rounded-xl border border-line bg-white p-8">
             <h3 className="mb-4 font-display text-[22px] font-bold tracking-tight text-ink">
-              Việc đang tuyển ({companyJobs.length})
+              Việc đang tuyển ({jobCount})
             </h3>
             {jobsLoading ? (
               <div className="flex flex-col gap-3">
@@ -175,6 +180,15 @@ export function CompanyDetailPage() {
                 {companyJobs.map((job) => (
                   <JobCard key={job._id} job={job} variant="row" />
                 ))}
+                {hasMore && (
+                  <button
+                    className={ui.btnGhost + " mt-2 w-full"}
+                    onClick={() => setPageSize((s) => s + PAGE_SIZE)}
+                    disabled={jobsLoading}
+                  >
+                    Xem thêm ({jobCount - companyJobs.length})
+                  </button>
+                )}
               </div>
             )}
           </section>
@@ -196,7 +210,7 @@ export function CompanyDetailPage() {
               )}
               <dt className="text-slate-400">Việc đang tuyển</dt>
               <dd className="text-right font-medium text-ink">
-                {companyJobs.length}
+                {jobCount}
               </dd>
               {company.email && (
                 <>
