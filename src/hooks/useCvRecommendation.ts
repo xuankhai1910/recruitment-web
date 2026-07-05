@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { cvRecommendationApi } from "@/api/cv-recommendation.api";
 import type { SetRecommendationCvDto } from "@/types/cv-recommendation";
 import { toast } from "sonner";
@@ -6,6 +7,14 @@ import { useAuthStore } from "@/stores/auth.store";
 
 const CV_KEY = ["recommendation-cv"] as const;
 const REC_JOBS_KEY = ["recommendation-cv", "jobs"] as const;
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (!isAxiosError(error)) return fallback;
+  const message = (error.response?.data as { message?: string | string[] })
+    ?.message;
+  if (Array.isArray(message)) return message[0] ?? fallback;
+  return message || fallback;
+}
 
 export function useRecommendationCv() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -27,9 +36,12 @@ export function useSetRecommendationCv() {
       qc.invalidateQueries({ queryKey: REC_JOBS_KEY });
       toast.success("Đã thiết lập CV gợi ý");
     },
-    onError: () => {
+    onError: (error) => {
       toast.error(
-        "Phân tích CV thất bại. Hệ thống có thể đang bận, vui lòng thử lại.",
+        getErrorMessage(
+          error,
+          "Phân tích CV thất bại. Hệ thống có thể đang bận, vui lòng thử lại.",
+        ),
       );
     },
   });
