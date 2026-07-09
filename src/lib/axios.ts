@@ -10,7 +10,7 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true,
+  withCredentials: true, // gửi cookie (refresh token) cùng request(http-only cookie)
 });
 
 // Attach access token to every request
@@ -60,7 +60,9 @@ api.interceptors.response.use(
         useAuthStore.getState().setAuth(user, access_token);
 
         // Flush queued requests
-        refreshQueue.forEach((cb) => { cb(access_token); });
+        refreshQueue.forEach((cb) => {
+          cb(access_token);
+        });
         refreshQueue = [];
 
         original.headers.Authorization = `Bearer ${access_token}`;

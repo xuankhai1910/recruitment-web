@@ -1,8 +1,11 @@
 import {
 	forwardRef,
+	useCallback,
 	useEffect,
+	useRef,
 	useState,
 	type ComponentProps,
+	type UIEvent,
 } from "react";
 import { Building2, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { companiesApi } from "@/api/companies.api";
@@ -23,6 +26,10 @@ import { cn } from "@/lib/utils";
 import type { Company } from "@/types/company";
 
 type CompanyOption = Pick<Company, "_id" | "name">;
+
+const PAGE_SIZE = 100;
+// Trigger the next page a little before the list actually bottoms out.
+const SCROLL_THRESHOLD_PX = 48;
 
 interface CompanySearchComboboxProps
 	extends Omit<ComponentProps<typeof Button>, "value" | "onSelect"> {
@@ -67,31 +74,71 @@ ref,
 	const [search, setSearch] = useState("");
 	const [companies, setCompanies] = useState<Company[]>([]);
 	const [loading, setLoading] = useState(false);
+	const [loadingMore, setLoadingMore] = useState(false);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
 
+	// Guards against firing another page request while one is in flight, and
+	// discards responses from a superseded request (e.g. an older search).
+	const inFlightRef = useRef(false);
+	const requestIdRef = useRef(0);
+
+	const fetchPage = useCallback(
+		async (pageNum: number, searchTerm: string, append: boolean) => {
+			const reqId = ++requestIdRef.current;
+			inFlightRef.current = true;
+			if (append) setLoadingMore(true);
+			else setLoading(true);
+
+			try {
+				const r = await companiesApi.getList({
+					current: pageNum,
+					pageSize: PAGE_SIZE,
+					...(searchTerm ? { name: `/${searchTerm}/i` } : {}),
+				});
+				// A newer request started while we were awaiting — drop this result.
+				if (reqId !== requestIdRef.current) return;
+
+				const { result, meta } = r.data.data;
+				setCompanies((prev) => (append ? [...prev, ...result] : result));
+				setPage(meta.current);
+				setHasMore(meta.current < meta.pages);
+			} catch {
+				// Keep the picker quiet; parent forms handle submit-level errors.
+			} finally {
+				if (reqId === requestIdRef.current) {
+					inFlightRef.current = false;
+					if (append) setLoadingMore(false);
+					else setLoading(false);
+				}
+			}
+		},
+		[],
+	);
+
+	// Reset to the first page whenever the search term changes (debounced).
 	useEffect(() => {
 		const timer = setTimeout(() => {
-			setLoading(true);
-			companiesApi
-				.getList({
-					current: 1,
-					pageSize: 20,
-					...(search ? { name: `/${search}/i` } : {}),
-				})
-				.then((r) => {
-					setCompanies(r.data.data.result);
-				})
-				.catch(() => {
-					// Keep the picker quiet; parent forms handle submit-level errors.
-				})
-				.finally(() => {
-					setLoading(false);
-				});
+			fetchPage(1, search, false);
 		}, 300);
 
 		return () => {
 			clearTimeout(timer);
 		};
-	}, [search]);
+	}, [search, fetchPage]);
+
+	const handleScroll = useCallback(
+		(e: UIEvent<HTMLDivElement>) => {
+			if (inFlightRef.current || !hasMore) return;
+			const el = e.currentTarget;
+			const distanceToBottom =
+				el.scrollHeight - el.scrollTop - el.clientHeight;
+			if (distanceToBottom <= SCROLL_THRESHOLD_PX) {
+				fetchPage(page + 1, search, true);
+			}
+		},
+		[hasMore, page, search, fetchPage],
+	);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -145,7 +192,7 @@ ref,
 						value={search}
 						onValueChange={setSearch}
 					/>
-					<CommandList>
+					<CommandList onScroll={handleScroll} className="show-scrollbar">
 						{loading ? (
 							<div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
 								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -176,6 +223,12 @@ ref,
 										<span className="truncate">{company.name}</span>
 									</CommandItem>
 								))}
+								{loadingMore && (
+									<div className="flex items-center justify-center py-3 text-sm text-muted-foreground">
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										{loadingText}
+									</div>
+								)}
 							</>
 						)}
 					</CommandList>

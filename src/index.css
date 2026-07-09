@@ -10,6 +10,26 @@
    gắn vào nữa nên các utility này hoàn toàn vô hại. */
 @custom-variant dark (&:is(.dark *));
 
+/* Ghi đè `no-scrollbar` của shadcn cho các danh sách cần thấy rõ thanh cuộn
+   (vd: combobox có infinite scroll). Dùng !important để thắng utility ẩn. */
+@utility show-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--border) transparent;
+
+  &::-webkit-scrollbar {
+    display: block !important;
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 9999px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 @theme inline {
   --font-heading: "Inter Variable", system-ui, sans-serif;
   --font-sans: "Inter Variable", system-ui, sans-serif;
