@@ -114,8 +114,22 @@ export function useBatchAnalyzeResumes() {
         try {
           await resumesApi.analyzeMatch(id);
           ok++;
-        } catch {
-          fail++;
+        } catch (err: unknown) {
+          // 429 = chạm ngưỡng throttle thoáng qua → đợi 2s rồi thử lại 1 lần,
+          // tránh mất CV giữa batch chỉ vì rate limit trong giây lát.
+          const status = (err as { response?: { status?: number } })?.response
+            ?.status;
+          if (status === 429) {
+            await new Promise((r) => setTimeout(r, 2000));
+            try {
+              await resumesApi.analyzeMatch(id);
+              ok++;
+            } catch {
+              fail++;
+            }
+          } else {
+            fail++;
+          }
         }
         setProgress((p) => ({ done: p.done + 1, total: p.total }));
       }
