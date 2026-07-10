@@ -30,13 +30,6 @@ export interface MatchExplanation {
   estimated: boolean;
 }
 
-// Semantic similarity is `toScore` = (cosine+1)/2, which compresses the useful
-// range: orthogonal (unrelated) vectors already score 0.5, and two same-domain
-// IT documents (a CV vs a JD) almost always land ~0.75–0.88. So the bar for
-// "Cao" must be high — otherwise nearly every job reads as highly similar.
-// Thresholds map back to cosine via cosine = 2·vectorScore − 1:
-//   HIGH 0.85 → cosine ~0.70 (genuinely close)
-//   MED  0.75 → cosine ~0.50 (same broad field)
 const VECTOR_HIGH = 0.85;
 const VECTOR_MED = 0.75;
 
@@ -197,11 +190,6 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     let verdict: Verdict = "unknown";
     const titleOverlap = titlesOverlap(cvTitle, jobTitle);
     if (cvTitle && jobTitle) {
-      // "Khớp" requires the applied positions to genuinely align (overlapping
-      // title text or the same specialization). A high taxonomy roleScore only
-      // means the roles are RELATED — that's a "Một phần" signal below, not a
-      // title match (e.g. Product Manager vs Business Analyst → roleScore 0.75
-      // but clearly different positions).
       if (
         b.desiredTitleScore >= 0.34 ||
         b.titleScore >= 0.5 ||
@@ -237,11 +225,6 @@ export function buildMatchExplanation(input: MatchInput): MatchExplanation {
     const jobText = [job.category, job.specialization]
       .filter(Boolean)
       .join(" / ");
-    // "Khớp" is reserved for the candidate's EXACT specialization (same role,
-    // or a different label that maps to the same fine-grained group → roleScore
-    // 1). Same category but a different specialization is only "Một phần" — a
-    // related role can still fit well, but it isn't the exact role. Beyond the
-    // category, fall back to the taxonomy roleScore (related → "Một phần").
     const roleScore = b.roleScore;
     const sameSpecialization =
       sameNorm(cv.desiredSpecialization, job.specialization) || roleScore === 1;

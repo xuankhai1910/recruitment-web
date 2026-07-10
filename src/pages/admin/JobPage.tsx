@@ -48,9 +48,6 @@ export default function JobPage() {
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [sortField, setSortField] = useState<"name" | "salary" | null>(null);
 	const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
-	// Mounting the heavy JobModal (form + Tiptap) blocks the click handler for
-	// 200-400ms. Marking the open as a transition lets React keep the UI
-	// responsive while the modal mounts off the main render path.
 	const [, startTransition] = useTransition();
 
 	const openModal = (job: Job | null) => {

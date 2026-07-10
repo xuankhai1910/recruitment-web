@@ -72,9 +72,6 @@ export function OptionCombobox({
 				sideOffset={4}
 				avoidCollisions={false}
 				className={cn(
-					// Match the trigger width and pin to bottom — inside a scrollable
-					// Dialog, Radix' collision detection would otherwise flip the
-					// popover above the trigger near the bottom of the viewport.
 					"w-[var(--radix-popover-trigger-width)] p-0",
 					className,
 				)}

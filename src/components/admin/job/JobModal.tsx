@@ -148,15 +148,10 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
   const hrCompanyId = !isAdmin ? (currentUser?.company?._id ?? "") : "";
   const createJob = useCreateJob();
   const updateJob = useUpdateJob();
-  // Admin sees full picker → fetch the dropdown. HR's company is locked, so
-  // we only need their one company record (logo/email/phone) for the payload.
-  // Both queries are mounted on JobModal mount (which happens on page mount),
-  // so the cache is warm by the time the user clicks Edit/Create.
+
   const { data: companiesData } = useCompaniesDropdown(isAdmin);
   const { data: hrCompany } = useCompany(hrCompanyId);
   const { data: taxonomy } = useJobTaxonomy();
-  // List endpoint strips benefits/requirements/responsibilities to keep payload
-  // small; refetch the full job by id so the edit form can hydrate them.
   const { data: fullJob } = useJob(open && job?._id ? job._id : "");
 
   const companies = useMemo(() => {
@@ -209,11 +204,6 @@ export function JobModal({ open, onOpenChange, job }: JobModalProps) {
   useEffect(() => {
     if (open) {
       if (job) {
-        // Prefer full-detail fetch (has benefits/requirements/responsibilities);
-        // fall back to row data while the request is in flight. Verify
-        // `fullJob._id === job._id` to defend against stale cache: when
-        // switching from edit(A) → close → edit(B), React Query can briefly
-        // hand back job A's data and flash it into the form.
         const source = fullJob?._id === job._id ? fullJob : job;
         form.reset({
           name: source.name,

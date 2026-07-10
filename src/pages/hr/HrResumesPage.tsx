@@ -120,9 +120,6 @@ export function HrResumesPage() {
 
   const isSearching = search.trim().length > 0;
   const isEmailSearch = search.includes("@");
-  // Khi search theo tên ứng viên, phải tra cứu /users để lấy userIds
-  // (resume không lưu name). Khi search theo email — resume có sẵn field
-  // `email` snapshot — đi thẳng vào API resumes, không cần round-trip users.
   const needsUserLookup = isSearching && !isEmailSearch;
 
   const { data: usersData } = useQuery({

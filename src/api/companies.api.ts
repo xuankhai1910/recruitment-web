@@ -1,6 +1,11 @@
 import { api } from '@/lib/axios';
 import type { ApiResponse, PaginatedResponse, PaginationParams } from '@/types/api';
-import type { Company, CreateCompanyDto, UpdateCompanyDto } from '@/types/company';
+import type {
+  Company,
+  CreateCompanyDto,
+  TopCompany,
+  UpdateCompanyDto,
+} from '@/types/company';
 
 export interface CompanyQueryParams extends PaginationParams {
   name?: string;
@@ -9,6 +14,10 @@ export interface CompanyQueryParams extends PaginationParams {
 export const companiesApi = {
   getList: (params: CompanyQueryParams) =>
     api.get<PaginatedResponse<Company>>('/companies', { params }),
+
+  /** Companies ranked by number of currently-recruiting jobs. */
+  getTop: (limit: number) =>
+    api.get<ApiResponse<TopCompany[]>>('/companies/top', { params: { limit } }),
 
   getById: (id: string) =>
     api.get<ApiResponse<Company>>(`/companies/${id}`),

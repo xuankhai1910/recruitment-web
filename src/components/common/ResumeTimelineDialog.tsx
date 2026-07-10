@@ -29,8 +29,6 @@ const STATUS_LABEL: Record<string, string> = {
   REJECTED: "Bị từ chối",
 };
 
-// Candidate-side (DevMarket) palette — mirrors the STATUS map in ResumesTab so
-// the dialog reads as part of the same teal/emerald/amber/rose design system.
 const STATUS_STYLE: Record<
   string,
   { dot: string; ring: string; badge: string; text: string }
@@ -107,15 +105,9 @@ export function ResumeTimelineDialog({
 
   const currentStatus = resume.status;
 
-  // Statuses the resume has actually passed through. The current status is
-  // always considered reached even if history is incomplete.
   const reachedSet = new Set<string>(history.map((h) => h.status));
   reachedSet.add(currentStatus);
 
-  // Overview shows ONLY the steps the resume has actually reached — never a
-  // placeholder for a step that hasn't happened yet. So a resume at
-  // "Đang xem xét" displays just "Chờ xử lý → Đang xem xét", with no greyed-out
-  // "Được duyệt" ahead of it.
   const flowSteps: string[] = STATUS_FLOW.filter((s) => reachedSet.has(s));
 
   return (

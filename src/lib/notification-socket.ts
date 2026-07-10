@@ -6,20 +6,13 @@ import type { AppNotification } from "@/types/notification";
 
 let socket: Socket | null = null;
 
-// Notification types mirror a change to a resume/application. When one arrives
-// we also refetch the ['resumes'] query family so any open list/detail updates
-// in real time — the candidate's "Đơn ứng tuyển" page (['resumes','my']) and
-// the HR resume table (['resumes', params]) — instead of only the bell badge.
 const RESUME_RELATED_TYPES = new Set<AppNotification["type"]>([
   "RESUME_STATUS_CHANGED",
   "NEW_RESUME_RECEIVED",
   "RESUME_SUBMITTED",
 ]);
 
-// Các loại noti là "xác nhận hành động do chính user vừa thực hiện ở tab này".
-// Mutation tương ứng (vd useCreateResume) đã bật toast thành công, nên nếu socket
-// bắn thêm toast nữa thì người dùng thấy 2 toast trùng. Vẫn tăng badge + invalidate
-// như thường, chỉ bỏ qua toast cho các loại này.
+
 const SELF_CONFIRM_TYPES = new Set<AppNotification["type"]>([
   "RESUME_SUBMITTED",
 ]);

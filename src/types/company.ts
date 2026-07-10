@@ -12,6 +12,10 @@ export interface Company {
   updatedBy: { _id: string; email: string };
 }
 
+export interface TopCompany extends Company {
+  jobCount: number;
+}
+
 export interface CreateCompanyDto {
   name: string;
   address: string;

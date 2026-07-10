@@ -11,6 +11,14 @@ export function useCompanies(params: CompanyQueryParams) {
   });
 }
 
+export function useTopCompanies(limit = 12) {
+  return useQuery({
+    queryKey: ["companies-top", limit],
+    queryFn: () => companiesApi.getTop(limit).then((r) => r.data.data),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useCompany(id: string) {
   return useQuery({
     queryKey: ["companies", id],

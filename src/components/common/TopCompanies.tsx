@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCompanies } from "@/hooks/useCompanies";
+import { useTopCompanies } from "@/hooks/useCompanies";
 import { CompanyCard } from "@/components/common/CompanyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -18,14 +18,10 @@ const SCROLL_AMOUNT = 320;
 
 export function TopCompanies() {
 	const navigate = useNavigate();
-	const { data, isLoading } = useCompanies({
-		current: 1,
-		pageSize: PAGE_SIZE,
-		sort: "-createdAt",
-	});
+	const { data, isLoading } = useTopCompanies(PAGE_SIZE);
 
 	const scrollerRef = useRef<HTMLDivElement>(null);
-	const companies = data?.result ?? [];
+	const companies = data ?? [];
 
 	const scrollBy = (direction: 1 | -1) => {
 		scrollerRef.current?.scrollBy({
@@ -81,7 +77,12 @@ export function TopCompanies() {
 						className="flex gap-4 overflow-x-auto pb-3 [scrollbar-width:thin]"
 					>
 						{companies.map((c) => (
-							<CompanyCard key={c._id} company={c} variant="carousel" />
+							<CompanyCard
+								key={c._id}
+								company={c}
+								openings={c.jobCount}
+								variant="carousel"
+							/>
 						))}
 					</div>
 				)}

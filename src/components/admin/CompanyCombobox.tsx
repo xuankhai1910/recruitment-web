@@ -70,19 +70,12 @@ export function CompanyCombobox({
 				sideOffset={4}
 				avoidCollisions={false}
 				className={cn(
-					// Match the trigger width so the dropdown lines up under the input,
-					// and pin to bottom — inside a scrollable Dialog, Radix' collision
-					// detection would otherwise flip the popover above the trigger when
-					// the field sits near the bottom of the viewport.
 					"w-[var(--radix-popover-trigger-width)] p-0",
 					className,
 				)}
 			>
 				<Command
 					filter={(_id, search, keywords) => {
-						// Items use `_id` as `value`; the searchable text is in keywords[0]
-						// (the company name). Strip Vietnamese accents on both sides so
-						// "vinh" matches "Vĩnh".
 						const haystack = nonAccentVietnamese(
 							keywords?.[0] ?? "",
 						).toLowerCase();
