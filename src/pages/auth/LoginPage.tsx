@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
@@ -23,6 +23,19 @@ export function LoginPage() {
   const googleLogin = useGoogleLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
+
+  const googleWrapRef = useRef<HTMLDivElement>(null);
+  const [googleBtnWidth, setGoogleBtnWidth] = useState(400);
+  useEffect(() => {
+    const el = googleWrapRef.current;
+    if (!el) return;
+    const update = () =>
+      setGoogleBtnWidth(Math.min(400, Math.floor(el.clientWidth)));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +168,7 @@ export function LoginPage() {
             <span className="h-px flex-1 bg-line" />
           </div>
 
-          <div className="flex justify-center [&>div]:w-full [&_iframe]:w-full!">
+          <div ref={googleWrapRef} className="flex justify-center">
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 const idToken = credentialResponse.credential;
@@ -171,7 +184,7 @@ export function LoginPage() {
               text="signin_with"
               shape="rectangular"
               size="large"
-              width="400"
+              width={googleBtnWidth.toString()}
             />
           </div>
 
