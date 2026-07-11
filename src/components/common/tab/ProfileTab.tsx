@@ -90,7 +90,7 @@ export function ProfileTab() {
 				<div className="space-y-1.5">
 					<Label className="text-xs text-slate-600">Giới tính</Label>
 					<Select value={gender} onValueChange={setGender}>
-						<SelectTrigger className="h-10 w-full cursor-pointer">
+						<SelectTrigger className="h-10! w-full cursor-pointer">
 							<SelectValue placeholder="Chọn..." />
 						</SelectTrigger>
 						<SelectContent>
