@@ -30,6 +30,13 @@ export const resumesApi = {
   getByUser: () =>
     api.post<ApiResponse<Resume[]>>('/resumes/by-user'),
 
+
+  getFileBlob: (url: string, download = false) =>
+    api.get<Blob>('/resumes/file', {
+      params: { url, download: download || undefined },
+      responseType: 'blob',
+    }),
+
   // Số lần user đã ứng tuyển 1 job (+ hạn mức) — FE đổi nhãn nút & cảnh báo.
   getApplyCount: (jobId: string) =>
     api.get<ApiResponse<{ count: number; limit: number; remaining: number }>>(

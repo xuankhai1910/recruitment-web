@@ -19,7 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { extractOriginalFileName, resumeFileUrl } from "@/lib/format";
+import { extractOriginalFileName } from "@/lib/format";
+import { useOpenResumeFile } from "@/hooks/useResumes";
 import type { CvAnalysis, RecommendationCv } from "@/types/cv-recommendation";
 
 interface CvDetailsProps {
@@ -37,14 +38,17 @@ export function CvDetails({
   onDelete,
   onView,
 }: CvDetailsProps) {
-  const fileUrl = resumeFileUrl(cv.resumeUrl);
+  const openResumeFile = useOpenResumeFile();
   const displayName = extractOriginalFileName(cv.resumeUrl);
 
   return (
     <div className="space-y-4">
       <CvFileCard
         displayName={displayName}
-        fileUrl={fileUrl}
+        onView={() => openResumeFile.mutate({ url: cv.resumeUrl, mode: "view" })}
+        onDownload={() =>
+          openResumeFile.mutate({ url: cv.resumeUrl, mode: "download" })
+        }
         source={cv.source}
         updatedAt={cv.updatedAt}
       />
@@ -84,12 +88,14 @@ export function CvDetails({
 
 function CvFileCard({
   displayName,
-  fileUrl,
+  onView,
+  onDownload,
   source,
   updatedAt,
 }: {
   displayName: string;
-  fileUrl: string;
+  onView: () => void;
+  onDownload: () => void;
   source: RecommendationCv["source"];
   updatedAt: string;
 }) {
@@ -125,31 +131,24 @@ function CvFileCard({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <a
-            href={fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 cursor-pointer"
+            aria-label="Xem CV"
+            onClick={onView}
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 cursor-pointer"
-              aria-label="Xem CV"
-            >
-              <ExternalLink className="h-4 w-4" />
-            </Button>
-          </a>
-          <a href={fileUrl} download className="inline-flex">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 cursor-pointer"
-              aria-label="Tải CV"
-            >
-              <Download className="h-4 w-4" />
-            </Button>
-          </a>
+            <ExternalLink className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 cursor-pointer"
+            aria-label="Tải CV"
+            onClick={onDownload}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>

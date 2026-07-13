@@ -26,6 +26,7 @@ import {
 import {
   useUpdateResumeStatus,
   useAnalyzeResumeMatch,
+  useOpenResumeFile,
 } from "@/hooks/useResumes";
 import { MatchComparisonModal } from "@/components/common/match/MatchComparisonModal";
 import { matchInputFromResumeMatch } from "@/lib/match-explanation";
@@ -57,6 +58,7 @@ export function ResumeDetail({
 }: ResumeDetailProps) {
   const updateStatus = useUpdateResumeStatus();
   const analyzeMatch = useAnalyzeResumeMatch();
+  const openResumeFile = useOpenResumeFile();
   const [status, setStatus] =
     useState<UpdateResumeStatusDto["status"]>("PENDING");
   const [match, setMatch] = useState<ResumeMatch | ResumeMatchResult | null>(
@@ -120,15 +122,16 @@ export function ResumeDetail({
           />
           <InfoItem label="CV">
             {resume.url ? (
-              <a
-                href={`${import.meta.env.VITE_STATIC_URL}/images/resume/${resume.url}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() =>
+                  openResumeFile.mutate({ url: resume.url })
+                }
                 className="inline-flex items-center gap-1 text-primary transition-colors duration-150 hover:text-primary/80"
               >
                 <FileDown className="h-4 w-4" />
                 <span>Tải CV</span>
-              </a>
+              </button>
             ) : (
               "—"
             )}

@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useResumes } from "@/hooks/useResumes";
+import { useResumes, useOpenResumeFile } from "@/hooks/useResumes";
 import { useStartConversation } from "@/hooks/useChat";
 import { useHasPermission } from "@/stores/auth.store";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
@@ -80,6 +80,7 @@ export function HrCandidateDetailPage() {
 	} as Record<string, unknown>);
 
 	const resumes = useMemo(() => resumesQ.data?.result ?? [], [resumesQ.data]);
+	const openResumeFile = useOpenResumeFile();
 
 	const [selected, setSelected] = useState<Resume | null>(null);
 	const [detailOpen, setDetailOpen] = useState(false);
@@ -277,15 +278,16 @@ export function HrCandidateDetailPage() {
 												</Badge>
 												<div className="flex items-center gap-1">
 													{r.url && (
-														<a
-															href={`${import.meta.env.VITE_STATIC_URL}/images/resume/${r.url}`}
-															target="_blank"
-															rel="noopener noreferrer"
+														<button
+															type="button"
+															onClick={() =>
+																openResumeFile.mutate({ url: r.url })
+															}
 															className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-blue-700 transition-colors hover:bg-blue-50"
 															title="Tải CV"
 														>
 															<FileDown className="h-4 w-4" />
-														</a>
+														</button>
 													)}
 													<Button
 														variant="ghost"

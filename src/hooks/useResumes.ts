@@ -153,6 +153,48 @@ export function useBatchAnalyzeResumes() {
   return { run, running, progress };
 }
 
+
+export function useOpenResumeFile() {
+  return useMutation({
+    mutationFn: async ({
+      url,
+      mode = 'view',
+    }: {
+      url: string;
+      mode?: 'view' | 'download';
+    }) => {
+      const popup = mode === 'view' ? window.open('', '_blank') : null;
+      try {
+        const res = await resumesApi.getFileBlob(url, mode === 'download');
+        const blobUrl = URL.createObjectURL(res.data);
+
+        if (mode === 'download') {
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(blobUrl);
+        } else if (popup) {
+          popup.location.href = blobUrl;
+          // Giải phóng blob URL sau khi tab mới đã có đủ thời gian tải xong.
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+        } else {
+          window.open(blobUrl, '_blank', 'noopener,noreferrer');
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+        }
+      } catch (err) {
+        popup?.close();
+        throw err;
+      }
+    },
+    onError: () => {
+      toast.error('Không thể mở file CV. Vui lòng thử lại.');
+    },
+  });
+}
+
 export function useDeleteResume() {
   const qc = useQueryClient();
   return useMutation({

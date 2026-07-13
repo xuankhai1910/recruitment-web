@@ -32,6 +32,7 @@ import {
   useResumes,
   useMatchBatchQuota,
   useBatchAnalyzeResumes,
+  useOpenResumeFile,
 } from "@/hooks/useResumes";
 import { useJobsByAdmin } from "@/hooks/useJobs";
 import { formatDateTime } from "@/lib/constants";
@@ -234,6 +235,8 @@ export function HrResumesPage() {
     return userNameMap[r.userId] ?? "...";
   };
 
+  const openResumeFile = useOpenResumeFile();
+
   const columns: Column<Resume>[] = [
     {
       key: "stt",
@@ -346,17 +349,18 @@ export function HrResumesPage() {
       className: "w-[8%] text-center",
       render: (row) =>
         row.url ? (
-          <a
-            href={`${import.meta.env.VITE_STATIC_URL}/images/resume/${row.url}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              openResumeFile.mutate({ url: row.url });
+            }}
             className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 transition-colors duration-150 hover:bg-blue-100"
             title="Xem / tải CV"
           >
             <FileDown className="h-3.5 w-3.5" />
             Xem CV
-          </a>
+          </button>
         ) : (
           <span className="text-xs text-muted-foreground">—</span>
         ),

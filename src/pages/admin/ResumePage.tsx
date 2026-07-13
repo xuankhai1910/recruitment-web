@@ -9,7 +9,7 @@ import { BulkDeleteButton } from "@/components/admin/BulkDeleteButton";
 import { MultiSelectFilter } from "@/components/admin/MultiSelectFilter";
 import { Access } from "@/components/guards/Access";
 import { ALL_PERMISSIONS } from "@/lib/permissions";
-import { useResumes, useDeleteResume } from "@/hooks/useResumes";
+import { useResumes, useDeleteResume, useOpenResumeFile } from "@/hooks/useResumes";
 import { useBulkDelete } from "@/hooks/useBulkDelete";
 import { resumesApi } from "@/api/resumes.api";
 import { formatDateTime, STATUS_LIST } from "@/lib/constants";
@@ -175,6 +175,8 @@ export default function ResumePage() {
 		return userNameMap[r.userId] ?? "...";
 	};
 
+	const openResumeFile = useOpenResumeFile();
+
 	const columns: Column<Resume>[] = [
 		{
 			key: "stt",
@@ -254,18 +256,17 @@ export default function ResumePage() {
 			className: "w-[6%]",
 			render: (row) =>
 				row.url ? (
-					<a
-						href={`${import.meta.env.VITE_STATIC_URL}/images/resume/${row.url}`}
-						target="_blank"
-						rel="noopener noreferrer"
+					<button
+						type="button"
 						className="inline-flex items-center gap-1 text-primary transition-colors duration-150 hover:text-primary/80"
 						onClick={(e) => {
 							e.stopPropagation();
+							openResumeFile.mutate({ url: row.url });
 						}}
 					>
 						<FileDown className="h-4 w-4" />
 						<span className="text-xs">Tải</span>
-					</a>
+					</button>
 				) : (
 					<span className="text-xs text-muted-foreground">—</span>
 				),

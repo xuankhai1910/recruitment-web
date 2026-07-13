@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMyResumes } from "@/hooks/useResumes";
-import { resumeFileUrl } from "@/lib/format";
+import { useMyResumes, useOpenResumeFile } from "@/hooks/useResumes";
 import { brandColor, brandShort } from "@/lib/brand";
 import { ResumeTimelineDialog } from "@/components/common/ResumeTimelineDialog";
 import { ui } from "@/lib/ui";
@@ -69,6 +68,7 @@ function StatTile({
 
 export function ResumesTab() {
   const { data, isLoading } = useMyResumes();
+  const openResumeFile = useOpenResumeFile();
   const resumes = useMemo(() => data ?? [], [data]);
   const [selected, setSelected] = useState<Resume | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -247,15 +247,13 @@ export function ResumesTab() {
                     >
                       <History className="h-4 w-4" />
                     </button>
-                    <a
-                      href={resumeFileUrl(r.url)}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => openResumeFile.mutate({ url: r.url })}
                       className="grid h-8 w-8 place-items-center rounded-lg border border-line bg-white text-slate-600 hover:border-ink hover:text-ink"
                       title="Mở file CV"
                     >
                       <ExternalLink className="h-4 w-4" />
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>

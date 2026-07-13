@@ -79,13 +79,6 @@ export function companyLogoUrl(logo?: string): string {
     : `${import.meta.env.VITE_STATIC_URL}/images/company/${logo}`;
 }
 
-export function resumeFileUrl(file: string): string {
-  if (!file) return "";
-  return file.startsWith("http")
-    ? file
-    : `${import.meta.env.VITE_STATIC_URL}/images/resume/${file}`;
-}
-
 /**
  * Backend stores uploaded files with generated suffixes for de-dupe safety.
  * Strip those technical parts for display only.
