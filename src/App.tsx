@@ -10,6 +10,7 @@ import { HrLayout } from "@/layouts/HrLayout";
 import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AuthenticatedRoute } from "@/components/guards/AuthenticatedRoute";
 import { HrRoute } from "@/components/guards/HrRoute";
+import { GuestRoute } from "@/components/guards/GuestRoute";
 import { HomePage } from "@/pages/HomePage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { PublicProfilePage } from "@/pages/profile/PublicProfilePage";
@@ -92,13 +93,15 @@ export default function App() {
 	return (
 		<Routes>
 			{/* Auth */}
-			<Route element={<AuthLayout />}>
-				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
-				<Route path="/forgot-password" element={<ForgotPasswordPage />} />
-				<Route path="/reset-password" element={<ResetPasswordPage />} />
-				<Route path="/hr/login" element={<HrLoginPage />} />
-				<Route path="/hr/register" element={<HrRegisterPage />} />
+			<Route element={<GuestRoute />}>
+				<Route element={<AuthLayout />}>
+					<Route path="/login" element={<LoginPage />} />
+					<Route path="/register" element={<RegisterPage />} />
+					<Route path="/forgot-password" element={<ForgotPasswordPage />} />
+					<Route path="/reset-password" element={<ResetPasswordPage />} />
+					<Route path="/hr/login" element={<HrLoginPage />} />
+					<Route path="/hr/register" element={<HrRegisterPage />} />
+				</Route>
 			</Route>
 
 			{/* Public */}
